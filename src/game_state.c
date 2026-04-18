@@ -64,6 +64,11 @@ bool game_state_load(GameState *state) {
 }
 
 double game_state_apply_offline_gains(GameState *state) {
+  if (state->last_update == 0) {
+    state->last_update = time(NULL);
+    return 0;
+  }
+  
   time_t now = time(NULL);
   double seconds_diff = (double)(now - state->last_update);
   double gained = 0;

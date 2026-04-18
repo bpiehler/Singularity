@@ -15,9 +15,9 @@ typedef struct {
 #define STORAGE_VERSION 1
 
 typedef struct {
-  uint32_t version; // Header for safety
-  double mass;
-  double dust;
+  double mass;       // 8-byte aligned
+  double dust;       // 8-byte aligned
+  uint32_t version;  // 4-byte aligned
   int counts[NUM_TIERS];
   time_t last_update;
 } GameState;

@@ -54,7 +54,9 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   GRect bounds = layer_get_bounds(layer);
   GPoint center = grect_center_point(&bounds);
 
-  int radius = 10 + (int)((s_state.mass / s_next_tier_cost) * 50);
+  // Safety check for division by zero
+  double goal = (s_next_tier_cost > 0) ? s_next_tier_cost : PRESTIGE_THRESHOLD;
+  int radius = 10 + (int)((s_state.mass / goal) * 50);
   if (radius > 70) radius = 70;
 
   GColor fill_color = PBL_IF_COLOR_ELSE(GColorElectricBlue, GColorWhite);
@@ -88,9 +90,9 @@ static void update_display() {
 }
 
 static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
-  // Heartbeat log
+  // Heartbeat log (using INFO to ensure it's visible)
   if (tick_time->tm_sec % 10 == 0) {
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "Heartbeat: App is alive");
+    APP_LOG(APP_LOG_LEVEL_INFO, "Heartbeat: App is alive");
   }
 
   s_state.mass += game_state_calculate_gravity(&s_state);
