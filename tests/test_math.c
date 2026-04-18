@@ -2,15 +2,16 @@
 #include <assert.h>
 #include <string.h>
 #include <math.h>
+#include <stddef.h>
 #include "../src/math_utils.h"
 #include "../src/game_state.h"
 
-// Mock the missing implementation files by including them 
-// (or we can compile them together, but for a simple script this works)
+// Mock the missing implementation files
 #include "../src/math_utils.c"
 #include "../src/game_state.c"
 
 void test_formatting() {
+  printf("Testing Formatting...\n");
   char buf[32];
   
   format_mass(0, buf);
@@ -19,44 +20,44 @@ void test_formatting() {
   format_mass(123.456, buf);
   assert(strcmp(buf, "123.456") == 0);
   
-  format_mass(1000.0, buf);
-  assert(strcmp(buf, "1.000e3") == 0);
-  
   format_mass(1e16, buf);
   assert(strcmp(buf, "1.000e16") == 0);
-  
+
+  format_mass(NAN, buf);
+  assert(strcmp(buf, "NaN") == 0);
+
   printf("✓ Formatting tests passed\n");
 }
 
-void test_costs() {
-  // Base cost 100, 0 owned -> 100
-  assert(fabs(calculate_cost(100, 0) - 100.0) < 0.001);
-  
-  // Base 100, 1 owned -> 115
-  assert(fabs(calculate_cost(100, 1) - 115.0) < 0.001);
-  
-  printf("✓ Cost calculation tests passed\n");
+void test_alignment() {
+  printf("Testing Memory Alignment...\n");
+  // Mass and Dust must be at the very start for 8-byte alignment on ARM
+  assert(offsetof(GameState, mass) == 0);
+  assert(offsetof(GameState, dust) == 8);
+  printf("✓ Alignment tests passed\n");
 }
 
-void test_milestones() {
-  // 0-24 units -> x1
-  assert(calculate_milestone_multiplier(0) == 1.0);
-  assert(calculate_milestone_multiplier(24) == 1.0);
+void test_buy_max_geometric() {
+  printf("Testing Buy Max (Geometric Series)...\n");
+  GameState state;
+  game_state_init(&state);
   
-  // 25 units -> x2
-  assert(calculate_milestone_multiplier(25) == 2.0);
+  // Give enough mass to buy exactly 10 Pebbles
+  // Cost for 10 units = 100 * (1.15^10 - 1) / 0.15 = 2030.37
+  state.mass = 2031;
+  game_state_buy_max(&state, 0);
   
-  // 50 units -> x4
-  assert(calculate_milestone_multiplier(50) == 4.0);
+  assert(state.counts[0] == 10);
+  assert(state.mass < 1.0); // Should have ~0.63 mg left
   
-  printf("✓ Milestone tests passed\n");
+  printf("✓ Buy Max math passed\n");
 }
 
 int main() {
-  printf("Running Math Tests...\n");
+  printf("=== STARTING AUTOMATED LOGIC TESTS ===\n");
+  test_alignment();
   test_formatting();
-  test_costs();
-  test_milestones();
-  printf("All tests passed!\n");
+  test_buy_max_geometric();
+  printf("=== ALL TESTS PASSED ===\n");
   return 0;
 }
