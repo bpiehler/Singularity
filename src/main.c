@@ -106,13 +106,12 @@ static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
 }
 
 static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
+  APP_LOG(APP_LOG_LEVEL_INFO, "Up/Down clicked, opening shop...");
   shop_menu_show(&s_state, update_display);
 }
 
 static void click_config_provider(void *context) {
-  // Use repeating clicks for better responsiveness and "spam-ability"
-  // fires every 100ms if held, but also responds faster to single clicks
-  window_single_repeating_click_subscribe(BUTTON_ID_SELECT, 100, select_click_handler);
+  window_single_click_subscribe(BUTTON_ID_SELECT, select_click_handler);
   window_single_click_subscribe(BUTTON_ID_UP, up_click_handler);
   window_single_click_subscribe(BUTTON_ID_DOWN, up_click_handler);
   

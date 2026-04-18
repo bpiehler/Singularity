@@ -79,11 +79,6 @@ static void select_long_click_handler(ClickRecognizerRef recognizer, void *conte
   }
 }
 
-static void shop_click_config_provider(void *context) {
-  menu_layer_set_click_config_onto_window(s_menu_layer, (Window *)context);
-  window_long_click_subscribe(BUTTON_ID_SELECT, 500, select_long_click_handler, NULL);
-}
-
 static void shop_window_load(Window *window) {
   Layer *window_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(window_layer);
@@ -95,12 +90,19 @@ static void shop_window_load(Window *window) {
     .select_click = menu_select_callback,
   });
 
-  window_set_click_config_provider_with_context(window, shop_click_config_provider, window);
+  // Use the standard setup for MenuLayer
+  menu_layer_set_click_config_onto_window(s_menu_layer, window);
+  
+  // Add our custom long-click handler AFTER the standard setup
+  // This will append to the existing config provider
+  window_long_click_subscribe(BUTTON_ID_SELECT, 500, select_long_click_handler, NULL);
+  
   layer_add_child(window_layer, menu_layer_get_layer(s_menu_layer));
 }
 
 static void shop_window_unload(Window *window) {
   menu_layer_destroy(s_menu_layer);
+  window_destroy(window);
   s_shop_window = NULL;
 }
 
