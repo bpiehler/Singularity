@@ -7,21 +7,25 @@ static Window *s_main_window;
 static TextLayer *s_mass_layer, *s_gravity_layer;
 static Layer *s_canvas_layer;
 static GameState s_state;
+static double s_next_tier_cost = PRESTIGE_THRESHOLD;
+
+static void update_next_tier_cost() {
+  s_next_tier_cost = PRESTIGE_THRESHOLD;
+  for (int i = 0; i < NUM_TIERS; i++) {
+    double cost = calculate_cost(TIERS[i].base_cost, s_state.counts[i]);
+    if (s_state.mass < cost) {
+      s_next_tier_cost = cost;
+      break;
+    }
+  }
+}
 
 static void canvas_update_proc(Layer *layer, GContext *ctx) {
   GRect bounds = layer_get_bounds(layer);
   GPoint center = grect_center_point(&bounds);
 
-  double next_cost = 1e16; 
-  for (int i = 0; i < NUM_TIERS; i++) {
-    double cost = calculate_cost(TIERS[i].base_cost, s_state.counts[i]);
-    if (s_state.mass < cost) {
-      next_cost = cost;
-      break;
-    }
-  }
-
-  int radius = 10 + (int)((s_state.mass / next_cost) * 50);
+  // Use cached cost for scaling to save CPU
+  int radius = 10 + (int)((s_state.mass / s_next_tier_cost) * 50);
   if (radius > 70) radius = 70;
 
   graphics_context_set_fill_color(ctx, GColorLightGray);
@@ -42,6 +46,11 @@ static void update_display() {
   format_mass(game_state_calculate_gravity(&s_state), val_buffer);
   snprintf(s_gravity_buffer, sizeof(s_gravity_buffer), "G: %s/s", val_buffer);
   text_layer_set_text(s_gravity_layer, s_gravity_buffer);
+
+  // If we exceeded the current goal, find the next one for the visual scale
+  if (s_state.mass >= s_next_tier_cost) {
+    update_next_tier_cost();
+  }
 
   if (s_canvas_layer) {
     layer_mark_dirty(s_canvas_layer);
@@ -68,7 +77,9 @@ static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
 }
 
 static void click_config_provider(void *context) {
-  window_single_click_subscribe(BUTTON_ID_SELECT, select_click_handler);
+  // Use repeating clicks for better responsiveness and "spam-ability"
+  // fires every 100ms if held, but also responds faster to single clicks
+  window_single_repeating_click_subscribe(BUTTON_ID_SELECT, 100, select_click_handler);
   window_single_click_subscribe(BUTTON_ID_UP, up_click_handler);
   window_single_click_subscribe(BUTTON_ID_DOWN, up_click_handler);
 }
@@ -112,6 +123,8 @@ static void init() {
   if (!game_state_load(&s_state)) {
     game_state_init(&s_state);
   }
+  
+  update_next_tier_cost();
   
   double gained = game_state_apply_offline_gains(&s_state);
   if (gained > 0) {
