@@ -15,12 +15,17 @@ static void update_next_tier_cost();
 
 static void health_handler(HealthEventType event, void *context) {
   APP_LOG(APP_LOG_LEVEL_DEBUG, "Health event: %d", (int)event);
+  
+  if (s_last_step_count == 0) {
+    s_last_step_count = (int)health_service_sum_today(HealthMetricStepCount);
+    return;
+  }
+
   if (event != HealthEventSleepUpdate) {
     int total_steps = (int)health_service_sum_today(HealthMetricStepCount);
     int delta = total_steps - s_last_step_count;
     
     if (delta > 0) {
-      APP_LOG(APP_LOG_LEVEL_INFO, "Converting %d steps to mass", delta);
       game_state_add_steps(&s_state, delta);
       update_display();
     }
@@ -37,7 +42,7 @@ static void update_next_tier_cost() {
       break;
     }
   }
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "Next goal cached: %ld", (long)s_next_tier_cost);
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "Next goal cached");
 }
 
 static void canvas_update_proc(Layer *layer, GContext *ctx) {
@@ -173,7 +178,7 @@ static void init() {
   // Health subscription
   if (health_service_metric_accessible(HealthMetricStepCount, time(NULL), time(NULL))) {
     APP_LOG(APP_LOG_LEVEL_INFO, "Health service accessible");
-    s_last_step_count = (int)health_service_sum_today(HealthMetricStepCount);
+    s_last_step_count = 0; // Trigger initialization in first event
     health_service_events_subscribe(health_handler, NULL);
   } else {
     APP_LOG(APP_LOG_LEVEL_WARNING, "Health service NOT accessible");
@@ -181,7 +186,7 @@ static void init() {
 
   double gained = game_state_apply_offline_gains(&s_state);
   if (gained > 0) {
-    APP_LOG(APP_LOG_LEVEL_INFO, "Offline gains applied: %ld", (long)gained);
+    APP_LOG(APP_LOG_LEVEL_INFO, "Offline gains applied");
   }
 
   s_main_window = window_create();

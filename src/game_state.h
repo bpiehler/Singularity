@@ -12,7 +12,10 @@ typedef struct {
   double yield;
 } TierInfo;
 
+#define STORAGE_VERSION 1
+
 typedef struct {
+  uint32_t version; // Header for safety
   double mass;
   double dust;
   int counts[NUM_TIERS];
@@ -44,3 +47,9 @@ double game_state_apply_offline_gains(GameState *state);
 
 // Buy as many units of a tier as possible
 void game_state_buy_max(GameState *state, int tier_index);
+
+// Trigger a prestige reset, returns amount of dust earned
+double game_state_prestige(GameState *state);
+
+// Add mass based on steps taken
+void game_state_add_steps(GameState *state, int steps);

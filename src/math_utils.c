@@ -3,6 +3,14 @@
 #include <stdio.h>
 
 void format_mass(double mass, char *buffer) {
+  if (isnan(mass)) {
+    snprintf(buffer, 16, "NaN");
+    return;
+  }
+  if (isinf(mass)) {
+    snprintf(buffer, 16, "Infinity");
+    return;
+  }
   if (mass == 0) {
     snprintf(buffer, 16, "0.000e0");
     return;
@@ -17,17 +25,15 @@ void format_mass(double mass, char *buffer) {
     // Scientific notation for larger numbers
     int exponent = 0;
     double mantissa = mass;
-    while (mantissa >= 10.0) {
+    while (mantissa >= 10.0 && exponent < 308) {
       mantissa /= 10.0;
       exponent++;
     }
-    while (mantissa < 1.0 && mantissa > 0.0) {
+    while (mantissa < 1.0 && mantissa > 0.0 && exponent > -308) {
       mantissa *= 10.0;
       exponent--;
     }
     
-    // We manually extract parts of the double since snprintf with %e 
-    // might not be supported on all Pebble SDK platforms/firmwares.
     int mantissa_int = (int)mantissa;
     int mantissa_frac = (int)((mantissa - mantissa_int) * 1000.0);
     snprintf(buffer, 16, "%d.%03de%d", mantissa_int, mantissa_frac, exponent);

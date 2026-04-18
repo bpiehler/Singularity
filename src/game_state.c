@@ -15,6 +15,7 @@ const TierInfo TIERS[NUM_TIERS] = {
 };
 
 void game_state_init(GameState *state) {
+  state->version = STORAGE_VERSION;
   state->mass = 1.0;
   state->dust = 0.0;
   for (int i = 0; i < NUM_TIERS; i++) {
@@ -46,6 +47,7 @@ double game_state_calculate_tap_strength(GameState *state) {
 }
 
 void game_state_save(GameState *state) {
+  state->version = STORAGE_VERSION;
   state->last_update = time(NULL);
   persist_write_data(STORAGE_KEY_GAME_STATE, state, sizeof(GameState));
 }
@@ -53,7 +55,10 @@ void game_state_save(GameState *state) {
 bool game_state_load(GameState *state) {
   if (persist_exists(STORAGE_KEY_GAME_STATE)) {
     persist_read_data(STORAGE_KEY_GAME_STATE, state, sizeof(GameState));
-    return true;
+    if (state->version == STORAGE_VERSION) {
+      return true;
+    }
+    APP_LOG(APP_LOG_LEVEL_WARNING, "Outdated save version");
   }
   return false;
 }
