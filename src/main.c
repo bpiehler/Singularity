@@ -17,6 +17,8 @@ static void update_display();
 static void update_next_tier_cost();
 
 static void tap_timer_callback(void *data) {
+  if (s_tap_timer == NULL) return; 
+
   // Fire a tap
   s_state.mass += game_state_calculate_tap_strength(&s_state);
   update_display();
@@ -25,6 +27,7 @@ static void tap_timer_callback(void *data) {
   
   // If held for 5 seconds and threshold met, trigger Big Bang
   if (s_hold_time_ms >= 5000 && s_state.mass >= PRESTIGE_THRESHOLD) {
+    APP_LOG(APP_LOG_LEVEL_INFO, "Big Bang triggered!");
     double earned = game_state_prestige(&s_state);
     if (earned > 0) {
       vibes_double_pulse();
@@ -41,11 +44,13 @@ static void tap_timer_callback(void *data) {
 }
 
 static void health_handler(HealthEventType event, void *context) {
+  APP_LOG(APP_LOG_LEVEL_INFO, "Health Event: %d", (int)event);
   if (event != HealthEventSleepUpdate) {
     int total_steps = (int)health_service_sum_today(HealthMetricStepCount);
     int delta = total_steps - s_last_step_count;
     
     if (delta > 0) {
+      APP_LOG(APP_LOG_LEVEL_INFO, "Steps delta: %d", delta);
       game_state_add_steps(&s_state, delta);
       update_display();
     }
@@ -127,6 +132,7 @@ static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
 }
 
 static void select_down_handler(ClickRecognizerRef recognizer, void *context) {
+  APP_LOG(APP_LOG_LEVEL_INFO, "Select down");
   s_hold_time_ms = 0;
   if (s_tap_timer) app_timer_cancel(s_tap_timer);
   s_tap_timer = app_timer_register(100, tap_timer_callback, NULL);
@@ -137,6 +143,7 @@ static void select_down_handler(ClickRecognizerRef recognizer, void *context) {
 }
 
 static void select_up_handler(ClickRecognizerRef recognizer, void *context) {
+  APP_LOG(APP_LOG_LEVEL_INFO, "Select up");
   if (s_tap_timer) {
     app_timer_cancel(s_tap_timer);
     s_tap_timer = NULL;
@@ -187,6 +194,7 @@ static void main_window_unload(Window *window) {
 }
 
 static void init() {
+  APP_LOG(APP_LOG_LEVEL_INFO, "App init start");
   if (!game_state_load(&s_state)) {
     game_state_init(&s_state);
   }
