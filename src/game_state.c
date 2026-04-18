@@ -45,18 +45,34 @@ double game_state_calculate_tap_strength(GameState *state) {
   return 1.0 + (gravity * 0.05);
 }
 
-void game_state_apply_offline_gains(GameState *state) {
+void game_state_save(GameState *state) {
+  state->last_update = time(NULL);
+  persist_write_data(STORAGE_KEY_GAME_STATE, state, sizeof(GameState));
+}
+
+bool game_state_load(GameState *state) {
+  if (persist_exists(STORAGE_KEY_GAME_STATE)) {
+    persist_read_data(STORAGE_KEY_GAME_STATE, state, sizeof(GameState));
+    return true;
+  }
+  return false;
+}
+
+double game_state_apply_offline_gains(GameState *state) {
   time_t now = time(NULL);
   double seconds_diff = (double)(now - state->last_update);
-  
+  double gained = 0;
+
   if (seconds_diff > 10.0) {
     if (seconds_diff > OFFLINE_CAP_SECONDS) {
       seconds_diff = OFFLINE_CAP_SECONDS;
     }
     
     double gravity = game_state_calculate_gravity(state);
-    state->mass += (gravity * seconds_diff);
+    gained = gravity * seconds_diff;
+    state->mass += gained;
   }
   
   state->last_update = now;
+  return gained;
 }
