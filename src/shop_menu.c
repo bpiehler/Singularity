@@ -28,11 +28,12 @@ static void menu_draw_row_callback(GContext *ctx, const Layer *cell_layer, MenuI
 
   bool is_highlighted = menu_cell_layer_is_highlighted(cell_layer);
   
+  // Dark Nebula Colors
   GColor text_color;
   if (is_highlighted) {
-    text_color = affordable ? GColorWhite : GColorLightGray;
+    text_color = GColorWhite;
   } else {
-    text_color = affordable ? GColorBlack : GColorDarkGray;
+    text_color = affordable ? GColorCeleste : GColorDarkGray;
   }
   graphics_context_set_text_color(ctx, text_color);
   
@@ -77,12 +78,19 @@ static void shop_window_load(Window *window) {
   APP_LOG(APP_LOG_LEVEL_INFO, "Shop: window_load start");
   Layer *window_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(window_layer);
+  
+  window_set_background_color(window, GColorBlack);
 
   s_menu_layer = menu_layer_create(bounds);
   if (!s_menu_layer) {
     APP_LOG(APP_LOG_LEVEL_ERROR, "Shop: MenuLayer NULL");
     return;
   }
+  
+  #if defined(PBL_COLOR)
+  menu_layer_set_normal_colors(s_menu_layer, GColorBlack, GColorCeleste);
+  menu_layer_set_highlight_colors(s_menu_layer, GColorImperialPurple, GColorWhite);
+  #endif
 
   menu_layer_set_callbacks(s_menu_layer, NULL, (MenuLayerCallbacks) {
     .get_num_rows = menu_get_num_rows_callback,
