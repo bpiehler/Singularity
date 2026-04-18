@@ -14,23 +14,28 @@ static void update_display();
 static void update_next_tier_cost();
 
 static void health_handler(HealthEventType event, void *context) {
+  #if defined(PBL_HEALTH)
   APP_LOG(APP_LOG_LEVEL_DEBUG, "Health event: %d", (int)event);
   
-  if (s_last_step_count == 0) {
-    s_last_step_count = (int)health_service_sum_today(HealthMetricStepCount);
-    return;
-  }
+  const time_t start = time_start_of_today();
+  const time_t end = time(NULL);
+  HealthServiceAccessibilityMask mask = health_service_metric_accessible(HealthMetricStepCount, start, end);
 
-  if (event != HealthEventSleepUpdate) {
+  if (mask & HealthServiceAccessibilityMaskAvailable) {
     int total_steps = (int)health_service_sum_today(HealthMetricStepCount);
-    int delta = total_steps - s_last_step_count;
     
-    if (delta > 0) {
-      game_state_add_steps(&s_state, delta);
-      update_display();
+    if (s_last_step_count == 0) {
+      s_last_step_count = total_steps;
+    } else {
+      int delta = total_steps - s_last_step_count;
+      if (delta > 0) {
+        game_state_add_steps(&s_state, delta);
+        update_display();
+      }
+      s_last_step_count = total_steps;
     }
-    s_last_step_count = total_steps;
   }
+  #endif
 }
 
 static void update_next_tier_cost() {
@@ -177,14 +182,11 @@ static void init() {
 
   update_next_tier_cost();
 
-  // Health subscription
-  if (health_service_metric_accessible(HealthMetricStepCount, time(NULL), time(NULL))) {
-    APP_LOG(APP_LOG_LEVEL_INFO, "Health service accessible");
-    s_last_step_count = 0; // Trigger initialization in first event
-    health_service_events_subscribe(health_handler, NULL);
-  } else {
-    APP_LOG(APP_LOG_LEVEL_WARNING, "Health service NOT accessible");
-  }
+  #if defined(PBL_HEALTH)
+  health_service_events_subscribe(health_handler, NULL);
+  #else
+  APP_LOG(APP_LOG_LEVEL_INFO, "Pebble Health not supported");
+  #endif
 
   double gained = game_state_apply_offline_gains(&s_state);
   if (gained > 0) {
