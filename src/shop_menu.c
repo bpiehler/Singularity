@@ -56,31 +56,49 @@ static void menu_select_callback(MenuLayer *menu_layer, MenuIndex *cell_index, v
     vibes_double_pulse();
     menu_layer_reload_data(s_menu_layer);
     if (s_callback) s_callback();
+  } else {
+    // Short vibe to indicate "can't afford"
+    vibes_short_pulse();
   }
 }
 
+static void select_long_click_handler(ClickRecognizerRef recognizer, void *context) {
+  MenuIndex cell_index = menu_layer_get_selected_index(s_menu_layer);
+  int i = cell_index.row;
+  
+  double start_mass = s_game_state->mass;
+  game_state_buy_max(s_game_state, i);
+  
+  if (s_game_state->mass < start_mass) {
+    vibes_long_pulse();
+    menu_layer_reload_data(s_menu_layer);
+    if (s_callback) s_callback();
+  }
+}
+
+static void shop_click_config_provider(void *context) {
+  // Inherit standard menu clicks
+  menu_layer_set_click_config_onto_window(s_menu_layer, (Window *)context);
+  // Add our custom long-press
+  window_long_click_subscribe(BUTTON_ID_SELECT, 500, select_long_click_handler, NULL);
+}
+
 static void shop_window_load(Window *window) {
-  APP_LOG(APP_LOG_LEVEL_INFO, "Shop: Loading window...");
+  APP_LOG(APP_LOG_LEVEL_INFO, "Shop: Loading...");
   Layer *window_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(window_layer);
 
   s_menu_layer = menu_layer_create(bounds);
-  if (!s_menu_layer) {
-    APP_LOG(APP_LOG_LEVEL_ERROR, "Shop: Failed to create MenuLayer!");
-    return;
-  }
-
   menu_layer_set_callbacks(s_menu_layer, NULL, (MenuLayerCallbacks) {
     .get_num_rows = menu_get_num_rows_callback,
     .draw_row = menu_draw_row_callback,
     .select_click = menu_select_callback,
   });
 
-  APP_LOG(APP_LOG_LEVEL_INFO, "Shop: Setting click config...");
-  menu_layer_set_click_config_onto_window(s_menu_layer, window);
+  // Set the click provider with the window as context
+  window_set_click_config_provider_with_context(window, shop_click_config_provider, window);
   
   layer_add_child(window_layer, menu_layer_get_layer(s_menu_layer));
-  APP_LOG(APP_LOG_LEVEL_INFO, "Shop: Load complete.");
 }
 
 static void shop_window_unload(Window *window) {
