@@ -61,6 +61,18 @@ static void menu_select_callback(MenuLayer *menu_layer, MenuIndex *cell_index, v
   }
 }
 
+static void menu_select_long_callback(MenuLayer *menu_layer, MenuIndex *cell_index, void *data) {
+  int i = cell_index->row;
+  double start_mass = s_game_state->mass;
+  game_state_buy_max(s_game_state, i);
+  
+  if (s_game_state->mass < start_mass) {
+    vibes_long_pulse();
+    menu_layer_reload_data(s_menu_layer);
+    if (s_callback) s_callback();
+  }
+}
+
 static void shop_window_load(Window *window) {
   APP_LOG(APP_LOG_LEVEL_INFO, "Shop: window_load start");
   Layer *window_layer = window_get_root_layer(window);
@@ -76,13 +88,12 @@ static void shop_window_load(Window *window) {
     .get_num_rows = menu_get_num_rows_callback,
     .draw_row = menu_draw_row_callback,
     .select_click = menu_select_callback,
+    .select_long_click = menu_select_long_callback,
   });
 
-  APP_LOG(APP_LOG_LEVEL_INFO, "Shop: menu_layer_set_click_config...");
-  // Use the SIMPLE helper directly, not inside a provider.
+  // Use the helper to set standard click behavior
   menu_layer_set_click_config_onto_window(s_menu_layer, window);
   
-  APP_LOG(APP_LOG_LEVEL_INFO, "Shop: layer_add_child...");
   layer_add_child(window_layer, menu_layer_get_layer(s_menu_layer));
   APP_LOG(APP_LOG_LEVEL_INFO, "Shop: window_load end");
 }
