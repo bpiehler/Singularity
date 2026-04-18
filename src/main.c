@@ -42,6 +42,16 @@ static AppTimer *s_tap_timer = NULL;
 static int s_hold_time_ms = 0;
 static bool s_is_app_exiting = false;
 static int s_taps_since_last_tick = 0;
+static bool s_app_has_focus = true;
+
+static void focus_handler(bool in_focus) {
+  s_app_has_focus = in_focus;
+  if (s_app_has_focus) {
+    // Catch-up for time spent in background (notifications, etc)
+    game_state_apply_offline_gains(&s_state);
+    update_display();
+  }
+}
 
 static void tap_timer_callback(void *data) {
   if (s_is_app_exiting || !s_tap_timer) return;
@@ -211,6 +221,7 @@ static void init() {
   
   // Global subscriptions
   tick_timer_service_subscribe(SECOND_UNIT, tick_handler);
+  app_focus_service_subscribe(focus_handler);
   #if defined(PBL_HEALTH)
   health_service_events_subscribe(health_handler, NULL);
   #endif
@@ -221,6 +232,7 @@ static void init() {
 static void deinit() {
   s_is_app_exiting = true;
   tick_timer_service_unsubscribe();
+  app_focus_service_unsubscribe();
   #if defined(PBL_HEALTH)
   health_service_events_unsubscribe();
   #endif
