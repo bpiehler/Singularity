@@ -6,7 +6,7 @@
 static Window *s_main_window;
 static TextLayer *s_mass_layer, *s_gravity_layer;
 static Layer *s_canvas_layer;
-static GameState *s_state; // Moved to HEAP for alignment safety
+static GameState *s_state; 
 static double s_next_tier_cost = PRESTIGE_THRESHOLD;
 
 static void update_display();
@@ -15,7 +15,7 @@ static void update_next_tier_cost();
 #if defined(PBL_HEALTH)
 static int s_last_step_count = 0;
 static void health_handler(HealthEventType event, void *context) {
-  // Temporarily disabled for stability testing
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "Trace: health_handler(%d)", (int)event);
 }
 #endif
 
@@ -23,11 +23,12 @@ static AppTimer *s_tap_timer = NULL;
 static int s_hold_time_ms = 0;
 
 static void tap_timer_callback(void *data) {
-  if (!s_state) return;
+  if (!s_state || !s_tap_timer) return;
   s_state->mass += game_state_calculate_tap_strength(s_state);
   s_hold_time_ms += 200;
   
   if (s_hold_time_ms >= 5000 && s_state->mass >= PRESTIGE_THRESHOLD) {
+    APP_LOG(APP_LOG_LEVEL_INFO, "Trace: Prestige Triggered");
     game_state_prestige(s_state);
     update_next_tier_cost();
     update_display();
@@ -39,6 +40,7 @@ static void tap_timer_callback(void *data) {
 }
 
 static void select_down_handler(ClickRecognizerRef recognizer, void *context) {
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "Trace: select_down");
   if (!s_state) return;
   s_hold_time_ms = 0;
   if (s_tap_timer) app_timer_cancel(s_tap_timer);
@@ -47,6 +49,7 @@ static void select_down_handler(ClickRecognizerRef recognizer, void *context) {
 }
 
 static void select_up_handler(ClickRecognizerRef recognizer, void *context) {
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "Trace: select_up");
   if (s_tap_timer) {
     app_timer_cancel(s_tap_timer);
     s_tap_timer = NULL;
@@ -67,6 +70,7 @@ static void update_next_tier_cost() {
 
 static void canvas_update_proc(Layer *layer, GContext *ctx) {
   if (!s_state) return;
+  // LOG SPAM: Removed to prevent log buffer overflow, but kept logic
   GRect bounds = layer_get_bounds(layer);
   GPoint center = grect_center_point(&bounds);
 
@@ -104,19 +108,22 @@ static void update_display() {
 }
 
 static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
-  if (tick_time->tm_sec % 10 == 0) {
-    APP_LOG(APP_LOG_LEVEL_INFO, "App Heartbeat (App is alive)");
+  if (!s_state) return;
+  if (tick_time->tm_sec % 30 == 0) {
+    APP_LOG(APP_LOG_LEVEL_INFO, "Trace: Tick (Active)");
   }
 
   s_state->mass += game_state_calculate_gravity(s_state);
   update_display();
   
   if (tick_time->tm_sec == 0) {
+    APP_LOG(APP_LOG_LEVEL_INFO, "Trace: Auto-Save");
     game_state_save(s_state);
   }
 }
 
 static void open_shop_handler(ClickRecognizerRef recognizer, void *context) {
+  APP_LOG(APP_LOG_LEVEL_INFO, "Trace: Opening Shop");
   if (s_state) shop_menu_show(s_state, update_display);
 }
 
@@ -127,14 +134,17 @@ static void click_config_provider(void *context) {
 }
 
 static void main_window_appear(Window *window) {
+  APP_LOG(APP_LOG_LEVEL_INFO, "Trace: main_window_appear");
   tick_timer_service_subscribe(SECOND_UNIT, tick_handler);
 }
 
 static void main_window_disappear(Window *window) {
+  APP_LOG(APP_LOG_LEVEL_INFO, "Trace: main_window_disappear");
   tick_timer_service_unsubscribe();
 }
 
 static void main_window_load(Window *window) {
+  APP_LOG(APP_LOG_LEVEL_INFO, "Trace: main_window_load");
   Layer *window_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(window_layer);
   window_set_background_color(window, GColorBlack);
@@ -161,6 +171,7 @@ static void main_window_load(Window *window) {
 }
 
 static void main_window_unload(Window *window) {
+  APP_LOG(APP_LOG_LEVEL_INFO, "Trace: main_window_unload");
   text_layer_destroy(s_mass_layer);
   text_layer_destroy(s_gravity_layer);
   layer_destroy(s_canvas_layer);
@@ -168,6 +179,7 @@ static void main_window_unload(Window *window) {
 }
 
 static void init() {
+  APP_LOG(APP_LOG_LEVEL_INFO, "Trace: init_start");
   s_state = malloc(sizeof(GameState));
   if (!s_state) return;
 
@@ -186,9 +198,11 @@ static void init() {
     .disappear = main_window_disappear
   });
   window_stack_push(s_main_window, true);
+  APP_LOG(APP_LOG_LEVEL_INFO, "Trace: init_end");
 }
 
 static void deinit() {
+  APP_LOG(APP_LOG_LEVEL_INFO, "Trace: deinit");
   if (s_state) {
     game_state_save(s_state);
     free(s_state);

@@ -21,13 +21,8 @@ void game_state_update_cache(GameState *state) {
     g += tier_yield * state->counts[i];
   }
   
-  // Base starting gravity from Dust: 0.1/s per dust
   g += (state->dust * 0.1);
-  
-  // Apply Cosmic Dust bonus multiplier (10% per dust)
   state->cached_gravity = g * (1.0 + (state->dust * 0.1));
-  
-  // Tap is 1mg + 5% of gravity
   state->cached_tap_strength = 1.0 + (state->cached_gravity * 0.05);
 }
 
@@ -51,24 +46,29 @@ double game_state_calculate_tap_strength(GameState *state) {
 }
 
 void game_state_save(GameState *state) {
+  APP_LOG(APP_LOG_LEVEL_INFO, "Persist: Saving...");
   state->version = STORAGE_VERSION;
   state->last_update = time(NULL);
   persist_write_data(STORAGE_KEY_GAME_STATE, state, sizeof(GameState));
+  APP_LOG(APP_LOG_LEVEL_INFO, "Persist: Save Complete");
 }
 
 bool game_state_load(GameState *state) {
+  APP_LOG(APP_LOG_LEVEL_INFO, "Persist: Loading...");
   if (persist_exists(STORAGE_KEY_GAME_STATE)) {
     persist_read_data(STORAGE_KEY_GAME_STATE, state, sizeof(GameState));
     if (state->version == STORAGE_VERSION) {
       game_state_update_cache(state);
+      APP_LOG(APP_LOG_LEVEL_INFO, "Persist: Load Success");
       return true;
     }
-    APP_LOG(APP_LOG_LEVEL_WARNING, "Outdated save version");
+    APP_LOG(APP_LOG_LEVEL_WARNING, "Persist: Outdated Version");
   }
   return false;
 }
 
 double game_state_apply_offline_gains(GameState *state) {
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "Math: Offline Check");
   if (state->last_update == 0) {
     state->last_update = time(NULL);
     return 0;
@@ -86,6 +86,7 @@ double game_state_apply_offline_gains(GameState *state) {
     double gravity = game_state_calculate_gravity(state);
     gained = gravity * seconds_diff;
     state->mass += gained;
+    APP_LOG(APP_LOG_LEVEL_INFO, "Math: Offline Gain Applied");
   }
   
   state->last_update = now;
@@ -97,16 +98,11 @@ void game_state_buy_max(GameState *state, int i) {
   double current_unit_cost = calculate_cost(base, state->counts[i]);
   if (state->mass < current_unit_cost) return;
 
-  // Closed-form geometric series solve for k units:
-  // k = floor(log(1 + mass * 0.15 / current_unit_cost) / log(1.15))
-  // We use 0.15 as the rate (r-1) for our 1.15x scaling
   int k = (int)(log(1.0 + state->mass * 0.15 / current_unit_cost) / log(1.15));
   if (k < 1) k = 1;
 
-  // Total cost for k units: Cost = C * (1.15^k - 1) / 0.15
   double total_cost = current_unit_cost * (pow(1.15, k) - 1.0) / 0.15;
 
-  // Adjust for floating point rounding errors to ensure we don't overspend
   while (total_cost > state->mass && k > 0) {
     k--;
     total_cost = current_unit_cost * (pow(1.15, k) - 1.0) / 0.15;
