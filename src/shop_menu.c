@@ -26,15 +26,25 @@ static void menu_draw_row_callback(GContext *ctx, const Layer *cell_layer, MenuI
 
   bool is_highlighted = menu_cell_layer_is_highlighted(cell_layer);
   
-  // Set colors: White if selected, Black if affordable, Gray if too expensive
-  GColor text_color = is_highlighted ? GColorWhite : (affordable ? GColorBlack : GColorDarkGray);
+  // Refined Color Logic
+  GColor text_color;
+  if (is_highlighted) {
+    text_color = affordable ? GColorWhite : GColorLightGray;
+  } else {
+    text_color = affordable ? GColorBlack : GColorDarkGray;
+  }
   graphics_context_set_text_color(ctx, text_color);
   
+  // Padding for Round Screens (Gabbro/Chalk)
+  int left_padding = PBL_IF_ROUND_ELSE(20, 5);
+  
   graphics_draw_text(ctx, name_buf, fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD), 
-                     GRect(5, 2, bounds.size.w - 10, 26), GTextOverflowModeTrailingEllipsis, GTextAlignmentLeft, NULL);
+                     GRect(left_padding, 2, bounds.size.w - (left_padding + 5), 26), 
+                     GTextOverflowModeTrailingEllipsis, GTextAlignmentLeft, NULL);
   
   graphics_draw_text(ctx, cost_buf, fonts_get_system_font(FONT_KEY_GOTHIC_18), 
-                     GRect(5, 26, bounds.size.w - 10, 20), GTextOverflowModeTrailingEllipsis, GTextAlignmentLeft, NULL);
+                     GRect(left_padding, 26, bounds.size.w - (left_padding + 5), 20), 
+                     GTextOverflowModeTrailingEllipsis, GTextAlignmentLeft, NULL);
 }
 
 static void menu_select_callback(MenuLayer *menu_layer, MenuIndex *cell_index, void *data) {
