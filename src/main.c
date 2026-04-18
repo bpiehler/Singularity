@@ -10,9 +10,35 @@ static GameState s_state;
 static double s_next_tier_cost = PRESTIGE_THRESHOLD;
 static bool s_is_prestiging = false;
 static int s_last_step_count = 0;
+static AppTimer *s_tap_timer = NULL;
+static int s_hold_time_ms = 0;
 
 static void update_display();
 static void update_next_tier_cost();
+
+static void tap_timer_callback(void *data) {
+  // Fire a tap
+  s_state.mass += game_state_calculate_tap_strength(&s_state);
+  update_display();
+  
+  s_hold_time_ms += 100;
+  
+  // If held for 5 seconds and threshold met, trigger Big Bang
+  if (s_hold_time_ms >= 5000 && s_state.mass >= PRESTIGE_THRESHOLD) {
+    double earned = game_state_prestige(&s_state);
+    if (earned > 0) {
+      vibes_double_pulse();
+      update_next_tier_cost();
+      update_display();
+      game_state_save(&s_state);
+    }
+    s_tap_timer = NULL;
+    return; 
+  }
+
+  // Continue timer while button is held
+  s_tap_timer = app_timer_register(100, tap_timer_callback, NULL);
+}
 
 static void health_handler(HealthEventType event, void *context) {
   if (event != HealthEventSleepUpdate) {
@@ -25,21 +51,6 @@ static void health_handler(HealthEventType event, void *context) {
     }
     s_last_step_count = total_steps;
   }
-}
-
-static void prestige_long_click_handler(ClickRecognizerRef recognizer, void *context) {
-  if (s_state.mass < PRESTIGE_THRESHOLD) return;
-  
-  s_is_prestiging = true;
-  double earned = game_state_prestige(&s_state);
-  if (earned > 0) {
-    // Big Bang Effect: Success haptics
-    vibes_double_pulse();
-    update_next_tier_cost();
-    update_display();
-    game_state_save(&s_state);
-  }
-  s_is_prestiging = false;
 }
 
 static void update_next_tier_cost() {
@@ -110,25 +121,32 @@ static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
   }
 }
 
-static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
-  s_state.mass += game_state_calculate_tap_strength(&s_state);
-  update_display();
-}
-
 static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
   APP_LOG(APP_LOG_LEVEL_INFO, "Up/Down clicked, opening shop...");
   shop_menu_show(&s_state, update_display);
 }
 
-static void click_config_provider(void *context) {
-  // Restore repeating clicks: fires every 100ms if held
-  window_single_repeating_click_subscribe(BUTTON_ID_SELECT, 100, select_click_handler);
+static void select_down_handler(ClickRecognizerRef recognizer, void *context) {
+  s_hold_time_ms = 0;
+  if (s_tap_timer) app_timer_cancel(s_tap_timer);
+  s_tap_timer = app_timer_register(100, tap_timer_callback, NULL);
   
+  // Also fire immediate first tap
+  s_state.mass += game_state_calculate_tap_strength(&s_state);
+  update_display();
+}
+
+static void select_up_handler(ClickRecognizerRef recognizer, void *context) {
+  if (s_tap_timer) {
+    app_timer_cancel(s_tap_timer);
+    s_tap_timer = NULL;
+  }
+}
+
+static void click_config_provider(void *context) {
+  window_raw_click_subscribe(BUTTON_ID_SELECT, select_down_handler, select_up_handler, NULL);
   window_single_click_subscribe(BUTTON_ID_UP, up_click_handler);
   window_single_click_subscribe(BUTTON_ID_DOWN, up_click_handler);
-  
-  // Big Bang Prestige (5 second hold)
-  window_long_click_subscribe(BUTTON_ID_SELECT, 5000, prestige_long_click_handler, NULL);
 }
 
 static void main_window_load(Window *window) {

@@ -35,11 +35,19 @@ static void menu_draw_row_callback(GContext *ctx, const Layer *cell_layer, MenuI
   // Dark Nebula Colors
   GColor text_color;
   if (is_highlighted) {
-    text_color = affordable ? GColorWhite : GColorLightGray;
+    text_color = affordable ? GColorWhite : PBL_IF_COLOR_ELSE(GColorLightGray, GColorWhite);
   } else {
     text_color = affordable ? GColorCeleste : GColorDarkGray;
   }
   graphics_context_set_text_color(ctx, text_color);
+
+  // On B&W, if it's selected but unaffordable, we apply a dither mask to the text
+  // to make it look "Light Gray" against the black selection bar.
+  #if !defined(PBL_COLOR)
+  if (is_highlighted && !affordable) {
+    graphics_context_set_compositing_mode(ctx, GCompOpClear); // Dither out every other pixel
+  }
+  #endif
 
   int left_padding = PBL_IF_ROUND_ELSE(20, 5);
   // Vertically centered within 52px: (52 - (24 + 18)) / 2 = 5px approx
@@ -51,7 +59,6 @@ static void menu_draw_row_callback(GContext *ctx, const Layer *cell_layer, MenuI
                      GRect(left_padding, 27, bounds.size.w - (left_padding + 5), 20), 
                      GTextOverflowModeTrailingEllipsis, GTextAlignmentLeft, NULL);
   }
-
 static void menu_select_callback(MenuLayer *menu_layer, MenuIndex *cell_index, void *data) {
   int i = cell_index->row;
   double cost = calculate_cost(TIERS[i].base_cost, s_game_state->counts[i]);
