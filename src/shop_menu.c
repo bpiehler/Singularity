@@ -67,6 +67,7 @@ static void menu_select_callback(MenuLayer *menu_layer, MenuIndex *cell_index, v
   if (s_game_state->mass >= cost) {
     s_game_state->mass -= cost;
     s_game_state->counts[i]++;
+    game_state_update_cache(s_game_state);
     vibes_double_pulse();
     menu_layer_reload_data(s_menu_layer);
     if (s_callback) s_callback();

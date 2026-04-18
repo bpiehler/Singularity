@@ -104,9 +104,8 @@ static void update_display() {
 }
 
 static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
-  if (!s_state) return;
   if (tick_time->tm_sec % 10 == 0) {
-    APP_LOG(APP_LOG_LEVEL_INFO, "App Heartbeat (Mass=%d)", (int)s_state->mass);
+    APP_LOG(APP_LOG_LEVEL_INFO, "App Heartbeat (App is alive)");
   }
 
   s_state->mass += game_state_calculate_gravity(s_state);

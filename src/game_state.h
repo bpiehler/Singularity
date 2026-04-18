@@ -17,6 +17,8 @@ typedef struct {
 typedef struct {
   double mass;       // 8-byte aligned
   double dust;       // 8-byte aligned
+  double cached_gravity;
+  double cached_tap_strength;
   uint32_t version;  // 4-byte aligned
   int counts[NUM_TIERS];
   time_t last_update;
@@ -36,10 +38,13 @@ void game_state_save(GameState *state);
 // Load state from persistent storage, returns true if data was found
 bool game_state_load(GameState *state);
 
-// Calculate total gravity per second
+// Recalculate and cache values to save CPU
+void game_state_update_cache(GameState *state);
+
+// Calculate total gravity per second (uses cache)
 double game_state_calculate_gravity(GameState *state);
 
-// Calculate tap strength
+// Calculate tap strength (uses cache)
 double game_state_calculate_tap_strength(GameState *state);
 
 // Apply offline gains, returns mass gained

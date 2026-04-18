@@ -14,6 +14,23 @@ const TierInfo TIERS[NUM_TIERS] = {
   {"Universe", 5000000000000000.0, 5000000000000.0}
 };
 
+void game_state_update_cache(GameState *state) {
+  double g = 0;
+  for (int i = 0; i < NUM_TIERS; i++) {
+    double tier_yield = TIERS[i].yield * calculate_milestone_multiplier(state->counts[i]);
+    g += tier_yield * state->counts[i];
+  }
+  
+  // Base starting gravity from Dust: 0.1/s per dust
+  g += (state->dust * 0.1);
+  
+  // Apply Cosmic Dust bonus multiplier (10% per dust)
+  state->cached_gravity = g * (1.0 + (state->dust * 0.1));
+  
+  // Tap is 1mg + 5% of gravity
+  state->cached_tap_strength = 1.0 + (state->cached_gravity * 0.05);
+}
+
 void game_state_init(GameState *state) {
   state->version = STORAGE_VERSION;
   state->mass = 1.0;
@@ -22,28 +39,15 @@ void game_state_init(GameState *state) {
     state->counts[i] = 0;
   }
   state->last_update = time(NULL);
+  game_state_update_cache(state);
 }
 
 double game_state_calculate_gravity(GameState *state) {
-  double gravity = 0;
-  for (int i = 0; i < NUM_TIERS; i++) {
-    double tier_yield = TIERS[i].yield * calculate_milestone_multiplier(state->counts[i]);
-    gravity += tier_yield * state->counts[i];
-  }
-  
-  // Apply Cosmic Dust starting gravity (0.1/s per dust)
-  gravity += (state->dust * 0.1);
-  
-  // Apply Cosmic Dust bonus multiplier (10% per dust)
-  gravity *= (1.0 + (state->dust * 0.1));
-  
-  return gravity;
+  return state->cached_gravity;
 }
 
 double game_state_calculate_tap_strength(GameState *state) {
-  double gravity = game_state_calculate_gravity(state);
-  // Tap is 1mg + 5% of gravity
-  return 1.0 + (gravity * 0.05);
+  return state->cached_tap_strength;
 }
 
 void game_state_save(GameState *state) {
@@ -56,6 +60,7 @@ bool game_state_load(GameState *state) {
   if (persist_exists(STORAGE_KEY_GAME_STATE)) {
     persist_read_data(STORAGE_KEY_GAME_STATE, state, sizeof(GameState));
     if (state->version == STORAGE_VERSION) {
+      game_state_update_cache(state);
       return true;
     }
     APP_LOG(APP_LOG_LEVEL_WARNING, "Outdated save version");
@@ -110,6 +115,7 @@ void game_state_buy_max(GameState *state, int i) {
   if (k > 0 && state->mass >= total_cost) {
     state->mass -= total_cost;
     state->counts[i] += k;
+    game_state_update_cache(state);
   }
 }
 
@@ -123,6 +129,7 @@ double game_state_prestige(GameState *state) {
     state->counts[i] = 0;
   }
   state->last_update = time(NULL);
+  game_state_update_cache(state);
   
   return earned_dust;
 }
