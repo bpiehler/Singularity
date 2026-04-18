@@ -6,7 +6,7 @@
 static Window *s_main_window;
 static TextLayer *s_mass_layer, *s_gravity_layer;
 static Layer *s_canvas_layer;
-static GameState *s_state; 
+static GameState s_state __attribute__((aligned(8))); 
 static double s_next_tier_cost = PRESTIGE_THRESHOLD;
 
 static void update_display();
@@ -30,8 +30,7 @@ static void health_handler(HealthEventType event, void *context) {
     } else {
       int delta = total_steps - s_last_step_count;
       if (delta > 0) {
-        game_state_add_steps(s_state, delta);
-        update_display();
+        game_state_add_steps(&s_state, delta);
       }
       s_last_step_count = total_steps;
     }
@@ -41,29 +40,46 @@ static void health_handler(HealthEventType event, void *context) {
 
 static AppTimer *s_tap_timer = NULL;
 static int s_hold_time_ms = 0;
+static bool s_is_app_exiting = false;
 
 static void tap_timer_callback(void *data) {
-  if (!s_state || !s_tap_timer) return;
-  s_state->mass += game_state_calculate_tap_strength(s_state);
-  s_hold_time_ms += 200;
+  if (s_is_app_exiting || !s_tap_timer) return;
+
+  s_hold_time_ms += 100;
   
-  if (s_hold_time_ms >= 5000 && s_state->mass >= PRESTIGE_THRESHOLD) {
-    game_state_prestige(s_state);
+  // Big Bang check
+  if (s_hold_time_ms >= 5000 && s_state.mass >= PRESTIGE_THRESHOLD) {
+    game_state_prestige(&s_state);
     update_next_tier_cost();
     update_display();
     vibes_double_pulse();
     s_tap_timer = NULL;
     return; 
   }
-  s_tap_timer = app_timer_register(200, tap_timer_callback, NULL);
+
+  // Repeating taps (fires every 200ms AFTER the initial 500ms delay)
+  // We check % 200 to achieve 5 taps per second
+  if (s_hold_time_ms >= 500 && (s_hold_time_ms % 200 == 0)) {
+    s_state.mass += game_state_calculate_tap_strength(&s_state);
+  }
+
+  s_tap_timer = app_timer_register(100, tap_timer_callback, NULL);
 }
 
 static void select_down_handler(ClickRecognizerRef recognizer, void *context) {
-  if (!s_state) return;
+  if (s_is_app_exiting) return;
   s_hold_time_ms = 0;
   if (s_tap_timer) app_timer_cancel(s_tap_timer);
-  s_tap_timer = app_timer_register(200, tap_timer_callback, NULL);
-  s_state->mass += game_state_calculate_tap_strength(s_state);
+  
+  // Initial Tap (Immediate)
+  s_state.mass += game_state_calculate_tap_strength(&s_state);
+  
+  // Note: NO update_display() here. 
+  // Redrawing the screen takes ~100ms and causes rapid clicks to be swallowed.
+  // The UI will refresh smoothly on the 1-second tick.
+
+  // Start timer for repeats and prestige hold
+  s_tap_timer = app_timer_register(100, tap_timer_callback, NULL);
 }
 
 static void select_up_handler(ClickRecognizerRef recognizer, void *context) {
@@ -74,11 +90,10 @@ static void select_up_handler(ClickRecognizerRef recognizer, void *context) {
 }
 
 static void update_next_tier_cost() {
-  if (!s_state) return;
   s_next_tier_cost = PRESTIGE_THRESHOLD;
   for (int i = 0; i < NUM_TIERS; i++) {
-    double cost = calculate_cost(TIERS[i].base_cost, s_state->counts[i]);
-    if (s_state->mass < cost) {
+    double cost = calculate_cost(TIERS[i].base_cost, s_state.counts[i]);
+    if (s_state.mass < cost) {
       s_next_tier_cost = cost;
       break;
     }
@@ -86,12 +101,11 @@ static void update_next_tier_cost() {
 }
 
 static void canvas_update_proc(Layer *layer, GContext *ctx) {
-  if (!s_state) return;
   GRect bounds = layer_get_bounds(layer);
   GPoint center = grect_center_point(&bounds);
 
   double goal = (s_next_tier_cost > 0) ? s_next_tier_cost : PRESTIGE_THRESHOLD;
-  double ratio = s_state->mass / goal;
+  double ratio = s_state.mass / goal;
   if (!(ratio >= 0.0 && ratio <= 1.0)) ratio = 0.0;
 
   int radius = 10 + (int)(ratio * 50);
@@ -104,61 +118,44 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
 }
 
 static void update_display() {
-  if (!s_state || !s_mass_layer || !s_gravity_layer) return;
+  if (!s_mass_layer || !s_gravity_layer) return;
 
   static char s_mass_buffer[64];
   static char s_gravity_buffer[64];
   char val_buffer[32];
   
-  format_mass(s_state->mass, val_buffer);
+  format_mass(s_state.mass, val_buffer);
   snprintf(s_mass_buffer, sizeof(s_mass_buffer), "%s mg", val_buffer);
   text_layer_set_text(s_mass_layer, s_mass_buffer);
   
-  double current_gravity = game_state_calculate_gravity(s_state);
+  double current_gravity = game_state_calculate_gravity(&s_state);
   format_mass(current_gravity, val_buffer);
   snprintf(s_gravity_buffer, sizeof(s_gravity_buffer), "G: %s/s", val_buffer);
   text_layer_set_text(s_gravity_layer, s_gravity_buffer);
 
-  if (s_state->mass >= s_next_tier_cost) update_next_tier_cost();
+  if (s_state.mass >= s_next_tier_cost) update_next_tier_cost();
   if (s_canvas_layer) layer_mark_dirty(s_canvas_layer);
 }
 
 static void save_timer_handler(void *data) {
-  if (s_state) {
-    game_state_save(s_state);
-  }
-  // Schedule next save in 5 minutes
+  if (s_is_app_exiting) return;
+  game_state_save(&s_state);
   app_timer_register(300000, save_timer_handler, NULL);
 }
 
 static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
-  if (!s_state) return;
-  s_state->mass += game_state_calculate_gravity(s_state);
+  s_state.mass += game_state_calculate_gravity(&s_state);
   update_display();
 }
 
 static void open_shop_handler(ClickRecognizerRef recognizer, void *context) {
-  if (s_state) shop_menu_show(s_state, update_display);
+  shop_menu_show(&s_state, update_display);
 }
 
 static void click_config_provider(void *context) {
   window_raw_click_subscribe(BUTTON_ID_SELECT, select_down_handler, select_up_handler, NULL);
   window_single_click_subscribe(BUTTON_ID_UP, open_shop_handler);
   window_single_click_subscribe(BUTTON_ID_DOWN, open_shop_handler);
-}
-
-static void main_window_appear(Window *window) {
-  tick_timer_service_subscribe(SECOND_UNIT, tick_handler);
-  #if defined(PBL_HEALTH)
-  health_service_events_subscribe(health_handler, NULL);
-  #endif
-}
-
-static void main_window_disappear(Window *window) {
-  tick_timer_service_unsubscribe();
-  #if defined(PBL_HEALTH)
-  health_service_events_unsubscribe();
-  #endif
 }
 
 static void main_window_load(Window *window) {
@@ -195,11 +192,9 @@ static void main_window_unload(Window *window) {
 }
 
 static void init() {
-  s_state = malloc(sizeof(GameState));
-  if (!s_state) return;
-
-  if (!game_state_load(s_state)) {
-    game_state_init(s_state);
+  s_is_app_exiting = false;
+  if (!game_state_load(&s_state)) {
+    game_state_init(&s_state);
   }
 
   update_next_tier_cost();
@@ -208,22 +203,27 @@ static void init() {
   window_set_click_config_provider(s_main_window, click_config_provider);
   window_set_window_handlers(s_main_window, (WindowHandlers) {
     .load = main_window_load, 
-    .unload = main_window_unload,
-    .appear = main_window_appear,
-    .disappear = main_window_disappear
+    .unload = main_window_unload
   });
   window_stack_push(s_main_window, true);
   
-  // Start the auto-save timer (5 mins)
+  // Global subscriptions
+  tick_timer_service_subscribe(SECOND_UNIT, tick_handler);
+  #if defined(PBL_HEALTH)
+  health_service_events_subscribe(health_handler, NULL);
+  #endif
+  
   app_timer_register(300000, save_timer_handler, NULL);
 }
 
 static void deinit() {
-  if (s_state) {
-    game_state_save(s_state);
-    free(s_state);
-    s_state = NULL;
-  }
+  s_is_app_exiting = true;
+  tick_timer_service_unsubscribe();
+  #if defined(PBL_HEALTH)
+  health_service_events_unsubscribe();
+  #endif
+  
+  game_state_save(&s_state);
   window_destroy(s_main_window);
 }
 
