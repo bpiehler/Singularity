@@ -10,7 +10,7 @@ static GameState s_state __attribute__((aligned(8)));
 static double s_next_tier_cost = PRESTIGE_THRESHOLD;
 
 static void update_display();
-static void update_next_tier_cost();
+void update_next_tier_cost();
 
 #if defined(PBL_HEALTH)
 static int s_last_step_count = 0;
@@ -41,6 +41,7 @@ static void health_handler(HealthEventType event, void *context) {
 static AppTimer *s_tap_timer = NULL;
 static int s_hold_time_ms = 0;
 static bool s_is_app_exiting = false;
+static int s_taps_since_last_tick = 0;
 
 static void tap_timer_callback(void *data) {
   if (s_is_app_exiting || !s_tap_timer) return;
@@ -61,6 +62,7 @@ static void tap_timer_callback(void *data) {
   // We check % 200 to achieve 5 taps per second
   if (s_hold_time_ms >= 500 && (s_hold_time_ms % 200 == 0)) {
     s_state.mass += game_state_calculate_tap_strength(&s_state);
+    s_taps_since_last_tick++;
   }
 
   s_tap_timer = app_timer_register(100, tap_timer_callback, NULL);
@@ -73,9 +75,7 @@ static void select_down_handler(ClickRecognizerRef recognizer, void *context) {
   
   // Initial Tap (Immediate)
   s_state.mass += game_state_calculate_tap_strength(&s_state);
-  
-  static int click_count = 0;
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "Click! #%d", ++click_count);
+  s_taps_since_last_tick++;
 
   // Start timer for repeats and prestige hold
   s_tap_timer = app_timer_register(100, tap_timer_callback, NULL);
@@ -88,7 +88,7 @@ static void select_up_handler(ClickRecognizerRef recognizer, void *context) {
   }
 }
 
-static void update_next_tier_cost() {
+void update_next_tier_cost() {
   s_next_tier_cost = PRESTIGE_THRESHOLD;
   for (int i = 0; i < NUM_TIERS; i++) {
     double cost = calculate_cost(TIERS[i].base_cost, s_state.counts[i]);
@@ -132,7 +132,6 @@ static void update_display() {
   snprintf(s_gravity_buffer, sizeof(s_gravity_buffer), "G: %s/s", val_buffer);
   text_layer_set_text(s_gravity_layer, s_gravity_buffer);
 
-  if (s_state.mass >= s_next_tier_cost) update_next_tier_cost();
   if (s_canvas_layer) layer_mark_dirty(s_canvas_layer);
 }
 
@@ -143,6 +142,10 @@ static void save_timer_handler(void *data) {
 }
 
 static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
+  if (s_taps_since_last_tick > 0) {
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "Taps this second: %d", s_taps_since_last_tick);
+    s_taps_since_last_tick = 0;
+  }
   s_state.mass += game_state_calculate_gravity(&s_state);
   update_display();
 }
