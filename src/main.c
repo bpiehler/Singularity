@@ -17,6 +17,7 @@ static void update_display();
 static void update_next_tier_cost();
 
 static void tap_timer_callback(void *data) {
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "tap_timer_callback ticking");
   if (s_tap_timer == NULL) return; 
 
   // Fire a tap
@@ -98,6 +99,15 @@ static void update_display() {
   static char s_gravity_buffer[32];
   char val_buffer[16];
   
+  if (s_mass_layer == NULL) {
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "s_mass_layer is NULL in update_display");
+    return;
+  }
+  if (s_gravity_layer == NULL) {
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "s_gravity_layer is NULL in update_display");
+    return;
+  }
+
   format_mass(s_state.mass, val_buffer);
   snprintf(s_mass_buffer, sizeof(s_mass_buffer), "%s mg", val_buffer);
   text_layer_set_text(s_mass_layer, s_mass_buffer);
@@ -117,6 +127,7 @@ static void update_display() {
 }
 
 static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "tick_handler firing");
   s_state.mass += game_state_calculate_gravity(&s_state);
   update_display();
   
@@ -151,12 +162,14 @@ static void select_up_handler(ClickRecognizerRef recognizer, void *context) {
 }
 
 static void click_config_provider(void *context) {
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "click_config_provider called");
   window_raw_click_subscribe(BUTTON_ID_SELECT, select_down_handler, select_up_handler, NULL);
   window_single_click_subscribe(BUTTON_ID_UP, up_click_handler);
   window_single_click_subscribe(BUTTON_ID_DOWN, up_click_handler);
 }
 
 static void main_window_load(Window *window) {
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "main_window_load start");
   Layer *window_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(window_layer);
 
@@ -184,6 +197,7 @@ static void main_window_load(Window *window) {
   layer_add_child(window_layer, text_layer_get_layer(s_gravity_layer));
 
   update_display();
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "main_window_load end");
 }
 
 static void main_window_unload(Window *window) {
