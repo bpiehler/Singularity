@@ -13,6 +13,8 @@ static uint16_t menu_get_num_rows_callback(MenuLayer *menu_layer, uint16_t secti
 static void menu_draw_row_callback(GContext *ctx, const Layer *cell_layer, MenuIndex *cell_index, void *data) {
   int i = cell_index->row;
   double cost = calculate_cost(TIERS[i].base_cost, s_game_state->counts[i]);
+  bool affordable = s_game_state->mass >= cost;
+  GRect bounds = layer_get_bounds(cell_layer);
   
   char name_buf[32];
   snprintf(name_buf, sizeof(name_buf), "%s (x%d)", TIERS[i].name, s_game_state->counts[i]);
@@ -21,8 +23,18 @@ static void menu_draw_row_callback(GContext *ctx, const Layer *cell_layer, MenuI
   char val_buf[16];
   format_mass(cost, val_buf);
   snprintf(cost_buf, sizeof(cost_buf), "Cost: %s", val_buf);
+
+  bool is_highlighted = menu_cell_layer_is_highlighted(cell_layer);
   
-  menu_cell_basic_draw(ctx, cell_layer, name_buf, cost_buf, NULL);
+  // Set colors: White if selected, Black if affordable, Gray if too expensive
+  GColor text_color = is_highlighted ? GColorWhite : (affordable ? GColorBlack : GColorDarkGray);
+  graphics_context_set_text_color(ctx, text_color);
+  
+  graphics_draw_text(ctx, name_buf, fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD), 
+                     GRect(5, 2, bounds.size.w - 10, 26), GTextOverflowModeTrailingEllipsis, GTextAlignmentLeft, NULL);
+  
+  graphics_draw_text(ctx, cost_buf, fonts_get_system_font(FONT_KEY_GOTHIC_18), 
+                     GRect(5, 26, bounds.size.w - 10, 20), GTextOverflowModeTrailingEllipsis, GTextAlignmentLeft, NULL);
 }
 
 static void menu_select_callback(MenuLayer *menu_layer, MenuIndex *cell_index, void *data) {
