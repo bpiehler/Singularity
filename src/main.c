@@ -74,9 +74,8 @@ static void select_down_handler(ClickRecognizerRef recognizer, void *context) {
   // Initial Tap (Immediate)
   s_state.mass += game_state_calculate_tap_strength(&s_state);
   
-  // Note: NO update_display() here. 
-  // Redrawing the screen takes ~100ms and causes rapid clicks to be swallowed.
-  // The UI will refresh smoothly on the 1-second tick.
+  static int click_count = 0;
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "Click! #%d", ++click_count);
 
   // Start timer for repeats and prestige hold
   s_tap_timer = app_timer_register(100, tap_timer_callback, NULL);
