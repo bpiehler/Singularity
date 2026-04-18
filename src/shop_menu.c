@@ -31,7 +31,7 @@ static void menu_draw_row_callback(GContext *ctx, const Layer *cell_layer, MenuI
   // Dark Nebula Colors
   GColor text_color;
   if (is_highlighted) {
-    text_color = GColorWhite;
+    text_color = affordable ? GColorWhite : GColorLightGray;
   } else {
     text_color = affordable ? GColorCeleste : GColorDarkGray;
   }
@@ -78,7 +78,7 @@ static void shop_window_load(Window *window) {
   APP_LOG(APP_LOG_LEVEL_INFO, "Shop: window_load start");
   Layer *window_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(window_layer);
-  
+
   window_set_background_color(window, GColorBlack);
 
   s_menu_layer = menu_layer_create(bounds);
@@ -86,7 +86,7 @@ static void shop_window_load(Window *window) {
     APP_LOG(APP_LOG_LEVEL_ERROR, "Shop: MenuLayer NULL");
     return;
   }
-  
+
   #if defined(PBL_COLOR)
   menu_layer_set_normal_colors(s_menu_layer, GColorBlack, GColorCeleste);
   menu_layer_set_highlight_colors(s_menu_layer, GColorImperialPurple, GColorWhite);
@@ -99,7 +99,6 @@ static void shop_window_load(Window *window) {
     .select_long_click = menu_select_long_callback,
   });
 
-  // Use the helper to set standard click behavior
   menu_layer_set_click_config_onto_window(s_menu_layer, window);
   
   layer_add_child(window_layer, menu_layer_get_layer(s_menu_layer));
@@ -131,7 +130,6 @@ void shop_menu_show(GameState *state, ShopPurchaseCallback callback) {
   });
   
   window_stack_push(s_shop_window, true);
-  APP_LOG(APP_LOG_LEVEL_INFO, "Shop: show() end");
 }
 
 void shop_menu_hide() {
