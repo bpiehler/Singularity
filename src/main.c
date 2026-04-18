@@ -60,15 +60,16 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
 static void update_display() {
   if (!s_mass_layer || !s_gravity_layer) return;
 
-  static char s_mass_buffer[32];
-  static char s_gravity_buffer[32];
-  char val_buffer[16];
+  static char s_mass_buffer[64];
+  static char s_gravity_buffer[64];
+  char val_buffer[32]; // Increased from 16
   
   format_mass(s_state.mass, val_buffer);
   snprintf(s_mass_buffer, sizeof(s_mass_buffer), "%s mg", val_buffer);
   text_layer_set_text(s_mass_layer, s_mass_buffer);
   
-  format_mass(game_state_calculate_gravity(&s_state), val_buffer);
+  double current_gravity = game_state_calculate_gravity(&s_state);
+  format_mass(current_gravity, val_buffer);
   snprintf(s_gravity_buffer, sizeof(s_gravity_buffer), "G: %s/s", val_buffer);
   text_layer_set_text(s_gravity_layer, s_gravity_buffer);
 
