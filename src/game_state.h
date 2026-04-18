@@ -41,3 +41,6 @@ double game_state_calculate_tap_strength(GameState *state);
 
 // Apply offline gains, returns mass gained
 double game_state_apply_offline_gains(GameState *state);
+
+// Buy as many units of a tier as possible
+void game_state_buy_max(GameState *state, int tier_index);

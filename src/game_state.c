@@ -76,3 +76,17 @@ double game_state_apply_offline_gains(GameState *state) {
   state->last_update = now;
   return gained;
 }
+
+void game_state_buy_max(GameState *state, int i) {
+  while (true) {
+    double cost = calculate_cost(TIERS[i].base_cost, state->counts[i]);
+    if (state->mass >= cost) {
+      state->mass -= cost;
+      state->counts[i]++;
+    } else {
+      break;
+    }
+    // Safety cap to prevent accidental infinite loops if costs are broken
+    if (state->counts[i] > 1000000) break; 
+  }
+}
