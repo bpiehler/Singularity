@@ -15,6 +15,10 @@ void format_mass(double mass, char *buffer) {
     snprintf(buffer, 16, "0.000e0");
     return;
   }
+  if (mass < 0) {
+    snprintf(buffer, 16, "0.000");
+    return;
+  }
 
   if (mass < 1000.0) {
     // Standard notation for small numbers
