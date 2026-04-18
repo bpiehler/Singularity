@@ -67,16 +67,19 @@ static void select_long_click_handler(ClickRecognizerRef recognizer, void *conte
   MenuIndex cell_index = menu_layer_get_selected_index(s_menu_layer);
   int i = cell_index.row;
   
-  // Calculate mass before to see if we actually bought anything
   double start_mass = s_game_state->mass;
   game_state_buy_max(s_game_state, i);
   
   if (s_game_state->mass < start_mass) {
-    // Stronger vibration for bulk purchase
     vibes_long_pulse();
     menu_layer_reload_data(s_menu_layer);
     if (s_callback) s_callback();
   }
+}
+
+static void shop_click_config_provider(void *context) {
+  menu_layer_set_click_config_onto_window(s_menu_layer, (Window *)context);
+  window_long_click_subscribe(BUTTON_ID_SELECT, 500, select_long_click_handler, NULL);
 }
 
 static void shop_window_load(Window *window) {
@@ -90,19 +93,13 @@ static void shop_window_load(Window *window) {
     .select_click = menu_select_callback,
   });
 
-  // Use the standard setup for MenuLayer
-  menu_layer_set_click_config_onto_window(s_menu_layer, window);
-  
-  // Add our custom long-click handler AFTER the standard setup
-  // This will append to the existing config provider
-  window_long_click_subscribe(BUTTON_ID_SELECT, 500, select_long_click_handler, NULL);
-  
+  window_set_click_config_provider_with_context(window, shop_click_config_provider, window);
   layer_add_child(window_layer, menu_layer_get_layer(s_menu_layer));
 }
 
 static void shop_window_unload(Window *window) {
   menu_layer_destroy(s_menu_layer);
-  window_destroy(window);
+  // Removed window_destroy from here to prevent crash loop
   s_shop_window = NULL;
 }
 
