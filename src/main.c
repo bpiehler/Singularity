@@ -98,8 +98,12 @@ static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
 }
 
 static void click_config_provider(void *context) {
-  window_single_click_subscribe(BUTTON_ID_SELECT, select_click_handler);
+  // Fire once immediately, then every 200ms while held
+  window_single_repeating_click_subscribe(BUTTON_ID_SELECT, 200, select_click_handler);
+  
+  // Big Bang Prestige (5 second hold)
   window_long_click_subscribe(BUTTON_ID_SELECT, 5000, prestige_handler, NULL);
+  
   window_single_click_subscribe(BUTTON_ID_UP, up_click_handler);
   window_single_click_subscribe(BUTTON_ID_DOWN, up_click_handler);
 }
