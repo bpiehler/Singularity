@@ -1,6 +1,7 @@
 #include <pebble.h>
 #include "game_state.h"
 #include "math_utils.h"
+#include "shop_menu.h"
 
 static Window *s_main_window;
 static TextLayer *s_mass_layer, *s_gravity_layer;
@@ -35,8 +36,14 @@ static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
   update_display();
 }
 
+static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
+  shop_menu_show(&s_state, update_display);
+}
+
 static void click_config_provider(void *context) {
   window_single_click_subscribe(BUTTON_ID_SELECT, select_click_handler);
+  window_single_click_subscribe(BUTTON_ID_UP, up_click_handler);
+  window_single_click_subscribe(BUTTON_ID_DOWN, up_click_handler);
 }
 
 static void main_window_load(Window *window) {
