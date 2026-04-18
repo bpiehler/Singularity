@@ -5,7 +5,30 @@
 
 static Window *s_main_window;
 static TextLayer *s_mass_layer, *s_gravity_layer;
+static Layer *s_canvas_layer;
 static GameState s_state;
+
+static void canvas_update_proc(Layer *layer, GContext *ctx) {
+  GRect bounds = layer_get_bounds(layer);
+  GPoint center = grect_center_point(&bounds);
+
+  double next_cost = 1e16; 
+  for (int i = 0; i < NUM_TIERS; i++) {
+    double cost = calculate_cost(TIERS[i].base_cost, s_state.counts[i]);
+    if (s_state.mass < cost) {
+      next_cost = cost;
+      break;
+    }
+  }
+
+  int radius = 10 + (int)((s_state.mass / next_cost) * 50);
+  if (radius > 70) radius = 70;
+
+  graphics_context_set_fill_color(ctx, GColorLightGray);
+  graphics_fill_circle(ctx, center, radius);
+  graphics_context_set_stroke_color(ctx, GColorBlack);
+  graphics_draw_circle(ctx, center, radius);
+}
 
 static void update_display() {
   static char s_mass_buffer[32];
@@ -19,6 +42,10 @@ static void update_display() {
   format_mass(game_state_calculate_gravity(&s_state), val_buffer);
   snprintf(s_gravity_buffer, sizeof(s_gravity_buffer), "G: %s/s", val_buffer);
   text_layer_set_text(s_gravity_layer, s_gravity_buffer);
+
+  if (s_canvas_layer) {
+    layer_mark_dirty(s_canvas_layer);
+  }
 }
 
 static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
@@ -50,6 +77,11 @@ static void main_window_load(Window *window) {
   Layer *window_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(window_layer);
 
+  // Canvas for the Center of Mass (bottom layer)
+  s_canvas_layer = layer_create(bounds);
+  layer_set_update_proc(s_canvas_layer, canvas_update_proc);
+  layer_add_child(window_layer, s_canvas_layer);
+
   // Mass at top
   s_mass_layer = text_layer_create(GRect(0, PBL_IF_ROUND_ELSE(40, 30), bounds.size.w, 30));
   text_layer_set_background_color(s_mass_layer, GColorClear);
@@ -72,6 +104,8 @@ static void main_window_load(Window *window) {
 static void main_window_unload(Window *window) {
   text_layer_destroy(s_mass_layer);
   text_layer_destroy(s_gravity_layer);
+  layer_destroy(s_canvas_layer);
+  s_canvas_layer = NULL;
 }
 
 static void init() {
