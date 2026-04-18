@@ -9,9 +9,23 @@ static Layer *s_canvas_layer;
 static GameState s_state;
 static double s_next_tier_cost = PRESTIGE_THRESHOLD;
 static bool s_is_prestiging = false;
+static int s_last_step_count = 0;
 
 static void update_display();
 static void update_next_tier_cost();
+
+static void health_handler(HealthEventType event, void *context) {
+  if (event != HealthEventSleepUpdate) {
+    int total_steps = (int)health_service_sum_today(HealthMetricStepCount);
+    int delta = total_steps - s_last_step_count;
+    
+    if (delta > 0) {
+      game_state_add_steps(&s_state, delta);
+      update_display();
+    }
+    s_last_step_count = total_steps;
+  }
+}
 
 static void prestige_long_click_handler(ClickRecognizerRef recognizer, void *context) {
   if (s_state.mass < PRESTIGE_THRESHOLD) return;
@@ -147,6 +161,12 @@ static void init() {
   }
   
   update_next_tier_cost();
+  
+  // Health subscription
+  if (health_service_metric_accessible(HealthMetricStepCount, time(NULL), time(NULL))) {
+    s_last_step_count = (int)health_service_sum_today(HealthMetricStepCount);
+    health_service_events_subscribe(health_handler, NULL);
+  }
   
   double gained = game_state_apply_offline_gains(&s_state);
   if (gained > 0) {

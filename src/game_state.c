@@ -90,3 +90,23 @@ void game_state_buy_max(GameState *state, int i) {
     if (state->counts[i] > 1000000) break; 
   }
 }
+
+double game_state_prestige(GameState *state) {
+  double earned_dust = calculate_prestige_dust(state->mass, PRESTIGE_THRESHOLD);
+  if (earned_dust < 1.0) return 0;
+  
+  state->dust += earned_dust;
+  state->mass = 1.0;
+  for (int i = 0; i < NUM_TIERS; i++) {
+    state->counts[i] = 0;
+  }
+  state->last_update = time(NULL);
+  
+  return earned_dust;
+}
+
+void game_state_add_steps(GameState *state, int steps) {
+  if (steps <= 0) return;
+  double tap_strength = game_state_calculate_tap_strength(state);
+  state->mass += (tap_strength * steps);
+}
