@@ -97,9 +97,11 @@ static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
 }
 
 static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "Select click (Tap)");
-  s_state.mass += game_state_calculate_tap_strength(&s_state);
-  update_display();
+  double strength = game_state_calculate_tap_strength(&s_state);
+  s_state.mass += strength;
+  
+  static int click_count = 0;
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "Tap registered (#%d)", ++click_count);
 }
 
 static void prestige_handler(ClickRecognizerRef recognizer, void *context) {
