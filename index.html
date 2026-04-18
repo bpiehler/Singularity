@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Singularity Pebble Simulator</title>
+    <style>
+        :root {
+            --pebble-bg: #000;
+            --pebble-fg: #fff; /* 1-bit or 8-color */
+            --accent: #f0f;
+        }
+
+        body { font-family: 'Courier New', Courier, monospace; background: #222; color: #eee; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        
+        /* THE WATCH FRAME */
+        #pebble-container {
+            width: 300px;
+            height: 400px;
+            background: #444;
+            border-radius: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            margin-bottom: 20px;
+        }
+
+        /* THE SCREEN */
+        #screen {
+            background: var(--pebble-bg);
+            overflow: hidden;
+            position: relative;
+            image-rendering: pixelated;
+            display: flex;
+            flex-direction: column;
+            color: var(--pebble-fg);
+            border: 2px solid #555;
+        }
+
+        #screen.rect { width: 144px; height: 168px; border-radius: 2px; }
+        #screen.round { width: 180px; height: 180px; border-radius: 50%; }
+
+        /* PEBBLE UI ELEMENTS */
+        .pebble-text { font-size: 14px; text-align: center; width: 100%; position: absolute; }
+        #ui-mass { top: 10px; font-weight: bold; }
+        #ui-gravity { bottom: 10px; font-size: 12px; }
+        
+        #center-of-mass {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            background: radial-gradient(circle, #fff 0%, #fff 40%, transparent 41%, transparent 100%);
+            background-size: 4px 4px; /* Basic Dither Mock */
+            background-color: #555;
+            transition: width 0.3s, height 0.3s;
+        }
+
+        /* WEB CONTROLS */
+        .controls { background: #333; padding: 20px; border-radius: 10px; width: 600px; }
+        .btn { background: #0f0; color: #000; border: none; padding: 8px 15px; cursor: pointer; margin: 5px; font-weight: bold; font-family: inherit; }
+        .btn:disabled { background: #333; color: #666; }
+        .shop-web { margin-top: 20px; border-top: 1px solid #555; padding-top: 10px; }
+        .tier { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; font-size: 12px; }
+        
+        .view-toggle { position: absolute; top: -40px; left: 0; }
+    </style>
+</head>
+<body>
+
+    <div id="pebble-container">
+        <div class="view-toggle">
+            <button class="btn" onclick="setShape('rect')">RECT</button>
+            <button class="btn" onclick="setShape('round')">ROUND</button>
+        </div>
+
+        <div id="screen" class="rect">
+            <div id="ui-mass" class="pebble-text">1.000e0 mg</div>
+            <div id="center-of-mass" style="width: 20px; height: 20px;"></div>
+            <div id="ui-gravity" class="pebble-text">G: 0.000e0/s</div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <div style="display: flex; justify-content: space-between;">
+            <div>
+                <strong>Dust:</strong> <span id="web-dust">0.000e0</span>
+                <br><strong>Bonus:</strong> +<span id="web-bonus">0</span>%
+            </div>
+            <div>
+                <button class="btn" onclick="game.compress()">TAP (Select)</button>
+                <button id="prestige-btn" class="btn" style="background:var(--accent); display:none" onclick="game.bigBang()">BIG BANG</button>
+            </div>
+        </div>
+
+        <div class="shop-web">
+            <h3>Compression Tiers (The Shop)</h3>
+            <div id="tiers-list"></div>
+        </div>
+
+        <div style="margin-top: 20px; color: #888; font-size: 11px;">
+            DEBUG: 
+            <button onclick="game.timeWarp(3600)">+1h</button>
+            <button onclick="game.timeWarp(86400)">+24h</button>
+            <button onclick="game.reset()">RESET</button>
+        </div>
+    </div>
+
+    <script>
+        const TIERS = [
+            { name: "Pebble", baseCost: 100, yield: 1 },
+            { name: "Rock", baseCost: 2500, yield: 20 },
+            { name: "Boulder", baseCost: 50000, yield: 500 },
+            { name: "Hill", baseCost: 1000000, yield: 12000 },
+            { name: "Mountain", baseCost: 75000000, yield: 500000 },
+            { name: "Planet", baseCost: 5000000000, yield: 20000000 },
+            { name: "Solar System", baseCost: 500000000000, yield: 1000000000 },
+            { name: "Galaxy", baseCost: 100000000000000, yield: 100000000000 },
+            { name: "Universe", baseCost: 5000000000000000, yield: 5000000000000 },
+        ];
+
+        const PRESTIGE_THRESHOLD = 1e16;
+
+        function setShape(s) {
+            document.getElementById('screen').className = s;
+        }
+
+        class Singularity {
+            constructor() {
+                this.load();
+                this.setupListeners();
+                this.updateUI();
+                this.startLoop();
+            }
+
+            load() {
+                const saved = JSON.parse(localStorage.getItem('singularity_pebble_proto')) || {};
+                this.mass = saved.mass || 1;
+                this.dust = saved.dust || 0;
+                this.counts = saved.counts || TIERS.map(() => 0);
+                this.lastUpdate = saved.lastUpdate || Date.now();
+                
+                const now = Date.now();
+                const offlineSecs = Math.min((now - this.lastUpdate) / 1000, 172800);
+                if (offlineSecs > 10) {
+                    const gained = this.calculateGravity() * offlineSecs;
+                    this.mass += gained;
+                }
+            }
+
+            save() {
+                const data = { mass: this.mass, dust: this.dust, counts: this.counts, lastUpdate: Date.now() };
+                localStorage.setItem('singularity_pebble_proto', JSON.stringify(data));
+            }
+
+            setupListeners() {
+                document.getElementById('tiers-list').addEventListener('click', (e) => {
+                    const idx = parseInt(e.target.dataset.index);
+                    if (e.target.classList.contains('buy-btn')) this.buyTier(idx);
+                    if (e.target.classList.contains('buy-max-btn')) this.buyMax(idx);
+                });
+            }
+
+            format(n) {
+                if (n === 0) return "0.000e0";
+                if (n < 1000) return n.toFixed(1); // Watch space is tight
+                return n.toExponential(3);
+            }
+
+            calculateGravity() {
+                let g = 0;
+                TIERS.forEach((tier, i) => {
+                    const milestones = Math.floor(this.counts[i] / 25);
+                    g += (tier.yield * Math.pow(2, milestones)) * this.counts[i];
+                });
+                return (g + (this.dust * 0.1)) * (1 + (this.dust * 0.1));
+            }
+
+            compress() {
+                this.mass += 1 + (this.calculateGravity() * 0.05);
+                this.updateUI();
+            }
+
+            buyTier(i) {
+                const cost = this.getCost(i);
+                if (this.mass >= cost) { this.mass -= cost; this.counts[i]++; this.updateUI(); this.save(); }
+            }
+
+            buyMax(i) {
+                const count = this.getMaxAffordable(i);
+                if (count > 0) {
+                    let totalCost = 0;
+                    for(let k=0; k<count; k++) totalCost += this.getCostAtIndex(i, this.counts[i] + k);
+                    this.mass -= totalCost; this.counts[i] += count; this.updateUI(); this.save();
+                }
+            }
+
+            getMaxAffordable(index) {
+                let count = 0, tempMass = this.mass, tempCounts = this.counts[index];
+                while (tempMass >= this.getCostAtIndex(index, tempCounts)) {
+                    tempMass -= this.getCostAtIndex(index, tempCounts);
+                    tempCounts++; count++;
+                    if (count > 1000) break; // Safety
+                }
+                return count;
+            }
+
+            getCostAtIndex(i, count) { return TIERS[i].baseCost * Math.pow(1.15, count); }
+            getCost(i) { return this.getCostAtIndex(i, this.counts[i]); }
+
+            bigBang() {
+                if (this.mass < PRESTIGE_THRESHOLD) return;
+                const newDust = Math.floor(Math.sqrt(this.mass / PRESTIGE_THRESHOLD));
+                if (confirm(`Trigger Big Bang for ${newDust} Dust?`)) {
+                    this.dust += newDust; this.mass = 1; this.counts = TIERS.map(() => 0);
+                    this.updateUI(); this.save();
+                }
+            }
+
+            timeWarp(s) { this.mass += this.calculateGravity() * s; this.updateUI(); }
+            reset() { localStorage.removeItem('singularity_pebble_proto'); location.reload(); }
+
+            updateUI() {
+                const gravity = this.calculateGravity();
+                const massStr = this.format(this.mass);
+                const gravStr = this.format(gravity);
+
+                // Update Watch Screen
+                document.getElementById('ui-mass').innerText = massStr + " mg";
+                document.getElementById('ui-gravity').innerText = "G: " + gravStr + "/s";
+
+                // Update Circle Visual
+                const nextTierIdx = this.counts.findIndex((c, i) => this.mass < this.getCost(i));
+                const progress = nextTierIdx === -1 ? 1 : this.mass / this.getCost(nextTierIdx);
+                const circleSize = 20 + (progress * 60); // From 20px to 80px
+                const circle = document.getElementById('center-of-mass');
+                circle.style.width = circleSize + 'px';
+                circle.style.height = circleSize + 'px';
+
+                // Update Leaning Effect
+                const thresholdStart = PRESTIGE_THRESHOLD * 0.9;
+                if (this.mass > thresholdStart) {
+                    const drift = Math.min(10, (this.mass - thresholdStart) / (PRESTIGE_THRESHOLD - thresholdStart) * 10);
+                    const jitterX = (Math.random() - 0.5) * drift;
+                    const jitterY = (Math.random() - 0.5) * drift;
+                    document.getElementById('ui-mass').style.transform = `translate(${jitterX}px, ${jitterY}px)`;
+                    document.getElementById('ui-gravity').style.transform = `translate(${jitterY}px, ${jitterX}px)`;
+                }
+
+                // Update Web Stats
+                document.getElementById('web-dust').innerText = this.format(this.dust);
+                document.getElementById('web-bonus').innerText = (this.dust * 10).toFixed(0);
+
+                const list = document.getElementById('tiers-list');
+                list.innerHTML = '';
+                TIERS.forEach((tier, i) => {
+                    const cost = this.getCost(i);
+                    const div = document.createElement('div');
+                    div.className = 'tier';
+                    div.innerHTML = `
+                        <span>${tier.name} (x${this.counts[i]}) - Cost: ${this.format(cost)}</span>
+                        <div>
+                            <button class="btn buy-btn" data-index="${i}" ${this.mass < cost ? 'disabled' : ''}>BUY</button>
+                            <button class="btn buy-max-btn" data-index="${i}" ${this.getMaxAffordable(i) <= 0 ? 'disabled' : ''}>MAX</button>
+                        </div>
+                    `;
+                    list.appendChild(div);
+                });
+
+                const prestigeBtn = document.getElementById('prestige-btn');
+                prestigeBtn.style.display = this.mass >= PRESTIGE_THRESHOLD ? 'inline-block' : 'none';
+            }
+
+            startLoop() {
+                setInterval(() => {
+                    this.mass += this.calculateGravity() / 10;
+                    this.updateUI();
+                }, 100);
+            }
+        }
+
+        const game = new Singularity();
+    </script>
+</body>
+</html>
