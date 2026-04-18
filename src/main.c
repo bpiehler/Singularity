@@ -8,6 +8,7 @@ static TextLayer *s_mass_layer, *s_gravity_layer;
 static Layer *s_canvas_layer;
 static GameState s_state;
 static double s_next_tier_cost = PRESTIGE_THRESHOLD;
+static int s_last_step_count = 0;
 
 static void update_display();
 static void update_next_tier_cost();
@@ -15,9 +16,13 @@ static void update_next_tier_cost();
 static void health_handler(HealthEventType event, void *context) {
   if (event != HealthEventSleepUpdate) {
     int total_steps = (int)health_service_sum_today(HealthMetricStepCount);
-    int delta = total_steps - s_state.mass; // Using mass as a proxy for 'last count' for now if variable was lost
-    // Actually, we should use our global
-    // delta = total_steps - s_last_step_count;
+    int delta = total_steps - s_last_step_count;
+    
+    if (delta > 0) {
+      game_state_add_steps(&s_state, delta);
+      update_display();
+    }
+    s_last_step_count = total_steps;
   }
 }
 
@@ -135,6 +140,13 @@ static void main_window_unload(Window *window) {
 static void init() {
   if (!game_state_load(&s_state)) game_state_init(&s_state);
   update_next_tier_cost();
+
+  // Health subscription
+  if (health_service_metric_accessible(HealthMetricStepCount, time(NULL), time(NULL))) {
+    s_last_step_count = (int)health_service_sum_today(HealthMetricStepCount);
+    health_service_events_subscribe(health_handler, NULL);
+  }
+
   s_main_window = window_create();
   window_set_click_config_provider(s_main_window, click_config_provider);
   window_set_window_handlers(s_main_window, (WindowHandlers) {.load = main_window_load, .unload = main_window_unload});
