@@ -61,10 +61,20 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   int radius = 10 + (int)((s_state.mass / s_next_tier_cost) * 50);
   if (radius > 70) radius = 70;
 
-  graphics_context_set_fill_color(ctx, GColorLightGray);
+  // Cosmic Colors
+  GColor fill_color = PBL_IF_COLOR_ELSE(GColorElectricBlue, GColorWhite);
+  
+  // If close to prestige, core starts to turn Red
+  if (s_state.mass >= PRESTIGE_THRESHOLD * 0.9) {
+    fill_color = GColorRed;
+  }
+
+  graphics_context_set_fill_color(ctx, fill_color);
   graphics_fill_circle(ctx, center, radius);
-  graphics_context_set_stroke_color(ctx, GColorBlack);
-  graphics_draw_circle(ctx, center, radius);
+  
+  graphics_context_set_stroke_width(ctx, 3);
+  graphics_context_set_stroke_color(ctx, PBL_IF_COLOR_ELSE(GColorVividViolet, GColorWhite));
+  graphics_draw_circle(ctx, center, radius + 2);
 }
 
 static void update_display() {
@@ -123,6 +133,8 @@ static void main_window_load(Window *window) {
   Layer *window_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(window_layer);
 
+  window_set_background_color(window, GColorBlack);
+
   // Canvas for the Center of Mass (bottom layer)
   s_canvas_layer = layer_create(bounds);
   layer_set_update_proc(s_canvas_layer, canvas_update_proc);
@@ -131,7 +143,7 @@ static void main_window_load(Window *window) {
   // Mass at top
   s_mass_layer = text_layer_create(GRect(0, PBL_IF_ROUND_ELSE(40, 30), bounds.size.w, 30));
   text_layer_set_background_color(s_mass_layer, GColorClear);
-  text_layer_set_text_color(s_mass_layer, GColorBlack);
+  text_layer_set_text_color(s_mass_layer, PBL_IF_COLOR_ELSE(GColorCeleste, GColorWhite));
   text_layer_set_text_alignment(s_mass_layer, GTextAlignmentCenter);
   text_layer_set_font(s_mass_layer, fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD));
   layer_add_child(window_layer, text_layer_get_layer(s_mass_layer));
@@ -139,7 +151,7 @@ static void main_window_load(Window *window) {
   // Gravity at bottom
   s_gravity_layer = text_layer_create(GRect(0, bounds.size.h - PBL_IF_ROUND_ELSE(50, 40), bounds.size.w, 20));
   text_layer_set_background_color(s_gravity_layer, GColorClear);
-  text_layer_set_text_color(s_gravity_layer, GColorBlack);
+  text_layer_set_text_color(s_gravity_layer, PBL_IF_COLOR_ELSE(GColorCeleste, GColorWhite));
   text_layer_set_text_alignment(s_gravity_layer, GTextAlignmentCenter);
   text_layer_set_font(s_gravity_layer, fonts_get_system_font(FONT_KEY_GOTHIC_18));
   layer_add_child(window_layer, text_layer_get_layer(s_gravity_layer));
