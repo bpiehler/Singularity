@@ -88,16 +88,28 @@ double game_state_apply_offline_gains(GameState *state) {
 }
 
 void game_state_buy_max(GameState *state, int i) {
-  while (true) {
-    double cost = calculate_cost(TIERS[i].base_cost, state->counts[i]);
-    if (state->mass >= cost) {
-      state->mass -= cost;
-      state->counts[i]++;
-    } else {
-      break;
-    }
-    // Safety cap to prevent accidental infinite loops if costs are broken
-    if (state->counts[i] > 1000000) break; 
+  double base = TIERS[i].base_cost;
+  double current_unit_cost = calculate_cost(base, state->counts[i]);
+  if (state->mass < current_unit_cost) return;
+
+  // Closed-form geometric series solve for k units:
+  // k = floor(log(1 + mass * 0.15 / current_unit_cost) / log(1.15))
+  // We use 0.15 as the rate (r-1) for our 1.15x scaling
+  int k = (int)(log(1.0 + state->mass * 0.15 / current_unit_cost) / log(1.15));
+  if (k < 1) k = 1;
+
+  // Total cost for k units: Cost = C * (1.15^k - 1) / 0.15
+  double total_cost = current_unit_cost * (pow(1.15, k) - 1.0) / 0.15;
+
+  // Adjust for floating point rounding errors to ensure we don't overspend
+  while (total_cost > state->mass && k > 0) {
+    k--;
+    total_cost = current_unit_cost * (pow(1.15, k) - 1.0) / 0.15;
+  }
+
+  if (k > 0 && state->mass >= total_cost) {
+    state->mass -= total_cost;
+    state->counts[i] += k;
   }
 }
 

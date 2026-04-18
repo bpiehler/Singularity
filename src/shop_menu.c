@@ -133,6 +133,7 @@ void shop_menu_show(GameState *state, ShopPurchaseCallback callback) {
   s_callback = callback;
   
   if (s_shop_window) {
+    window_stack_remove(s_shop_window, false);
     window_destroy(s_shop_window);
   }
   

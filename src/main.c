@@ -10,13 +10,18 @@ static GameState s_state;
 static double s_next_tier_cost = PRESTIGE_THRESHOLD;
 static int s_last_step_count = 0;
 
+static AppTimer *s_tap_timer = NULL;
+static int s_hold_time_ms = 0;
+
 static void update_display();
 static void update_next_tier_cost();
 
 static void health_handler(HealthEventType event, void *context) {
   #if defined(PBL_HEALTH)
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "Health event: %d", (int)event);
-  
+  if (event == HealthEventSignificantUpdate) {
+    s_last_step_count = 0; // Reset baseline on day rollover
+  }
+
   const time_t start = time_start_of_today();
   const time_t end = time(NULL);
   HealthServiceAccessibilityMask mask = health_service_metric_accessible(HealthMetricStepCount, start, end);
@@ -38,6 +43,44 @@ static void health_handler(HealthEventType event, void *context) {
   #endif
 }
 
+static void tap_timer_callback(void *data) {
+  // Fire a tap
+  s_state.mass += game_state_calculate_tap_strength(&s_state);
+  update_display();
+  
+  s_hold_time_ms += 200;
+  
+  // If held for 5 seconds and threshold met, trigger Big Bang
+  if (s_hold_time_ms >= 5000 && s_state.mass >= PRESTIGE_THRESHOLD) {
+    APP_LOG(APP_LOG_LEVEL_INFO, "BIG BANG TRIGGERED");
+    game_state_prestige(&s_state);
+    update_next_tier_cost();
+    update_display();
+    vibes_double_pulse();
+    s_tap_timer = NULL;
+    return; 
+  }
+
+  s_tap_timer = app_timer_register(200, tap_timer_callback, NULL);
+}
+
+static void select_down_handler(ClickRecognizerRef recognizer, void *context) {
+  s_hold_time_ms = 0;
+  if (s_tap_timer) app_timer_cancel(s_tap_timer);
+  s_tap_timer = app_timer_register(200, tap_timer_callback, NULL);
+  
+  // Fire immediate first tap
+  s_state.mass += game_state_calculate_tap_strength(&s_state);
+  update_display();
+}
+
+static void select_up_handler(ClickRecognizerRef recognizer, void *context) {
+  if (s_tap_timer) {
+    app_timer_cancel(s_tap_timer);
+    s_tap_timer = NULL;
+  }
+}
+
 static void update_next_tier_cost() {
   s_next_tier_cost = PRESTIGE_THRESHOLD;
   for (int i = 0; i < NUM_TIERS; i++) {
@@ -47,17 +90,18 @@ static void update_next_tier_cost() {
       break;
     }
   }
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "Next goal cached");
 }
 
 static void canvas_update_proc(Layer *layer, GContext *ctx) {
   GRect bounds = layer_get_bounds(layer);
   GPoint center = grect_center_point(&bounds);
 
-  // Safety check for division by zero
+  // Safety check for division by zero and large casts
   double goal = (s_next_tier_cost > 0) ? s_next_tier_cost : PRESTIGE_THRESHOLD;
-  int radius = 10 + (int)((s_state.mass / goal) * 50);
-  if (radius > 70) radius = 70;
+  double ratio = s_state.mass / goal;
+  if (ratio > 1.0) ratio = 1.0; // Clamp to prevent Undefined Behavior in cast
+  
+  int radius = 10 + (int)(ratio * 50);
 
   GColor fill_color = PBL_IF_COLOR_ELSE(GColorElectricBlue, GColorWhite);
   if (s_state.mass >= PRESTIGE_THRESHOLD * 0.9) fill_color = GColorRed;
@@ -74,7 +118,7 @@ static void update_display() {
 
   static char s_mass_buffer[64];
   static char s_gravity_buffer[64];
-  char val_buffer[32]; // Increased from 16
+  char val_buffer[32];
   
   format_mass(s_state.mass, val_buffer);
   snprintf(s_mass_buffer, sizeof(s_mass_buffer), "%s mg", val_buffer);
@@ -90,7 +134,6 @@ static void update_display() {
 }
 
 static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
-  // Heartbeat log (using INFO to ensure it's visible)
   if (tick_time->tm_sec % 10 == 0) {
     APP_LOG(APP_LOG_LEVEL_INFO, "Heartbeat: App is alive");
   }
@@ -98,47 +141,39 @@ static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
   s_state.mass += game_state_calculate_gravity(&s_state);
   update_display();
   if (tick_time->tm_sec == 0) {
-    APP_LOG(APP_LOG_LEVEL_INFO, "Auto-saving state...");
     game_state_save(&s_state);
   }
 }
 
-static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
-  double strength = game_state_calculate_tap_strength(&s_state);
-  s_state.mass += strength;
-  
-  static int click_count = 0;
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "Tap registered (#%d)", ++click_count);
-}
-
-static void prestige_handler(ClickRecognizerRef recognizer, void *context) {
-  APP_LOG(APP_LOG_LEVEL_INFO, "Long-press SELECT (Prestige attempt)");
-  if (s_state.mass >= PRESTIGE_THRESHOLD) {
-    APP_LOG(APP_LOG_LEVEL_INFO, "BIG BANG TRIGGERED");
-    game_state_prestige(&s_state);
-    update_next_tier_cost();
-    update_display();
-    vibes_double_pulse();
-  } else {
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "Prestige failed: mass too low");
-  }
-}
-
-static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
-  APP_LOG(APP_LOG_LEVEL_INFO, "Opening shop...");
+static void open_shop_handler(ClickRecognizerRef recognizer, void *context) {
   shop_menu_show(&s_state, update_display);
 }
 
 static void click_config_provider(void *context) {
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "Setting up click configuration...");
-  window_single_repeating_click_subscribe(BUTTON_ID_SELECT, 200, select_click_handler);
-  window_long_click_subscribe(BUTTON_ID_SELECT, 5000, prestige_handler, NULL);
-  window_single_click_subscribe(BUTTON_ID_UP, up_click_handler);
-  window_single_click_subscribe(BUTTON_ID_DOWN, up_click_handler);
+  // Fix SDK conflict by using RAW clicks for SELECT
+  window_raw_click_subscribe(BUTTON_ID_SELECT, select_down_handler, select_up_handler, NULL);
+  
+  window_single_click_subscribe(BUTTON_ID_UP, open_shop_handler);
+  window_single_click_subscribe(BUTTON_ID_DOWN, open_shop_handler);
+}
+
+static void main_window_appear(Window *window) {
+  tick_timer_service_subscribe(SECOND_UNIT, tick_handler);
+  #if defined(PBL_HEALTH)
+  if (!health_service_events_subscribe(health_handler, NULL)) {
+     APP_LOG(APP_LOG_LEVEL_WARNING, "Health failed");
+  }
+  #endif
+}
+
+static void main_window_disappear(Window *window) {
+  tick_timer_service_unsubscribe();
+  #if defined(PBL_HEALTH)
+  health_service_events_unsubscribe();
+  #endif
 }
 
 static void main_window_load(Window *window) {
-  APP_LOG(APP_LOG_LEVEL_INFO, "Main window loading...");
   Layer *window_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(window_layer);
   window_set_background_color(window, GColorBlack);
@@ -162,11 +197,9 @@ static void main_window_load(Window *window) {
   layer_add_child(window_layer, text_layer_get_layer(s_gravity_layer));
 
   update_display();
-  APP_LOG(APP_LOG_LEVEL_INFO, "Main window loaded.");
 }
 
 static void main_window_unload(Window *window) {
-  APP_LOG(APP_LOG_LEVEL_INFO, "Main window unloading...");
   text_layer_destroy(s_mass_layer);
   text_layer_destroy(s_gravity_layer);
   layer_destroy(s_canvas_layer);
@@ -174,40 +207,20 @@ static void main_window_unload(Window *window) {
 }
 
 static void init() {
-  APP_LOG(APP_LOG_LEVEL_INFO, "App initialization started");
-  if (!game_state_load(&s_state)) {
-    APP_LOG(APP_LOG_LEVEL_INFO, "No saved state, starting fresh");
-    game_state_init(&s_state);
-  } else {
-    APP_LOG(APP_LOG_LEVEL_INFO, "Saved state loaded");
-  }
-
+  if (!game_state_load(&s_state)) game_state_init(&s_state);
   update_next_tier_cost();
-
-  #if defined(PBL_HEALTH)
-  health_service_events_subscribe(health_handler, NULL);
-  #else
-  APP_LOG(APP_LOG_LEVEL_INFO, "Pebble Health not supported");
-  #endif
-
-  double gained = game_state_apply_offline_gains(&s_state);
-  if (gained > 0) {
-    APP_LOG(APP_LOG_LEVEL_INFO, "Offline gains applied");
-  }
-
   s_main_window = window_create();
   window_set_click_config_provider(s_main_window, click_config_provider);
   window_set_window_handlers(s_main_window, (WindowHandlers) {
     .load = main_window_load, 
-    .unload = main_window_unload
+    .unload = main_window_unload,
+    .appear = main_window_appear,
+    .disappear = main_window_disappear
   });
   window_stack_push(s_main_window, true);
-  tick_timer_service_subscribe(SECOND_UNIT, tick_handler);
-  APP_LOG(APP_LOG_LEVEL_INFO, "App initialized.");
 }
 
 static void deinit() {
-  APP_LOG(APP_LOG_LEVEL_INFO, "App deinitializing...");
   game_state_save(&s_state);
   window_destroy(s_main_window);
 }
