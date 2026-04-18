@@ -12,7 +12,7 @@ static uint16_t menu_get_num_rows_callback(MenuLayer *menu_layer, uint16_t secti
 
 static void menu_draw_row_callback(GContext *ctx, const Layer *cell_layer, MenuIndex *cell_index, void *data) {
   int i = cell_index->row;
-  if (!s_game_state) return;
+  if (!s_game_state || i >= NUM_TIERS) return;
 
   double cost = calculate_cost(TIERS[i].base_cost, s_game_state->counts[i]);
   bool affordable = s_game_state->mass >= cost;
@@ -57,56 +57,43 @@ static void menu_select_callback(MenuLayer *menu_layer, MenuIndex *cell_index, v
     menu_layer_reload_data(s_menu_layer);
     if (s_callback) s_callback();
   } else {
-    // Short vibe to indicate "can't afford"
     vibes_short_pulse();
   }
 }
 
-static void select_long_click_handler(ClickRecognizerRef recognizer, void *context) {
-  MenuIndex cell_index = menu_layer_get_selected_index(s_menu_layer);
-  int i = cell_index.row;
-  
-  double start_mass = s_game_state->mass;
-  game_state_buy_max(s_game_state, i);
-  
-  if (s_game_state->mass < start_mass) {
-    vibes_long_pulse();
-    menu_layer_reload_data(s_menu_layer);
-    if (s_callback) s_callback();
-  }
-}
-
-static void shop_click_config_provider(void *context) {
-  // Inherit standard menu clicks
-  menu_layer_set_click_config_onto_window(s_menu_layer, (Window *)context);
-  // Add our custom long-press
-  window_long_click_subscribe(BUTTON_ID_SELECT, 500, select_long_click_handler, NULL);
-}
-
 static void shop_window_load(Window *window) {
-  APP_LOG(APP_LOG_LEVEL_INFO, "Shop: Loading...");
+  APP_LOG(APP_LOG_LEVEL_INFO, "Shop: window_load start");
   Layer *window_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(window_layer);
 
   s_menu_layer = menu_layer_create(bounds);
+  if (!s_menu_layer) {
+    APP_LOG(APP_LOG_LEVEL_ERROR, "Shop: MenuLayer NULL");
+    return;
+  }
+
   menu_layer_set_callbacks(s_menu_layer, NULL, (MenuLayerCallbacks) {
     .get_num_rows = menu_get_num_rows_callback,
     .draw_row = menu_draw_row_callback,
     .select_click = menu_select_callback,
   });
 
-  // Set the click provider with the window as context
-  window_set_click_config_provider_with_context(window, shop_click_config_provider, window);
+  APP_LOG(APP_LOG_LEVEL_INFO, "Shop: menu_layer_set_click_config...");
+  // Use the SIMPLE helper directly, not inside a provider.
+  menu_layer_set_click_config_onto_window(s_menu_layer, window);
   
+  APP_LOG(APP_LOG_LEVEL_INFO, "Shop: layer_add_child...");
   layer_add_child(window_layer, menu_layer_get_layer(s_menu_layer));
+  APP_LOG(APP_LOG_LEVEL_INFO, "Shop: window_load end");
 }
 
 static void shop_window_unload(Window *window) {
-  APP_LOG(APP_LOG_LEVEL_INFO, "Shop: Unloading...");
-  menu_layer_destroy(s_menu_layer);
-  window_destroy(window);
-  s_shop_window = NULL;
-  s_menu_layer = NULL;
+  APP_LOG(APP_LOG_LEVEL_INFO, "Shop: window_unload start");
+  if (s_menu_layer) {
+    menu_layer_destroy(s_menu_layer);
+    s_menu_layer = NULL;
+  }
+  APP_LOG(APP_LOG_LEVEL_INFO, "Shop: window_unload end");
 }
 
 void shop_menu_show(GameState *state, ShopPurchaseCallback callback) {
@@ -114,18 +101,18 @@ void shop_menu_show(GameState *state, ShopPurchaseCallback callback) {
   s_game_state = state;
   s_callback = callback;
   
-  s_shop_window = window_create();
-  if (!s_shop_window) {
-    APP_LOG(APP_LOG_LEVEL_ERROR, "Shop: Failed to create window!");
-    return;
+  if (s_shop_window) {
+    window_destroy(s_shop_window);
   }
-
+  
+  s_shop_window = window_create();
   window_set_window_handlers(s_shop_window, (WindowHandlers) {
     .load = shop_window_load,
     .unload = shop_window_unload,
   });
   
   window_stack_push(s_shop_window, true);
+  APP_LOG(APP_LOG_LEVEL_INFO, "Shop: show() end");
 }
 
 void shop_menu_hide() {
