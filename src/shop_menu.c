@@ -58,7 +58,8 @@ static void menu_draw_row_callback(GContext *ctx, const Layer *cell_layer, MenuI
   graphics_draw_text(ctx, cost_buf, fonts_get_system_font(FONT_KEY_GOTHIC_18), 
                      GRect(left_padding, 27, bounds.size.w - (left_padding + 5), 20), 
                      GTextOverflowModeTrailingEllipsis, GTextAlignmentLeft, NULL);
-  }
+}
+
 static void menu_select_callback(MenuLayer *menu_layer, MenuIndex *cell_index, void *data) {
   int i = cell_index->row;
   double cost = calculate_cost(TIERS[i].base_cost, s_game_state->counts[i]);

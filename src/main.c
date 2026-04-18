@@ -6,7 +6,7 @@
 static Window *s_main_window;
 static TextLayer *s_mass_layer, *s_gravity_layer;
 static Layer *s_canvas_layer;
-static GameState s_state;
+static GameState s_state __attribute__((aligned(8)));
 static double s_next_tier_cost __attribute__((aligned(8))) = PRESTIGE_THRESHOLD;
 static AppTimer *s_tap_timer = NULL;
 static int s_hold_time_ms = 0;
@@ -52,7 +52,6 @@ static void health_handler(HealthEventType event, void *context) {
 static void tap_timer_callback(void *data) {
   // Fire a tap
   s_state.mass += game_state_calculate_tap_strength(&s_state);
-  update_display();
   
   s_hold_time_ms += 200;
   
@@ -77,7 +76,6 @@ static void select_down_handler(ClickRecognizerRef recognizer, void *context) {
   
   // Fire immediate first tap
   s_state.mass += game_state_calculate_tap_strength(&s_state);
-  update_display();
 }
 
 static void select_up_handler(ClickRecognizerRef recognizer, void *context) {
