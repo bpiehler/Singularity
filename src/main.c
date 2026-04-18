@@ -1,4 +1,5 @@
 #include <pebble.h>
+#include <math.h>
 #include "game_state.h"
 #include "math_utils.h"
 #include "shop_menu.h"
@@ -7,10 +8,8 @@ static Window *s_main_window;
 static TextLayer *s_mass_layer, *s_gravity_layer;
 static Layer *s_canvas_layer;
 static GameState s_state __attribute__((aligned(8))); 
-static double s_next_tier_cost = PRESTIGE_THRESHOLD;
 
 static void update_display();
-void update_next_tier_cost();
 
 #if defined(PBL_HEALTH)
 static int s_last_step_count = 0;
@@ -61,7 +60,6 @@ static void tap_timer_callback(void *data) {
   // Big Bang check
   if (s_hold_time_ms >= 5000 && s_state.mass >= PRESTIGE_THRESHOLD) {
     game_state_prestige(&s_state);
-    update_next_tier_cost();
     update_display();
     vibes_double_pulse();
     s_tap_timer = NULL;
@@ -98,31 +96,61 @@ static void select_up_handler(ClickRecognizerRef recognizer, void *context) {
   }
 }
 
-void update_next_tier_cost() {
-  s_next_tier_cost = PRESTIGE_THRESHOLD;
-  for (int i = 0; i < NUM_TIERS; i++) {
-    double cost = calculate_cost(TIERS[i].base_cost, s_state.counts[i]);
-    if (s_state.mass < cost) {
-      s_next_tier_cost = cost;
-      break;
-    }
-  }
-}
-
 static void canvas_update_proc(Layer *layer, GContext *ctx) {
   GRect bounds = layer_get_bounds(layer);
   GPoint center = grect_center_point(&bounds);
 
-  double goal = (s_next_tier_cost > 0) ? s_next_tier_cost : PRESTIGE_THRESHOLD;
-  double ratio = s_state.mass / goal;
-  if (!(ratio >= 0.0 && ratio <= 1.0)) ratio = 0.0;
+  // radius = 10 + (log10(mass) / 16.0) * 60
+  double log_mass = log10(s_state.mass > 1.0 ? s_state.mass : 1.0);
+  if (log_mass > 16.0) log_mass = 16.0;
+  int radius = 10 + (int)((log_mass / 16.0) * 60.0);
 
-  int radius = 10 + (int)(ratio * 50);
+  // Singularity Instability (Jitter and Red Color)
+  bool is_unstable = (s_state.mass >= PRESTIGE_THRESHOLD * 0.9);
+  if (is_unstable) {
+    center.x += (rand() % 3) - 1;
+    center.y += (rand() % 3) - 1;
+  }
 
-  graphics_context_set_fill_color(ctx, PBL_IF_COLOR_ELSE(GColorElectricBlue, GColorWhite));
+  int era = game_state_get_era(&s_state);
+  GColor era_color;
+  
+  if (is_unstable) {
+    era_color = GColorRed;
+  } else {
+    static const GColor colors[] = {
+      GColorWhite,          // Era 0: Terrestrial
+      GColorIslamicGreen,   // Era 1: Monolithic
+      GColorCyan,           // Era 2: Planetary
+      GColorYellow,         // Era 3: Stellar
+      GColorVividViolet     // Era 4: Singularity
+    };
+    era_color = PBL_IF_COLOR_ELSE(colors[era], GColorWhite);
+  }
+
+  graphics_context_set_fill_color(ctx, era_color);
   graphics_fill_circle(ctx, center, radius);
-  graphics_context_set_stroke_width(ctx, 3);
-  graphics_context_set_stroke_color(ctx, PBL_IF_COLOR_ELSE(GColorVividViolet, GColorWhite));
+
+  // Era-specific B&W patterns or extra details
+  #if defined(PBL_BW)
+  if (!is_unstable) {
+    if (era == 1) { // Monolithic: Horizontal Stripes (simulated with lines)
+      for (int i = -radius; i < radius; i += 4) {
+        graphics_context_set_stroke_color(ctx, GColorBlack);
+        graphics_draw_line(ctx, GPoint(center.x - radius, center.y + i), GPoint(center.x + radius, center.y + i));
+      }
+    } else if (era == 2) { // Planetary: Crosshatch
+      graphics_context_set_stroke_color(ctx, GColorBlack);
+      graphics_draw_circle(ctx, center, radius / 2);
+    } else if (era == 3) { // Stellar: Inverted core
+      graphics_context_set_fill_color(ctx, GColorBlack);
+      graphics_fill_circle(ctx, center, radius / 2);
+    }
+  }
+  #endif
+
+  graphics_context_set_stroke_width(ctx, 2);
+  graphics_context_set_stroke_color(ctx, is_unstable ? GColorWhite : era_color);
   graphics_draw_circle(ctx, center, radius + 2);
 }
 
@@ -134,7 +162,7 @@ static void update_display() {
   char val_buffer[32];
   
   format_mass(s_state.mass, val_buffer);
-  snprintf(s_mass_buffer, sizeof(s_mass_buffer), "%s mg", val_buffer);
+  snprintf(s_mass_buffer, sizeof(s_mass_buffer), "%s", val_buffer);
   text_layer_set_text(s_mass_layer, s_mass_buffer);
   
   double current_gravity = game_state_calculate_gravity(&s_state);
@@ -208,8 +236,6 @@ static void init() {
   if (!game_state_load(&s_state)) {
     game_state_init(&s_state);
   }
-
-  update_next_tier_cost();
 
   s_main_window = window_create();
   window_set_click_config_provider(s_main_window, click_config_provider);

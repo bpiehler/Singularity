@@ -11,17 +11,42 @@
 #include "../src/game_state.c"
 
 void test_formatting() {
-  printf("Testing Formatting...\n");
+  printf("Testing Formatting thresholds...\n");
   char buf[32];
   
+  // mg threshold
   format_mass(0, buf);
-  assert(strcmp(buf, "0.000e0") == 0);
+  assert(strcmp(buf, "0 mg") == 0);
+  format_mass(500, buf);
+  assert(strcmp(buf, "500 mg") == 0);
+  format_mass(999.9, buf);
+  assert(strcmp(buf, "999 mg") == 0);
   
-  format_mass(123.456, buf);
-  assert(strcmp(buf, "123.456") == 0);
+  // g threshold
+  format_mass(1000, buf);
+  assert(strcmp(buf, "1.0 g") == 0);
+  format_mass(1500, buf);
+  assert(strcmp(buf, "1.5 g") == 0);
+  format_mass(999900, buf);
+  assert(strcmp(buf, "999.9 g") == 0);
   
+  // kg threshold
+  format_mass(1000000, buf);
+  assert(strcmp(buf, "1.0 kg") == 0);
+  format_mass(2500000, buf);
+  assert(strcmp(buf, "2.5 kg") == 0);
+  
+  // t threshold
+  format_mass(1000000000, buf);
+  assert(strcmp(buf, "1.0 t") == 0);
+  format_mass(500000000000, buf);
+  assert(strcmp(buf, "500.0 t") == 0);
+  
+  // scientific threshold
+  format_mass(1000000000000, buf);
+  assert(strcmp(buf, "1.000e12 mg") == 0);
   format_mass(1e16, buf);
-  assert(strcmp(buf, "1.000e16") == 0);
+  assert(strcmp(buf, "1.000e16 mg") == 0);
 
   format_mass(NAN, buf);
   assert(strcmp(buf, "NaN") == 0);

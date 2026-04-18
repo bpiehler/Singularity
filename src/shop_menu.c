@@ -68,7 +68,6 @@ static void menu_select_callback(MenuLayer *menu_layer, MenuIndex *cell_index, v
     s_game_state->mass -= cost;
     s_game_state->counts[i]++;
     game_state_update_cache(s_game_state);
-    update_next_tier_cost(); // Refresh the visual circle's target cost
     vibes_double_pulse();
     menu_layer_reload_data(s_menu_layer);
     if (s_callback) s_callback();
@@ -83,7 +82,6 @@ static void menu_select_long_callback(MenuLayer *menu_layer, MenuIndex *cell_ind
   game_state_buy_max(s_game_state, i);
   
   if (s_game_state->mass < start_mass) {
-    update_next_tier_cost(); // Refresh the visual circle's target cost
     vibes_long_pulse();
     menu_layer_reload_data(s_menu_layer);
     if (s_callback) s_callback();

@@ -11,22 +11,25 @@ void format_mass(double mass, char *buffer) {
     snprintf(buffer, 16, "Infinity");
     return;
   }
-  if (mass == 0) {
-    snprintf(buffer, 16, "0.000e0");
-    return;
-  }
-  if (mass < 0) {
-    snprintf(buffer, 16, "0.000");
+  if (mass <= 0) {
+    snprintf(buffer, 16, "0 mg");
     return;
   }
 
   if (mass < 1000.0) {
-    // Standard notation for small numbers
-    int integer_part = (int)mass;
-    int fractional_part = (int)((mass - integer_part) * 1000.0);
-    snprintf(buffer, 16, "%d.%03d", integer_part, fractional_part);
+    // Milligrams: 0 - 999 mg
+    snprintf(buffer, 16, "%d mg", (int)mass);
+  } else if (mass < 1000000.0) {
+    // Grams: 1.0 g - 999.9 g
+    snprintf(buffer, 16, "%.1f g", mass / 1000.0);
+  } else if (mass < 1000000000.0) {
+    // Kilograms: 1.0 kg - 999.9 kg
+    snprintf(buffer, 16, "%.1f kg", mass / 1000000.0);
+  } else if (mass < 1000000000000.0) {
+    // Tonnes: 1.0 t - 999.9 t
+    snprintf(buffer, 16, "%.1f t", mass / 1000000000.0);
   } else {
-    // Scientific notation for larger numbers
+    // Scientific notation for larger numbers: >= 1.000e12 mg
     int exponent = 0;
     double mantissa = mass;
     while (mantissa >= 10.0 && exponent < 308) {
@@ -40,7 +43,7 @@ void format_mass(double mass, char *buffer) {
     
     int mantissa_int = (int)mantissa;
     int mantissa_frac = (int)((mantissa - mantissa_int) * 1000.0);
-    snprintf(buffer, 16, "%d.%03de%d", mantissa_int, mantissa_frac, exponent);
+    snprintf(buffer, 16, "%d.%03de%d mg", mantissa_int, mantissa_frac, exponent);
   }
 }
 

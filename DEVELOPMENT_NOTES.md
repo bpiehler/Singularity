@@ -56,6 +56,15 @@ This document captures critical technical lessons learned during the development
 
 ---
 
+## 5. Focus & Lifecycle
+
+### **Focus Catch-up Logic**
+*   **Issue:** When a notification appears or the emulator loses focus, the `TickTimer` pauses. This could cause the player to lose mass accumulation.
+*   **Lesson:** Use `AppFocusService` to detect when the app returns to the foreground.
+*   **Resolution:** Implemented a `focus_handler` that triggers an immediate `game_state_apply_offline_gains()`. This ensures that every second of "lost focus" time is instantly accounted for as soon as the app is visible again.
+
+---
+
 ## 4. Portability & Math
 
 ### **Safe Scientific Notation**

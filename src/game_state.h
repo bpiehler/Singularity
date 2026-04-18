@@ -58,3 +58,6 @@ double game_state_prestige(GameState *state);
 
 // Add mass based on steps taken
 void game_state_add_steps(GameState *state, int steps);
+
+// Get the current era (0-4) based on highest tier owned
+int game_state_get_era(GameState *state);

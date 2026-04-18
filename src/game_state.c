@@ -135,3 +135,18 @@ void game_state_add_steps(GameState *state, int steps) {
   double tap_strength = game_state_calculate_tap_strength(state);
   state->mass += (tap_strength * steps);
 }
+
+int game_state_get_era(GameState *state) {
+  int highest = -1;
+  for (int i = NUM_TIERS - 1; i >= 0; i--) {
+    if (state->counts[i] > 0) {
+      highest = i;
+      break;
+    }
+  }
+  if (highest <= 2) return 0; // Terrestrial (Pebble, Rock, Boulder)
+  if (highest <= 4) return 1; // Monolithic (Hill, Mountain)
+  if (highest == 5) return 2; // Planetary (Planet)
+  if (highest <= 7) return 3; // Stellar (Solar System, Galaxy)
+  return 4;                   // Singularity (Universe)
+}
