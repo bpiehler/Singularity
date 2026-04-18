@@ -14,11 +14,13 @@ static void update_display();
 static void update_next_tier_cost();
 
 static void health_handler(HealthEventType event, void *context) {
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "Health event: %d", (int)event);
   if (event != HealthEventSleepUpdate) {
     int total_steps = (int)health_service_sum_today(HealthMetricStepCount);
     int delta = total_steps - s_last_step_count;
     
     if (delta > 0) {
+      APP_LOG(APP_LOG_LEVEL_INFO, "Converting %d steps to mass", delta);
       game_state_add_steps(&s_state, delta);
       update_display();
     }
@@ -35,6 +37,7 @@ static void update_next_tier_cost() {
       break;
     }
   }
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "Next goal cached: %ld", (long)s_next_tier_cost);
 }
 
 static void canvas_update_proc(Layer *layer, GContext *ctx) {
@@ -74,41 +77,53 @@ static void update_display() {
 }
 
 static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
+  // Heartbeat log
+  if (tick_time->tm_sec % 10 == 0) {
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "Heartbeat: App is alive");
+  }
+
   s_state.mass += game_state_calculate_gravity(&s_state);
   update_display();
-  if (tick_time->tm_sec == 0) game_state_save(&s_state);
+  if (tick_time->tm_sec == 0) {
+    APP_LOG(APP_LOG_LEVEL_INFO, "Auto-saving state...");
+    game_state_save(&s_state);
+  }
 }
 
 static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "Select click (Tap)");
   s_state.mass += game_state_calculate_tap_strength(&s_state);
   update_display();
 }
 
 static void prestige_handler(ClickRecognizerRef recognizer, void *context) {
+  APP_LOG(APP_LOG_LEVEL_INFO, "Long-press SELECT (Prestige attempt)");
   if (s_state.mass >= PRESTIGE_THRESHOLD) {
+    APP_LOG(APP_LOG_LEVEL_INFO, "BIG BANG TRIGGERED");
     game_state_prestige(&s_state);
     update_next_tier_cost();
     update_display();
     vibes_double_pulse();
+  } else {
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "Prestige failed: mass too low");
   }
 }
 
 static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
+  APP_LOG(APP_LOG_LEVEL_INFO, "Opening shop...");
   shop_menu_show(&s_state, update_display);
 }
 
 static void click_config_provider(void *context) {
-  // Fire once immediately, then every 200ms while held
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "Setting up click configuration...");
   window_single_repeating_click_subscribe(BUTTON_ID_SELECT, 200, select_click_handler);
-  
-  // Big Bang Prestige (5 second hold)
   window_long_click_subscribe(BUTTON_ID_SELECT, 5000, prestige_handler, NULL);
-  
   window_single_click_subscribe(BUTTON_ID_UP, up_click_handler);
   window_single_click_subscribe(BUTTON_ID_DOWN, up_click_handler);
 }
 
 static void main_window_load(Window *window) {
+  APP_LOG(APP_LOG_LEVEL_INFO, "Main window loading...");
   Layer *window_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(window_layer);
   window_set_background_color(window, GColorBlack);
@@ -132,9 +147,11 @@ static void main_window_load(Window *window) {
   layer_add_child(window_layer, text_layer_get_layer(s_gravity_layer));
 
   update_display();
+  APP_LOG(APP_LOG_LEVEL_INFO, "Main window loaded.");
 }
 
 static void main_window_unload(Window *window) {
+  APP_LOG(APP_LOG_LEVEL_INFO, "Main window unloading...");
   text_layer_destroy(s_mass_layer);
   text_layer_destroy(s_gravity_layer);
   layer_destroy(s_canvas_layer);
@@ -142,23 +159,43 @@ static void main_window_unload(Window *window) {
 }
 
 static void init() {
-  if (!game_state_load(&s_state)) game_state_init(&s_state);
+  APP_LOG(APP_LOG_LEVEL_INFO, "App initialization started");
+  if (!game_state_load(&s_state)) {
+    APP_LOG(APP_LOG_LEVEL_INFO, "No saved state, starting fresh");
+    game_state_init(&s_state);
+  } else {
+    APP_LOG(APP_LOG_LEVEL_INFO, "Saved state loaded");
+  }
+
   update_next_tier_cost();
 
   // Health subscription
   if (health_service_metric_accessible(HealthMetricStepCount, time(NULL), time(NULL))) {
+    APP_LOG(APP_LOG_LEVEL_INFO, "Health service accessible");
     s_last_step_count = (int)health_service_sum_today(HealthMetricStepCount);
     health_service_events_subscribe(health_handler, NULL);
+  } else {
+    APP_LOG(APP_LOG_LEVEL_WARNING, "Health service NOT accessible");
+  }
+
+  double gained = game_state_apply_offline_gains(&s_state);
+  if (gained > 0) {
+    APP_LOG(APP_LOG_LEVEL_INFO, "Offline gains applied: %ld", (long)gained);
   }
 
   s_main_window = window_create();
   window_set_click_config_provider(s_main_window, click_config_provider);
-  window_set_window_handlers(s_main_window, (WindowHandlers) {.load = main_window_load, .unload = main_window_unload});
+  window_set_window_handlers(s_main_window, (WindowHandlers) {
+    .load = main_window_load, 
+    .unload = main_window_unload
+  });
   window_stack_push(s_main_window, true);
   tick_timer_service_subscribe(SECOND_UNIT, tick_handler);
+  APP_LOG(APP_LOG_LEVEL_INFO, "App initialized.");
 }
 
 static void deinit() {
+  APP_LOG(APP_LOG_LEVEL_INFO, "App deinitializing...");
   game_state_save(&s_state);
   window_destroy(s_main_window);
 }
