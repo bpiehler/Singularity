@@ -8,6 +8,25 @@ static TextLayer *s_mass_layer, *s_gravity_layer;
 static Layer *s_canvas_layer;
 static GameState s_state;
 static double s_next_tier_cost = PRESTIGE_THRESHOLD;
+static bool s_is_prestiging = false;
+
+static void update_display();
+static void update_next_tier_cost();
+
+static void prestige_long_click_handler(ClickRecognizerRef recognizer, void *context) {
+  if (s_state.mass < PRESTIGE_THRESHOLD) return;
+  
+  s_is_prestiging = true;
+  double earned = game_state_prestige(&s_state);
+  if (earned > 0) {
+    // Big Bang Effect: Success haptics
+    vibes_double_pulse();
+    update_next_tier_cost();
+    update_display();
+    game_state_save(&s_state);
+  }
+  s_is_prestiging = false;
+}
 
 static void update_next_tier_cost() {
   s_next_tier_cost = PRESTIGE_THRESHOLD;
@@ -82,6 +101,9 @@ static void click_config_provider(void *context) {
   window_single_repeating_click_subscribe(BUTTON_ID_SELECT, 100, select_click_handler);
   window_single_click_subscribe(BUTTON_ID_UP, up_click_handler);
   window_single_click_subscribe(BUTTON_ID_DOWN, up_click_handler);
+  
+  // Big Bang Prestige (5 second hold)
+  window_long_click_subscribe(BUTTON_ID_SELECT, 5000, prestige_long_click_handler, NULL);
 }
 
 static void main_window_load(Window *window) {
