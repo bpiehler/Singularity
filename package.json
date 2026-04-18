@@ -1,0 +1,23 @@
+{
+  "name": "singularity",
+  "version": "1.0.0",
+  "author": "BrittP",
+  "pebble": {
+    "displayName": "Singularity",
+    "uuid": "a739c941-8656-4b2a-8994-6e11802d3f6d",
+    "sdkVersion": "3",
+    "targetPlatforms": [
+      "basalt",
+      "chalk",
+      "diorite"
+    ],
+    "watchapp": {
+      "watchface": false
+    },
+    "resources": {
+      "media": []
+    }
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}
