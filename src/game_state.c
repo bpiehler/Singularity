@@ -26,7 +26,10 @@ void game_state_update_cache(GameState *state) {
   state->cached_tap_strength = (highest_base_yield * 10.0) + (state->cached_gravity * 0.25);
   if (state->cached_tap_strength < 1.0) state->cached_tap_strength = 1.0;
   
-  // Cache prestige reward using custom safe math
+  // Track Peak Mass
+  if (state->mass > state->highest_mass_ever) state->highest_mass_ever = state->mass;
+
+  // Cache prestige reward
   state->cached_prestige_dust = calculate_prestige_dust(state->mass, PRESTIGE_THRESHOLD);
 }
 
@@ -34,6 +37,9 @@ void game_state_init(GameState *state) {
   state->version = STORAGE_VERSION;
   state->mass = 1.0;
   state->dust = 0.0;
+  state->highest_mass_ever = 1.0;
+  state->total_singularities = 0;
+  state->total_playtime_seconds = 0;
   for (int i = 0; i < NUM_TIERS; i++) state->counts[i] = 0;
   state->last_update = time(NULL);
   game_state_update_cache(state);
@@ -68,6 +74,10 @@ double game_state_apply_offline_gains(GameState *state) {
     if (seconds_diff > OFFLINE_CAP_SECONDS) seconds_diff = OFFLINE_CAP_SECONDS;
     gained = state->cached_gravity * seconds_diff;
     state->mass += gained;
+    
+    // Add offline time to total playtime
+    state->total_playtime_seconds += (uint32_t)seconds_diff;
+    
     game_state_update_cache(state);
   }
   state->last_update = now;
@@ -95,7 +105,10 @@ void game_state_buy_max(GameState *state, int i) {
 double game_state_prestige(GameState *state) {
   double earned = calculate_prestige_dust(state->mass, PRESTIGE_THRESHOLD);
   if (earned < 1.0) return 0;
+  
   state->dust += earned;
+  state->total_singularities++; // New Universe created
+  
   state->mass = 1.0;
   for (int i = 0; i < NUM_TIERS; i++) state->counts[i] = 0;
   state->last_update = time(NULL);

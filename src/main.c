@@ -3,6 +3,7 @@
 #include "game_state.h"
 #include "math_utils.h"
 #include "shop_menu.h"
+#include "stats_menu.h"
 
 static Window *s_main_window;
 static TextLayer *s_mass_layer, *s_gravity_layer;
@@ -49,7 +50,6 @@ static int s_collapse_frame = 0;
 static void collapse_timer_callback(void *data) {
   if (s_is_app_exiting) return;
   s_collapse_frame++;
-  
   if (s_collapse_frame < 40) {
     layer_mark_dirty(s_canvas_layer);
     app_timer_register(30, collapse_timer_callback, NULL);
@@ -87,6 +87,7 @@ static void tap_timer_callback(void *data) {
   if (s_hold_time_ms >= 500 && (s_hold_time_ms % 200 == 0)) {
     s_state.mass += game_state_calculate_tap_strength(&s_state);
     s_taps_since_last_tick++;
+    game_state_update_cache(&s_state); // Updates Peak Mass
   }
   s_tap_timer = app_timer_register(100, tap_timer_callback, NULL);
 }
@@ -97,14 +98,12 @@ static void select_down_handler(ClickRecognizerRef recognizer, void *context) {
   if (s_tap_timer) app_timer_cancel(s_tap_timer);
   s_state.mass += game_state_calculate_tap_strength(&s_state);
   s_taps_since_last_tick++;
+  game_state_update_cache(&s_state); // Updates Peak Mass
   s_tap_timer = app_timer_register(100, tap_timer_callback, NULL);
 }
 
 static void select_up_handler(ClickRecognizerRef recognizer, void *context) {
-  if (s_tap_timer) {
-    app_timer_cancel(s_tap_timer);
-    s_tap_timer = NULL;
-  }
+  if (s_tap_timer) { app_timer_cancel(s_tap_timer); s_tap_timer = NULL; }
 }
 
 static void canvas_update_proc(Layer *layer, GContext *ctx) {
@@ -138,9 +137,8 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   }
   int era = game_state_get_era(&s_state);
   GColor era_color;
-  if (is_unstable || s_is_collapsing) {
-    era_color = GColorRed;
-  } else {
+  if (is_unstable || s_is_collapsing) era_color = GColorRed;
+  else {
     switch (era) {
       case 0: era_color = GColorWhite; break;
       case 1: era_color = GColorIslamicGreen; break;
@@ -218,6 +216,8 @@ static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
   if (s_is_collapsing) return;
   s_taps_since_last_tick = 0;
   s_state.mass += game_state_calculate_gravity(&s_state);
+  s_state.total_playtime_seconds++;
+  game_state_update_cache(&s_state); // Updates Peak Mass
   update_display();
   if (tick_time->tm_sec == 0) game_state_save(&s_state);
 }
@@ -227,20 +227,23 @@ static void open_shop_handler(ClickRecognizerRef recognizer, void *context) {
   shop_menu_show(&s_state, update_display);
 }
 
+static void open_stats_handler(ClickRecognizerRef recognizer, void *context) {
+  if (s_is_collapsing) return;
+  stats_menu_show(&s_state);
+}
+
 static void down_long_click_handler(ClickRecognizerRef recognizer, void *context) {
   if (s_is_collapsing) return;
-  // GOD MODE: Instant 1e36 mass
   s_state.mass = 1.0e36;
   game_state_update_cache(&s_state);
   update_display();
   vibes_double_pulse();
-  APP_LOG(APP_LOG_LEVEL_INFO, "God Mode: Mass set to 1e36!");
 }
 
 static void up_long_click_handler(ClickRecognizerRef recognizer, void *context) {
   if (s_is_collapsing) return;
   double gravity = game_state_calculate_gravity(&s_state);
-  double gain = gravity * 21600.0; // 6 Hours
+  double gain = gravity * 21600.0;
   if (gain < 1000000.0) gain = 1000000.0; 
   s_state.mass += gain;
   game_state_update_cache(&s_state);
@@ -251,9 +254,8 @@ static void up_long_click_handler(ClickRecognizerRef recognizer, void *context) 
 static void click_config_provider(void *context) {
   window_raw_click_subscribe(BUTTON_ID_DOWN, select_down_handler, select_up_handler, NULL);
   window_long_click_subscribe(BUTTON_ID_DOWN, 500, down_long_click_handler, NULL);
-
   window_single_click_subscribe(BUTTON_ID_SELECT, open_shop_handler);
-  window_single_click_subscribe(BUTTON_ID_UP, open_shop_handler);
+  window_single_click_subscribe(BUTTON_ID_UP, open_stats_handler);
   window_long_click_subscribe(BUTTON_ID_UP, 500, up_long_click_handler, NULL);
 }
 
@@ -287,28 +289,19 @@ static void main_window_unload(Window *window) {
 }
 
 static void init() {
-  APP_LOG(APP_LOG_LEVEL_INFO, "Main: Init Start");
   s_is_app_exiting = false;
-  if (!game_state_load(&s_state)) {
-    APP_LOG(APP_LOG_LEVEL_INFO, "Main: Fresh Init triggered");
-    game_state_init(&s_state);
-  } else {
-    APP_LOG(APP_LOG_LEVEL_INFO, "Main: Load Success, Applying Offline");
-    game_state_apply_offline_gains(&s_state);
-  }
-  APP_LOG(APP_LOG_LEVEL_INFO, "Main: Creating Window");
+  if (!game_state_load(&s_state)) game_state_init(&s_state);
+  else game_state_apply_offline_gains(&s_state);
   s_main_window = window_create();
   window_set_click_config_provider(s_main_window, click_config_provider);
   window_set_window_handlers(s_main_window, (WindowHandlers) { .load = main_window_load, .unload = main_window_unload });
   window_stack_push(s_main_window, true);
-  APP_LOG(APP_LOG_LEVEL_INFO, "Main: Subscribing services");
   tick_timer_service_subscribe(SECOND_UNIT, tick_handler);
   app_focus_service_subscribe(focus_handler);
   #if defined(PBL_HEALTH)
   health_service_events_subscribe(health_handler, NULL);
   #endif
   app_timer_register(300000, save_timer_handler, NULL);
-  APP_LOG(APP_LOG_LEVEL_INFO, "Main: Init Complete");
 }
 
 static void deinit() {
@@ -320,6 +313,7 @@ static void deinit() {
   #endif
   game_state_save(&s_state);
   shop_menu_deinit();
+  stats_menu_deinit();
   window_destroy(s_main_window);
 }
 

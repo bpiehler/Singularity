@@ -15,7 +15,7 @@ typedef struct {
 extern const TierInfo TIERS[NUM_TIERS];
 
 #define STORAGE_KEY_GAME_STATE 100
-#define STORAGE_VERSION 3
+#define STORAGE_VERSION 4
 
 // CRITICAL: Doubles must be at the top for 8-byte alignment on ARM hardware.
 typedef struct __attribute__((aligned(8))) {
@@ -24,10 +24,12 @@ typedef struct __attribute__((aligned(8))) {
   double cached_gravity;
   double cached_tap_strength;
   double cached_prestige_dust;
+  double highest_mass_ever;
   int counts[NUM_TIERS];
   uint32_t version;
   time_t last_update;
-  int padding; // Total size: 88 bytes (multiple of 8)
+  uint32_t total_playtime_seconds;
+  int total_singularities;
 } GameState;
 
 typedef void (*ShopPurchaseCallback)(void);
