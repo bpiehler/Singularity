@@ -32,17 +32,13 @@ static void menu_draw_row_callback(GContext *ctx, const Layer *cell_layer, MenuI
     format_mass(cost, s_val_buf);
     snprintf(s_cost_buf, sizeof(s_cost_buf), "Cost: %s", s_val_buf);
   } else {
-    // Big Bang Row (Pre-calculated in shop_menu_show)
+    // TEMPORARY: Bare-bones Big Bang Row to test stability
     affordable = s_game_state->mass >= PRESTIGE_THRESHOLD;
     snprintf(s_name_buf, sizeof(s_name_buf), "%s", affordable ? "THE BIG BANG" : "SINGULARITY");
     
-    if (affordable) {
-      format_mass(s_cached_reward, s_val_buf);
-      snprintf(s_cost_buf, sizeof(s_cost_buf), "Reward: %s Dust", s_val_buf);
-    } else {
-      format_mass(PRESTIGE_THRESHOLD, s_val_buf);
-      snprintf(s_cost_buf, sizeof(s_cost_buf), "Goal: %s", s_val_buf);
-    }
+    // Static subtitle, NO reward calculation
+    format_mass(PRESTIGE_THRESHOLD, s_val_buf);
+    snprintf(s_cost_buf, sizeof(s_cost_buf), "Goal: %s", s_val_buf);
   }
 
   GRect bounds = layer_get_bounds(cell_layer);
@@ -130,15 +126,9 @@ void shop_menu_show(GameState *state, ShopPurchaseCallback callback) {
   s_game_state = state;
   s_callback = callback;
   
-  // Calculate reward ONCE at entry (Prevents crash in draw loop)
-  s_cached_reward = calculate_prestige_dust(s_game_state->mass, PRESTIGE_THRESHOLD);
+  // TEMPORARY: Disable dynamic reward calculation to test stability
+  s_cached_reward = 0; // calculate_prestige_dust(s_game_state->mass, PRESTIGE_THRESHOLD);
   
-  static char lbuf[32];
-  format_mass(s_game_state->mass, lbuf);
-  APP_LOG(APP_LOG_LEVEL_INFO, "Shop: Open | Mass: %s", lbuf);
-  format_mass(s_cached_reward, lbuf);
-  APP_LOG(APP_LOG_LEVEL_INFO, "Shop: Reward: %s Dust", lbuf);
-
   if (s_shop_window) { window_stack_push(s_shop_window, true); return; }
   s_shop_window = window_create();
   window_set_window_handlers(s_shop_window, (WindowHandlers) { .load = shop_window_load, .unload = shop_window_unload });
