@@ -15,15 +15,26 @@ const TierInfo TIERS[NUM_TIERS] = {
 };
 
 void game_state_update_cache(GameState *state) {
-  double g = 0;
+  double raw_g = 0;
+  double highest_base_yield = 1.0;
+  
   for (int i = 0; i < NUM_TIERS; i++) {
     double tier_yield = TIERS[i].yield * calculate_milestone_multiplier(state->counts[i]);
-    g += tier_yield * state->counts[i];
+    raw_g += tier_yield * state->counts[i];
+    if (state->counts[i] > 0) {
+      highest_base_yield = TIERS[i].yield;
+    }
   }
   
-  g += (state->dust * 0.1);
-  state->cached_gravity = g * (1.0 + (state->dust * 0.1));
-  state->cached_tap_strength = 1.0 + (state->cached_gravity * 0.05);
+  // Apply multiplicative dust bonus (+10% per dust)
+  state->cached_gravity = raw_g * (1.0 + (state->dust * 0.1));
+  
+  // Tap Strength = (Highest Tier Base Yield * 10) + (Gravity * 0.25)
+  // This ensures taps always feel like a significant boost over passive income.
+  state->cached_tap_strength = (highest_base_yield * 10.0) + (state->cached_gravity * 0.25);
+  
+  // Global floor to ensure fresh start isn't broken
+  if (state->cached_tap_strength < 1.0) state->cached_tap_strength = 1.0;
 }
 
 void game_state_init(GameState *state) {
@@ -132,8 +143,12 @@ double game_state_prestige(GameState *state) {
 
 void game_state_add_steps(GameState *state, int steps) {
   if (steps <= 0) return;
-  double tap_strength = game_state_calculate_tap_strength(state);
-  state->mass += (tap_strength * steps);
+  // 1 Step = 1.0 Seconds of total passive gravity
+  double gravity = game_state_calculate_gravity(state);
+  
+  // Floor for starting out: if gravity is zero, 1 step = 100mg
+  double gain = (gravity > 0) ? (gravity * (double)steps) : (100.0 * (double)steps);
+  state->mass += gain;
 }
 
 int game_state_get_era(GameState *state) {
