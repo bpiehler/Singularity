@@ -164,14 +164,29 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
                        GTextOverflowModeTrailingEllipsis, GTextAlignmentCenter, NULL);
   } else {
     // Upgrade Ready (>)
-    bool any_affordable = false;
-    for (int i = 0; i < NUM_TIERS; i++) {
-      if (s_state.mass >= calculate_cost(TIERS[i].base_cost, s_state.counts[i])) {
-        any_affordable = true;
+    // Logic: Only show for the highest tier already owned.
+    int highest_owned = -1;
+    for (int i = NUM_TIERS - 1; i >= 0; i--) {
+      if (s_state.counts[i] > 0) {
+        highest_owned = i;
         break;
       }
     }
-    if (any_affordable) {
+    
+    // Check if we can afford the NEXT one of that highest tier
+    bool upgrade_ready = false;
+    if (highest_owned >= 0) {
+      if (s_state.mass >= calculate_cost(TIERS[highest_owned].base_cost, s_state.counts[highest_owned])) {
+        upgrade_ready = true;
+      }
+    } else {
+      // Fresh start: show if we can afford the very first Pebble
+      if (s_state.mass >= TIERS[0].base_cost) {
+        upgrade_ready = true;
+      }
+    }
+
+    if (upgrade_ready) {
       graphics_context_set_text_color(ctx, era_color);
       graphics_draw_text(ctx, ">", fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD), 
                          GRect(bounds.size.w - 15, 12, 10, 20), 
