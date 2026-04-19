@@ -173,11 +173,19 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
       }
     }
     
-    // Check if we can afford the NEXT one of that highest tier
+    // Check if we can afford the NEXT one of that highest tier 
+    // OR the FIRST one of the next tier
     bool upgrade_ready = false;
     if (highest_owned >= 0) {
+      // 1. Can afford current highest?
       if (s_state.mass >= calculate_cost(TIERS[highest_owned].base_cost, s_state.counts[highest_owned])) {
         upgrade_ready = true;
+      }
+      // 2. Can afford next tier unlock?
+      if (highest_owned + 1 < NUM_TIERS) {
+        if (s_state.mass >= TIERS[highest_owned + 1].base_cost) {
+          upgrade_ready = true;
+        }
       }
     } else {
       // Fresh start: show if we can afford the very first Pebble
