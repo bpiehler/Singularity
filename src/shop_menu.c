@@ -69,8 +69,14 @@ static void menu_draw_row_callback(GContext *ctx, const Layer *cell_layer, MenuI
                      GTextOverflowModeTrailingEllipsis, GTextAlignmentLeft, NULL);
 }
 
+static void safe_hide_timer_callback(void *data) {
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "Shop: Delayed hide executing");
+  shop_menu_hide();
+}
+
 static void menu_select_callback(MenuLayer *menu_layer, MenuIndex *cell_index, void *data) {
   int i = cell_index->row;
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "Shop: Select Row %d", i);
   
   if (i < NUM_TIERS) {
     // Normal Tier Purchase
@@ -87,12 +93,17 @@ static void menu_select_callback(MenuLayer *menu_layer, MenuIndex *cell_index, v
     }
   } else {
     // The Big Bang (Prestige)
+    APP_LOG(APP_LOG_LEVEL_INFO, "Shop: Big Bang requested!");
     if (s_game_state->mass >= PRESTIGE_THRESHOLD) {
+      APP_LOG(APP_LOG_LEVEL_INFO, "Shop: Threshold met, executing prestige...");
       game_state_prestige(s_game_state);
       vibes_long_pulse();
       if (s_callback) s_callback();
-      shop_menu_hide(); // Return to main screen (Safe Pop)
+      
+      // Delay the window close to ensure OS is ready
+      app_timer_register(100, safe_hide_timer_callback, NULL);
     } else {
+      APP_LOG(APP_LOG_LEVEL_WARNING, "Shop: Big Bang denied (insufficient mass)");
       vibes_short_pulse();
     }
   }

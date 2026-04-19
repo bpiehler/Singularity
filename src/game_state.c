@@ -127,17 +127,26 @@ void game_state_buy_max(GameState *state, int i) {
 }
 
 double game_state_prestige(GameState *state) {
+  APP_LOG(APP_LOG_LEVEL_INFO, "Math: Prestige Starting...");
   double earned_dust = calculate_prestige_dust(state->mass, PRESTIGE_THRESHOLD);
-  if (earned_dust < 1.0) return 0;
+  APP_LOG(APP_LOG_LEVEL_INFO, "Math: Dust Earned: %d", (int)earned_dust);
+
+  if (earned_dust < 1.0) {
+    APP_LOG(APP_LOG_LEVEL_WARNING, "Math: Prestige Aborted (Earned < 1)");
+    return 0;
+  }
   
   state->dust += earned_dust;
   state->mass = 1.0;
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "Math: Counts Resetting...");
   for (int i = 0; i < NUM_TIERS; i++) {
     state->counts[i] = 0;
   }
   state->last_update = time(NULL);
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "Math: Updating Cache...");
   game_state_update_cache(state);
   
+  APP_LOG(APP_LOG_LEVEL_INFO, "Math: Prestige Complete!");
   return earned_dust;
 }
 
