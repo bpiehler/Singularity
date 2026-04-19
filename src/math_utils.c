@@ -4,41 +4,47 @@
 
 void format_mass(double mass, char *buffer) {
   if (isnan(mass)) {
-    snprintf(buffer, 16, "NaN");
+    snprintf(buffer, 32, "NaN");
     return;
   }
   if (isinf(mass)) {
-    snprintf(buffer, 16, "Infinity");
+    snprintf(buffer, 32, "Infinity");
     return;
   }
   if (mass <= 0) {
-    snprintf(buffer, 16, "0 mg");
+    snprintf(buffer, 32, "0 mg");
     return;
   }
 
+  // Thresholds for units
+  const char* units[] = {"mg", "g", "kg", "t", "kt", "Mt", "Gt", "Tt"};
+  double current_threshold = 1000.0;
+  
+  // mg is handled as pure integer
   if (mass < 1000.0) {
-    // Milligrams: 0 - 999 mg
-    snprintf(buffer, 16, "%d mg", (int)mass);
-  } else if (mass < 1000000.0) {
-    // Grams: 1.0 g - 999.9 g
-    double g = mass / 1000.0;
-    int whole = (int)g;
-    int frac = (int)((g - whole) * 10.0);
-    snprintf(buffer, 16, "%d.%d g", whole, frac);
-  } else if (mass < 1000000000.0) {
-    // Kilograms: 1.0 kg - 999.9 kg
-    double kg = mass / 1000000.0;
-    int whole = (int)kg;
-    int frac = (int)((kg - whole) * 10.0);
-    snprintf(buffer, 16, "%d.%d kg", whole, frac);
-  } else if (mass < 1000000000000.0) {
-    // Tonnes: 1.0 t - 999.9 t
-    double t = mass / 1000000000.0;
-    int whole = (int)t;
-    int frac = (int)((t - whole) * 10.0);
-    snprintf(buffer, 16, "%d.%d t", whole, frac);
+    snprintf(buffer, 32, "%d mg", (int)mass);
+    return;
+  }
+
+  // Find the appropriate metric unit
+  int unit_idx = 0;
+  double val = mass;
+  while (val >= 1000.0 && unit_idx < 7) {
+    val /= 1000.0;
+    unit_idx++;
+  }
+
+  if (unit_idx < 8 && val < 1000.0) {
+    // Add 0.05 for rounding to 1 decimal place before casting to int
+    int whole = (int)val;
+    int frac = (int)((val - whole) * 10.0 + 0.5);
+    if (frac >= 10) {
+      whole++;
+      frac = 0;
+    }
+    snprintf(buffer, 32, "%d.%d %s", whole, frac, units[unit_idx]);
   } else {
-    // Scientific notation for larger numbers: >= 1.000e12 mg
+    // Scientific notation for larger numbers: >= 1.0e24 mg
     int exponent = 0;
     double mantissa = mass;
     while (mantissa >= 10.0 && exponent < 308) {
@@ -51,8 +57,12 @@ void format_mass(double mass, char *buffer) {
     }
     
     int mantissa_int = (int)mantissa;
-    int mantissa_frac = (int)((mantissa - mantissa_int) * 1000.0);
-    snprintf(buffer, 16, "%d.%03de%d mg", mantissa_int, mantissa_frac, exponent);
+    int mantissa_frac = (int)((mantissa - mantissa_int) * 1000.0 + 0.5);
+    if (mantissa_frac >= 1000) {
+      mantissa_int++;
+      mantissa_frac = 0;
+    }
+    snprintf(buffer, 32, "%d.%03de%d mg", mantissa_int, mantissa_frac, exponent);
   }
 }
 

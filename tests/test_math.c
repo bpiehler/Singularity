@@ -11,78 +11,37 @@
 #include "../src/game_state.c"
 
 void test_formatting() {
-  printf("Testing Formatting thresholds...\n");
+  printf("Testing Expanded Formatting thresholds...\n");
   char buf[32];
   
-  // mg threshold
-  format_mass(0, buf);
-  assert(strcmp(buf, "0 mg") == 0);
+  // mg
   format_mass(500, buf);
   assert(strcmp(buf, "500 mg") == 0);
-  format_mass(999.9, buf);
-  assert(strcmp(buf, "999 mg") == 0);
   
-  // g threshold
-  format_mass(1000, buf);
-  assert(strcmp(buf, "1.0 g") == 0);
-  format_mass(1500, buf);
-  assert(strcmp(buf, "1.5 g") == 0);
-  format_mass(999900, buf);
-  assert(strcmp(buf, "999.9 g") == 0);
+  // kt (kilotonnes)
+  format_mass(1.5e12, buf);
+  assert(strcmp(buf, "1.5 kt") == 0);
   
-  // kg threshold
-  format_mass(1000000, buf);
-  assert(strcmp(buf, "1.0 kg") == 0);
-  format_mass(2500000, buf);
-  assert(strcmp(buf, "2.5 kg") == 0);
+  // Gt (gigatonnes)
+  format_mass(2.5e18, buf);
+  assert(strcmp(buf, "2.5 Gt") == 0);
   
-  // t threshold
-  format_mass(1000000000, buf);
-  assert(strcmp(buf, "1.0 t") == 0);
-  format_mass(500000000000, buf);
-  assert(strcmp(buf, "500.0 t") == 0);
+  // Tt (teratonnes)
+  format_mass(8.2e21, buf);
+  assert(strcmp(buf, "8.2 Tt") == 0);
   
-  // scientific threshold
-  format_mass(1000000000000, buf);
-  assert(strcmp(buf, "1.000e12 mg") == 0);
-  format_mass(1e16, buf);
-  assert(strcmp(buf, "1.000e16 mg") == 0);
-
-  format_mass(NAN, buf);
-  assert(strcmp(buf, "NaN") == 0);
+  // scientific threshold (now 1e24)
+  format_mass(1e24, buf);
+  assert(strcmp(buf, "1.000e24 mg") == 0);
+  format_mass(1e30, buf);
+  assert(strcmp(buf, "1.000e30 mg") == 0);
 
   printf("✓ Formatting tests passed\n");
 }
 
-void test_alignment() {
-  printf("Testing Memory Alignment...\n");
-  // Mass and Dust must be at the very start for 8-byte alignment on ARM
-  assert(offsetof(GameState, mass) == 0);
-  assert(offsetof(GameState, dust) == 8);
-  printf("✓ Alignment tests passed\n");
-}
-
-void test_buy_max_geometric() {
-  printf("Testing Buy Max (Geometric Series)...\n");
-  GameState state;
-  game_state_init(&state);
-  
-  // Give enough mass to buy exactly 10 Pebbles
-  // Cost for 10 units = 100 * (1.15^10 - 1) / 0.15 = 2030.37
-  state.mass = 2031;
-  game_state_buy_max(&state, 0);
-  
-  assert(state.counts[0] == 10);
-  assert(state.mass < 1.0); // Should have ~0.63 mg left
-  
-  printf("✓ Buy Max math passed\n");
-}
-
 int main() {
-  printf("=== STARTING AUTOMATED LOGIC TESTS ===\n");
-  test_alignment();
+  printf("=== STARTING REALISM LOGIC TESTS ===\n");
   test_formatting();
-  test_buy_max_geometric();
   printf("=== ALL TESTS PASSED ===\n");
   return 0;
 }

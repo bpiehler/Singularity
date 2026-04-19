@@ -3,7 +3,7 @@
 #include <pebble.h>
 
 // Format a double into a scientific notation string (e.g., "1.234e56")
-// Buffer must be at least 16 bytes
+// Buffer must be at least 32 bytes
 void format_mass(double mass, char *buffer);
 
 // Calculate the cost of the next unit in a tier

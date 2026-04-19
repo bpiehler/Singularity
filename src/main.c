@@ -100,10 +100,10 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   GRect bounds = layer_get_bounds(layer);
   GPoint center = grect_center_point(&bounds);
 
-  // radius = 10 + (log10(mass) / 16.0) * 60
+  // radius = 10 + (log10(mass) / 30.0) * 60
   double log_mass = log10(s_state.mass > 1.0 ? s_state.mass : 1.0);
-  if (log_mass > 16.0) log_mass = 16.0;
-  int radius = 10 + (int)((log_mass / 16.0) * 60.0);
+  if (log_mass > 30.0) log_mass = 30.0;
+  int radius = 10 + (int)((log_mass / 30.0) * 60.0);
 
   // Singularity Instability (Jitter and Red Color)
   bool is_unstable = (s_state.mass >= PRESTIGE_THRESHOLD * 0.9);
