@@ -4,14 +4,14 @@
 
 const TierInfo TIERS[NUM_TIERS] = {
   {"Pebble", 100.0, 1.0},
-  {"Rock", 5000.0, 25.0},
-  {"Boulder", 1000000.0, 2500.0},
-  {"Asteroid", 1000000000.0, 1000000.0},
-  {"Moon", 1.0e14, 5.0e10},
-  {"Planet", 1.0e19, 2.5e15},
-  {"Gas Giant", 1.0e23, 1.0e19},
-  {"Star", 1.0e26, 5.0e21},
-  {"Black Hole", 1.0e29, 1.0e25}
+  {"Rock", 1000000.0, 10000.0},
+  {"Boulder", 1.0e10, 1.0e8},
+  {"Mountain", 1.0e14, 1.0e12},
+  {"Asteroid", 1.0e18, 1.0e16},
+  {"Moon", 1.0e22, 1.0e20},
+  {"Planet", 1.0e26, 1.0e24},
+  {"Gas Giant", 1.0e30, 1.0e28},
+  {"Star", 1.0e34, 1.0e32}
 };
 
 void game_state_update_cache(GameState *state) {
@@ -160,8 +160,8 @@ int game_state_get_era(GameState *state) {
     }
   }
   if (highest <= 2) return 0; // Terrestrial (Pebble, Rock, Boulder)
-  if (highest <= 4) return 1; // Lunar/Asteroid (Asteroid, Moon)
-  if (highest <= 6) return 2; // Planetary (Planet, Gas Giant)
-  if (highest == 7) return 3; // Stellar (Star)
-  return 4;                   // Singularity (Black Hole)
+  if (highest <= 4) return 1; // Lunar/Asteroid (Mountain, Asteroid)
+  if (highest <= 6) return 2; // Planetary (Moon, Planet)
+  if (highest == 7) return 3; // Stellar (Gas Giant)
+  return 4;                   // Singularity (Star)
 }

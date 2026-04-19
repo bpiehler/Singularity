@@ -4,7 +4,7 @@
 
 #define NUM_TIERS 9
 #define OFFLINE_CAP_SECONDS 172800 // 48 hours
-#define PRESTIGE_THRESHOLD 1e30
+#define PRESTIGE_THRESHOLD 1e36
 
 typedef struct {
   char *name;
