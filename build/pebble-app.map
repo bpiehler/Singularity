@@ -50,8 +50,6 @@ Archive member included to satisfy reference by file (symbol)
                               /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/crt0.o (__libc_fini_array)
 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-lock.o)
                               /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-findfp.o) (__retarget_lock_init_recursive)
-/home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libm_a-s_modf.o)
-                              src/shop_menu.c.49.o (modf)
 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-__atexit.o)
                               /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-atexit.o) (__register_exitproc)
 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-__call_atexit.o)
@@ -70,8 +68,6 @@ Archive member included to satisfy reference by file (symbol)
                               /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-freer.o) (_sbrk_r)
 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-sysconf.o)
                               /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-freer.o) (sysconf)
-/home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libm_a-s_fpclassify.o)
-                              /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libm_a-s_modf.o) (__fpclassifyd)
 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-errno.o)
                               /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-sysconf.o) (__errno)
 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-w_log.o)
@@ -1320,8 +1316,6 @@ Discarded input sections
                 0x00000000        0x1 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-lock.o)
  .bss.__lock___sfp_recursive_mutex
                 0x00000000        0x1 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-lock.o)
- .text          0x00000000        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libm_a-s_modf.o)
- .bss           0x00000000        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libm_a-s_modf.o)
  .text          0x00000000        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-__atexit.o)
  .bss           0x00000000        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-__atexit.o)
  .text.__register_exitproc
@@ -1386,8 +1380,6 @@ Discarded input sections
  .text          0x00000000        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-sysconf.o)
  .bss           0x00000000        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-sysconf.o)
  .text.sysconf  0x00000000       0x1c /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-sysconf.o)
- .text          0x00000000        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libm_a-s_fpclassify.o)
- .bss           0x00000000        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libm_a-s_fpclassify.o)
  .text          0x00000000        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-errno.o)
  .bss           0x00000000        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-errno.o)
  .text          0x00000000        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-m/nofp/crtend.o
@@ -1474,7 +1466,7 @@ LOAD /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gc
  .note.gnu.build-id
                 0x00000084       0x24 linker stubs
 
-.text           0x000000a8     0x44d0
+.text           0x000000a8     0x41f0
  *(.text)
  .text          0x000000a8       0x14 /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
  .text          0x000000bc      0x378 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-m/nofp/libgcc.a(_arm_addsubdf3.o)
@@ -1623,455 +1615,449 @@ LOAD /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gc
                 0x00002180                calculate_milestone_multiplier
  *fill*         0x0000219e        0x2 
  .text.calculate_prestige_dust
-                0x000021a0      0x110 src/math_utils.c.49.o
+                0x000021a0       0x7c src/math_utils.c.49.o
                 0x000021a0                calculate_prestige_dust
  .text.menu_get_num_rows_callback
-                0x000022b0        0x4 src/shop_menu.c.49.o
+                0x0000221c        0x4 src/shop_menu.c.49.o
  .text.menu_get_cell_height_callback
-                0x000022b4        0x4 src/shop_menu.c.49.o
+                0x00002220        0x4 src/shop_menu.c.49.o
  .text.shop_window_unload
-                0x000022b8       0x24 src/shop_menu.c.49.o
+                0x00002224       0x24 src/shop_menu.c.49.o
  .text.shop_window_load
-                0x000022dc      0x130 src/shop_menu.c.49.o
+                0x00002248      0x130 src/shop_menu.c.49.o
  .text.big_bang_timer_callback
-                0x0000240c        0x4 src/shop_menu.c.49.o
+                0x00002378        0x4 src/shop_menu.c.49.o
+ *fill*         0x0000237c        0x4 
  .text.menu_draw_row_callback
-                0x00002410      0x2a4 src/shop_menu.c.49.o
+                0x00002380      0x224 src/shop_menu.c.49.o
  .text.menu_select_long_callback
-                0x000026b4       0x50 src/shop_menu.c.49.o
+                0x000025a4       0x50 src/shop_menu.c.49.o
  .text.shop_menu_show
-                0x00002704       0x60 src/shop_menu.c.49.o
-                0x00002704                shop_menu_show
+                0x000025f4       0x60 src/shop_menu.c.49.o
+                0x000025f4                shop_menu_show
  .text.shop_menu_hide
-                0x00002764       0x14 src/shop_menu.c.49.o
-                0x00002764                shop_menu_hide
+                0x00002654       0x14 src/shop_menu.c.49.o
+                0x00002654                shop_menu_hide
  .text.menu_select_callback
-                0x00002778       0xd0 src/shop_menu.c.49.o
+                0x00002668       0xd0 src/shop_menu.c.49.o
  .text.shop_menu_deinit
-                0x00002848       0x18 src/shop_menu.c.49.o
-                0x00002848                shop_menu_deinit
+                0x00002738       0x18 src/shop_menu.c.49.o
+                0x00002738                shop_menu_deinit
  .text.app_event_loop
-                0x00002860        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002860                app_event_loop
- .text.app_log  0x0000286c        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x0000286c                app_log
+                0x00002750        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00002750                app_event_loop
+ .text.app_log  0x0000275c        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x0000275c                app_log
  .text.app_timer_cancel
-                0x00002878        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002878                app_timer_cancel
+                0x00002768        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00002768                app_timer_cancel
  .text.app_timer_register
-                0x00002884        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002884                app_timer_register
+                0x00002774        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00002774                app_timer_register
  .text.fonts_get_system_font
-                0x00002890        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002890                fonts_get_system_font
+                0x00002780        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00002780                fonts_get_system_font
  .text.graphics_draw_circle
-                0x0000289c        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x0000289c                graphics_draw_circle
+                0x0000278c        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x0000278c                graphics_draw_circle
  .text.graphics_draw_line
-                0x000028a8        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x000028a8                graphics_draw_line
+                0x00002798        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00002798                graphics_draw_line
  .text.graphics_fill_circle
-                0x000028b4        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x000028b4                graphics_fill_circle
+                0x000027a4        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x000027a4                graphics_fill_circle
  .text.graphics_fill_rect
-                0x000028c0        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x000028c0                graphics_fill_rect
+                0x000027b0        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x000027b0                graphics_fill_rect
  .text.layer_add_child
-                0x000028cc        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x000028cc                layer_add_child
+                0x000027bc        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x000027bc                layer_add_child
  .text.layer_create
-                0x000028d8        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x000028d8                layer_create
+                0x000027c8        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x000027c8                layer_create
  .text.layer_destroy
-                0x000028e4        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x000028e4                layer_destroy
+                0x000027d4        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x000027d4                layer_destroy
  .text.layer_get_bounds
-                0x000028f0        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x000028f0                layer_get_bounds
+                0x000027e0        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x000027e0                layer_get_bounds
  .text.layer_mark_dirty
-                0x000028fc        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x000028fc                layer_mark_dirty
+                0x000027ec        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x000027ec                layer_mark_dirty
  .text.layer_set_update_proc
-                0x00002908        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002908                layer_set_update_proc
- .text.memset   0x00002914        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002914                memset
+                0x000027f8        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x000027f8                layer_set_update_proc
+ .text.memset   0x00002804        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00002804                memset
  .text.menu_layer_destroy
-                0x00002920        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002920                menu_layer_destroy
+                0x00002810        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00002810                menu_layer_destroy
  .text.menu_layer_get_layer
-                0x0000292c        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x0000292c                menu_layer_get_layer
+                0x0000281c        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x0000281c                menu_layer_get_layer
  .text.menu_layer_reload_data
-                0x00002938        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002938                menu_layer_reload_data
+                0x00002828        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00002828                menu_layer_reload_data
  .text.menu_layer_set_click_config_onto_window
-                0x00002944        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002944                menu_layer_set_click_config_onto_window
+                0x00002834        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00002834                menu_layer_set_click_config_onto_window
  .text.menu_layer_set_selected_index
-                0x00002950        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002950                menu_layer_set_selected_index
+                0x00002840        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00002840                menu_layer_set_selected_index
  .text.persist_exists
-                0x0000295c        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x0000295c                persist_exists
- .text.rand     0x00002968        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002968                rand
+                0x0000284c        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x0000284c                persist_exists
+ .text.rand     0x00002858        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00002858                rand
  .text.snprintf
-                0x00002974        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002974                snprintf
- .text.strcpy   0x00002980        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002980                strcpy
+                0x00002864        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00002864                snprintf
+ .text.strcpy   0x00002870        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00002870                strcpy
  .text.tick_timer_service_subscribe
-                0x0000298c        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x0000298c                tick_timer_service_subscribe
+                0x0000287c        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x0000287c                tick_timer_service_subscribe
  .text.tick_timer_service_unsubscribe
-                0x00002998        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002998                tick_timer_service_unsubscribe
+                0x00002888        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00002888                tick_timer_service_unsubscribe
  .text.vibes_double_pulse
-                0x000029a4        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x000029a4                vibes_double_pulse
+                0x00002894        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00002894                vibes_double_pulse
  .text.vibes_long_pulse
-                0x000029b0        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x000029b0                vibes_long_pulse
+                0x000028a0        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x000028a0                vibes_long_pulse
  .text.vibes_short_pulse
-                0x000029bc        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x000029bc                vibes_short_pulse
+                0x000028ac        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x000028ac                vibes_short_pulse
  .text.window_create
-                0x000029c8        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x000029c8                window_create
+                0x000028b8        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x000028b8                window_create
  .text.window_destroy
-                0x000029d4        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x000029d4                window_destroy
+                0x000028c4        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x000028c4                window_destroy
  .text.window_get_root_layer
-                0x000029e0        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x000029e0                window_get_root_layer
+                0x000028d0        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x000028d0                window_get_root_layer
  .text.window_set_click_config_provider
-                0x000029ec        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x000029ec                window_set_click_config_provider
+                0x000028dc        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x000028dc                window_set_click_config_provider
  .text.window_set_window_handlers
-                0x000029f8        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x000029f8                window_set_window_handlers
+                0x000028e8        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x000028e8                window_set_window_handlers
  .text.window_stack_pop
-                0x00002a04        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002a04                window_stack_pop
+                0x000028f4        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x000028f4                window_stack_pop
  .text.window_stack_push
-                0x00002a10        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002a10                window_stack_push
+                0x00002900        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00002900                window_stack_push
  .text.app_focus_service_subscribe
-                0x00002a1c        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002a1c                app_focus_service_subscribe
+                0x0000290c        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x0000290c                app_focus_service_subscribe
  .text.app_focus_service_unsubscribe
-                0x00002a28        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002a28                app_focus_service_unsubscribe
+                0x00002918        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00002918                app_focus_service_unsubscribe
  .text.window_long_click_subscribe
-                0x00002a34        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002a34                window_long_click_subscribe
+                0x00002924        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00002924                window_long_click_subscribe
  .text.window_raw_click_subscribe
-                0x00002a40        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002a40                window_raw_click_subscribe
+                0x00002930        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00002930                window_raw_click_subscribe
  .text.window_single_click_subscribe
-                0x00002a4c        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002a4c                window_single_click_subscribe
+                0x0000293c        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x0000293c                window_single_click_subscribe
  .text.graphics_draw_text
-                0x00002a58        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002a58                graphics_draw_text
+                0x00002948        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00002948                graphics_draw_text
  .text.persist_read_data
-                0x00002a64        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002a64                persist_read_data
+                0x00002954        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00002954                persist_read_data
  .text.persist_write_data
-                0x00002a70        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002a70                persist_write_data
+                0x00002960        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00002960                persist_write_data
  .text.graphics_context_set_fill_color
-                0x00002a7c        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002a7c                graphics_context_set_fill_color
+                0x0000296c        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x0000296c                graphics_context_set_fill_color
  .text.graphics_context_set_stroke_color
-                0x00002a88        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002a88                graphics_context_set_stroke_color
+                0x00002978        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00002978                graphics_context_set_stroke_color
  .text.graphics_context_set_text_color
-                0x00002a94        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002a94                graphics_context_set_text_color
+                0x00002984        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00002984                graphics_context_set_text_color
  .text.window_set_background_color
-                0x00002aa0        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002aa0                window_set_background_color
+                0x00002990        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00002990                window_set_background_color
  .text.menu_layer_create
-                0x00002aac        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002aac                menu_layer_create
+                0x0000299c        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x0000299c                menu_layer_create
  .text.graphics_context_set_stroke_width
-                0x00002ab8        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002ab8                graphics_context_set_stroke_width
+                0x000029a8        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x000029a8                graphics_context_set_stroke_width
  .text.menu_cell_layer_is_highlighted
-                0x00002ac4        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002ac4                menu_cell_layer_is_highlighted
+                0x000029b4        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x000029b4                menu_cell_layer_is_highlighted
  .text.text_layer_create
-                0x00002ad0        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002ad0                text_layer_create
+                0x000029c0        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x000029c0                text_layer_create
  .text.text_layer_destroy
-                0x00002adc        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002adc                text_layer_destroy
+                0x000029cc        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x000029cc                text_layer_destroy
  .text.text_layer_get_layer
-                0x00002ae8        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002ae8                text_layer_get_layer
+                0x000029d8        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x000029d8                text_layer_get_layer
  .text.text_layer_set_background_color
-                0x00002af4        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002af4                text_layer_set_background_color
+                0x000029e4        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x000029e4                text_layer_set_background_color
  .text.text_layer_set_font
-                0x00002b00        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002b00                text_layer_set_font
+                0x000029f0        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x000029f0                text_layer_set_font
  .text.text_layer_set_text
-                0x00002b0c        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002b0c                text_layer_set_text
+                0x000029fc        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x000029fc                text_layer_set_text
  .text.text_layer_set_text_alignment
-                0x00002b18        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002b18                text_layer_set_text_alignment
+                0x00002a08        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00002a08                text_layer_set_text_alignment
  .text.text_layer_set_text_color
-                0x00002b24        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002b24                text_layer_set_text_color
- .text.time     0x00002b30        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002b30                time
+                0x00002a14        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00002a14                text_layer_set_text_color
+ .text.time     0x00002a20        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00002a20                time
  .text.menu_layer_set_callbacks
-                0x00002b3c        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002b3c                menu_layer_set_callbacks
- .text.modf     0x00002b48       0xa4 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libm_a-s_modf.o)
-                0x00002b48                modf
- .text.__fpclassifyd
-                0x00002bec       0x58 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libm_a-s_fpclassify.o)
-                0x00002bec                __fpclassifyd
- .text.__errno  0x00002c44        0xc /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-errno.o)
-                0x00002c44                __errno
- .text.log      0x00002c50       0x68 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-w_log.o)
-                0x00002c50                log
- .text.log10    0x00002cb8       0x68 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-w_log10.o)
-                0x00002cb8                log10
- .text.pow      0x00002d20       0xdc /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-w_pow.o)
-                0x00002d20                pow
- .text.sqrt     0x00002dfc       0x50 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-w_sqrt.o)
-                0x00002dfc                sqrt
- .text.finite   0x00002e4c        0xc /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-s_finite.o)
-                0x00002e4c                finite
- .text.nan      0x00002e58        0xc /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-s_nan.o)
-                0x00002e58                nan
+                0x00002a2c        0xc /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00002a2c                menu_layer_set_callbacks
+ .text.__errno  0x00002a38        0xc /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-errno.o)
+                0x00002a38                __errno
+ .text.log      0x00002a44       0x68 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-w_log.o)
+                0x00002a44                log
+ .text.log10    0x00002aac       0x68 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-w_log10.o)
+                0x00002aac                log10
+ .text.pow      0x00002b14       0xdc /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-w_pow.o)
+                0x00002b14                pow
+ .text.sqrt     0x00002bf0       0x50 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-w_sqrt.o)
+                0x00002bf0                sqrt
+ .text.finite   0x00002c40        0xc /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-s_finite.o)
+                0x00002c40                finite
+ .text.nan      0x00002c4c        0xc /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-s_nan.o)
+                0x00002c4c                nan
  .text.__ieee754_sqrt
-                0x00002e64      0x1dc /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-e_sqrt.o)
-                0x00002e64                __ieee754_sqrt
+                0x00002c58      0x1dc /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-e_sqrt.o)
+                0x00002c58                __ieee754_sqrt
+ *fill*         0x00002e34        0x4 
  .text.__ieee754_log
-                0x00003040      0x3ac /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-e_log.o)
-                0x00003040                __ieee754_log
- *fill*         0x000033ec        0x4 
+                0x00002e38      0x3ac /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-e_log.o)
+                0x00002e38                __ieee754_log
+ *fill*         0x000031e4        0x4 
  .text.__ieee754_log10
-                0x000033f0      0x104 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-e_log10.o)
-                0x000033f0                __ieee754_log10
- *fill*         0x000034f4        0x4 
+                0x000031e8      0x104 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-e_log10.o)
+                0x000031e8                __ieee754_log10
+ *fill*         0x000032ec        0x4 
  .text.__ieee754_pow
-                0x000034f8      0xbc8 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-e_pow.o)
-                0x000034f8                __ieee754_pow
- .text.fabs     0x000040c0        0x8 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-s_fabs.o)
-                0x000040c0                fabs
- .text.scalbn   0x000040c8       0xfc /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-s_scalbn.o)
-                0x000040c8                scalbn
+                0x000032f0      0xbc8 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-e_pow.o)
+                0x000032f0                __ieee754_pow
+ .text.fabs     0x00003eb8        0x8 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-s_fabs.o)
+                0x00003eb8                fabs
+ .text.scalbn   0x00003ec0       0xfc /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-s_scalbn.o)
+                0x00003ec0                scalbn
  .text.with_errno
-                0x000041c4       0x18 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-math_err.o)
- .text.xflow    0x000041dc       0x30 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-math_err.o)
+                0x00003fbc       0x18 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-math_err.o)
+ .text.xflow    0x00003fd4       0x30 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-math_err.o)
  .text.__math_uflow
-                0x0000420c        0xc /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-math_err.o)
-                0x0000420c                __math_uflow
+                0x00004004        0xc /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-math_err.o)
+                0x00004004                __math_uflow
  .text.__math_oflow
-                0x00004218        0xc /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-math_err.o)
-                0x00004218                __math_oflow
+                0x00004010        0xc /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-math_err.o)
+                0x00004010                __math_oflow
  *(.rodata)
  *(.rodata*)
  .rodata.game_state_save.str1.1
-                0x00004224      0x340 src/game_state.c.49.o
+                0x0000401c      0x263 src/game_state.c.49.o
                                  0x37 (size before relaxing)
  .rodata.game_state_load.str1.1
-                0x00004564       0x44 src/game_state.c.49.o
+                0x0000427f       0x44 src/game_state.c.49.o
  .rodata.game_state_apply_offline_gains.str1.1
-                0x00004564       0x2f src/game_state.c.49.o
+                0x0000427f       0x2f src/game_state.c.49.o
  .rodata.game_state_prestige.str1.1
-                0x00004564       0xa0 src/game_state.c.49.o
+                0x0000427f       0xa0 src/game_state.c.49.o
  .rodata.str1.1
-                0x00004564       0x41 src/game_state.c.49.o
+                0x0000427f       0x41 src/game_state.c.49.o
  .rodata.canvas_update_proc.str1.1
-                0x00004564       0x3a src/main.c.49.o
+                0x0000427f       0x3a src/main.c.49.o
  .rodata.update_display.str1.1
-                0x00004564        0xb src/main.c.49.o
+                0x0000427f        0xb src/main.c.49.o
  .rodata.main_window_load.str1.1
-                0x00004564       0x16 src/main.c.49.o
+                0x0000427f       0x16 src/main.c.49.o
  .rodata.format_mass.str1.1
-                0x00004564       0x3e src/math_utils.c.49.o
- .rodata.calculate_prestige_dust.str1.1
-                0x00004564       0x6b src/math_utils.c.49.o
+                0x0000427f       0x3e src/math_utils.c.49.o
  .rodata.menu_draw_row_callback.str1.1
-                0x00004564       0xea src/shop_menu.c.49.o
+                0x0000427f       0x78 src/shop_menu.c.49.o
+ *fill*         0x0000427f        0x1 
  .rodata.log.str1.4
-                0x00004564        0x1 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-w_log.o)
+                0x00004280        0x1 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-w_log.o)
  .rodata.log10.str1.4
-                0x00004565        0x1 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-w_log10.o)
- *fill*         0x00004565        0x3 
- .rodata.tiny   0x00004568        0x8 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-e_sqrt.o)
- .rodata.one    0x00004570        0x8 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-e_sqrt.o)
+                0x00004281        0x1 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-w_log10.o)
+ *fill*         0x00004281        0x7 
+ .rodata.tiny   0x00004288        0x8 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-e_sqrt.o)
+ .rodata.one    0x00004290        0x8 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-e_sqrt.o)
 
-.glue_7         0x00004578        0x0
- .glue_7        0x00004578        0x0 linker stubs
+.glue_7         0x00004298        0x0
+ .glue_7        0x00004298        0x0 linker stubs
 
-.glue_7t        0x00004578        0x0
- .glue_7t       0x00004578        0x0 linker stubs
+.glue_7t        0x00004298        0x0
+ .glue_7t       0x00004298        0x0 linker stubs
 
-.vfp11_veneer   0x00004578        0x0
- .vfp11_veneer  0x00004578        0x0 linker stubs
+.vfp11_veneer   0x00004298        0x0
+ .vfp11_veneer  0x00004298        0x0 linker stubs
 
-.v4_bx          0x00004578        0x0
- .v4_bx         0x00004578        0x0 linker stubs
+.v4_bx          0x00004298        0x0
+ .v4_bx         0x00004298        0x0 linker stubs
 
-.init           0x00004578        0x4
- .init          0x00004578        0x4 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-m/nofp/crti.o
-                0x00004578                _init
+.init           0x00004298        0x4
+ .init          0x00004298        0x4 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-m/nofp/crti.o
+                0x00004298                _init
 
-.fini           0x0000457c        0x4
- .fini          0x0000457c        0x4 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-m/nofp/crti.o
-                0x0000457c                _fini
+.fini           0x0000429c        0x4
+ .fini          0x0000429c        0x4 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-m/nofp/crti.o
+                0x0000429c                _fini
 
-.iplt           0x00004580        0x0
- .iplt          0x00004580        0x0 src/game_state.c.49.o
+.iplt           0x000042a0        0x0
+ .iplt          0x000042a0        0x0 src/game_state.c.49.o
 
-.rel.dyn        0x00004580        0x0
- .rel.iplt      0x00004580        0x0 src/game_state.c.49.o
- .rel.got       0x00004580        0x0 src/game_state.c.49.o
+.rel.dyn        0x000042a0        0x0
+ .rel.iplt      0x000042a0        0x0 src/game_state.c.49.o
+ .rel.got       0x000042a0        0x0 src/game_state.c.49.o
 
-.data           0x00004580      0x220
+.data           0x000042a0      0x220
  *(.data)
- .data          0x00004580        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-m/nofp/crti.o
- .data          0x00004580        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-m/nofp/crtbegin.o
- .data          0x00004580        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/crt0.o
- .data          0x00004580        0x0 src/game_state.c.49.o
- .data          0x00004580        0x0 src/main.c.49.o
- .data          0x00004580        0x0 src/math_utils.c.49.o
- .data          0x00004580        0x0 src/shop_menu.c.49.o
- .data          0x00004580        0x0 aplite/appinfo.auto.c.49.o
- .data          0x00004580        0x0 aplite/src/resource_ids.auto.c.49.o
- .data          0x00004580        0x0 /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
- .data          0x00004580        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-m/nofp/libgcc.a(_arm_muldf3.o)
- .data          0x00004580        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-m/nofp/libgcc.a(_arm_mulsf3.o)
- .data          0x00004580        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-m/nofp/libgcc.a(_arm_addsubdf3.o)
- .data          0x00004580        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-m/nofp/libgcc.a(_arm_muldivdf3.o)
- .data          0x00004580        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-m/nofp/libgcc.a(_arm_cmpdf2.o)
- .data          0x00004580        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-m/nofp/libgcc.a(_arm_unorddf2.o)
- .data          0x00004580        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-m/nofp/libgcc.a(_arm_fixdfsi.o)
- .data          0x00004580        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-m/nofp/libgcc.a(_arm_addsubsf3.o)
- .data          0x00004580        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-m/nofp/libgcc.a(_arm_muldivsf3.o)
- .data          0x00004580        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-m/nofp/libgcc.a(_arm_fixsfsi.o)
- .data          0x00004580        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-atexit.o)
- .data          0x00004580        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-exit.o)
- .data          0x00004580        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-findfp.o)
- .data          0x00004580        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-fwalk.o)
- .data          0x00004580        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-stdio.o)
- .data          0x00004580        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-closer.o)
- .data          0x00004580        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-reent.o)
- .data          0x00004580        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-impure.o)
- .data          0x00004580        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-lseekr.o)
- .data          0x00004580        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-readr.o)
- .data          0x00004580        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-writer.o)
- .data          0x00004580        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-init.o)
- .data          0x00004580        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-fini.o)
- .data          0x00004580        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-lock.o)
- .data          0x00004580        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libm_a-s_modf.o)
- .data          0x00004580        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-__atexit.o)
- .data          0x00004580        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-__call_atexit.o)
- .data          0x00004580        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-freer.o)
- .data          0x00004580        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-mallocr.o)
- .data          0x00004580        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-mlock.o)
- .data          0x00004580        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-fclose.o)
- .data          0x00004580        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-fflush.o)
- .data          0x00004580        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-sbrkr.o)
- .data          0x00004580        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-sysconf.o)
- .data          0x00004580        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libm_a-s_fpclassify.o)
- .data          0x00004580        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-errno.o)
- .data          0x00004580        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-m/nofp/crtend.o
- .data          0x00004580        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-m/nofp/crtn.o
- .data          0x00004580        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-w_log.o)
- .data          0x00004580        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-w_log10.o)
- .data          0x00004580        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-w_pow.o)
- .data          0x00004580        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-w_sqrt.o)
- .data          0x00004580        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-s_finite.o)
- .data          0x00004580        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-s_nan.o)
- .data          0x00004580        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-e_sqrt.o)
- .data          0x00004580        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-e_log.o)
- .data          0x00004580        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-e_log10.o)
- .data          0x00004580        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-e_pow.o)
- .data          0x00004580        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-s_fabs.o)
- .data          0x00004580        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-s_scalbn.o)
- .data          0x00004580        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-math_err.o)
+ .data          0x000042a0        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-m/nofp/crti.o
+ .data          0x000042a0        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-m/nofp/crtbegin.o
+ .data          0x000042a0        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/crt0.o
+ .data          0x000042a0        0x0 src/game_state.c.49.o
+ .data          0x000042a0        0x0 src/main.c.49.o
+ .data          0x000042a0        0x0 src/math_utils.c.49.o
+ .data          0x000042a0        0x0 src/shop_menu.c.49.o
+ .data          0x000042a0        0x0 aplite/appinfo.auto.c.49.o
+ .data          0x000042a0        0x0 aplite/src/resource_ids.auto.c.49.o
+ .data          0x000042a0        0x0 /home/brittp/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+ .data          0x000042a0        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-m/nofp/libgcc.a(_arm_muldf3.o)
+ .data          0x000042a0        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-m/nofp/libgcc.a(_arm_mulsf3.o)
+ .data          0x000042a0        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-m/nofp/libgcc.a(_arm_addsubdf3.o)
+ .data          0x000042a0        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-m/nofp/libgcc.a(_arm_muldivdf3.o)
+ .data          0x000042a0        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-m/nofp/libgcc.a(_arm_cmpdf2.o)
+ .data          0x000042a0        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-m/nofp/libgcc.a(_arm_unorddf2.o)
+ .data          0x000042a0        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-m/nofp/libgcc.a(_arm_fixdfsi.o)
+ .data          0x000042a0        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-m/nofp/libgcc.a(_arm_addsubsf3.o)
+ .data          0x000042a0        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-m/nofp/libgcc.a(_arm_muldivsf3.o)
+ .data          0x000042a0        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-m/nofp/libgcc.a(_arm_fixsfsi.o)
+ .data          0x000042a0        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-atexit.o)
+ .data          0x000042a0        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-exit.o)
+ .data          0x000042a0        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-findfp.o)
+ .data          0x000042a0        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-fwalk.o)
+ .data          0x000042a0        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-stdio.o)
+ .data          0x000042a0        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-closer.o)
+ .data          0x000042a0        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-reent.o)
+ .data          0x000042a0        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-impure.o)
+ .data          0x000042a0        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-lseekr.o)
+ .data          0x000042a0        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-readr.o)
+ .data          0x000042a0        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-writer.o)
+ .data          0x000042a0        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-init.o)
+ .data          0x000042a0        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-fini.o)
+ .data          0x000042a0        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-lock.o)
+ .data          0x000042a0        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-__atexit.o)
+ .data          0x000042a0        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-__call_atexit.o)
+ .data          0x000042a0        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-freer.o)
+ .data          0x000042a0        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-mallocr.o)
+ .data          0x000042a0        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-mlock.o)
+ .data          0x000042a0        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-fclose.o)
+ .data          0x000042a0        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-fflush.o)
+ .data          0x000042a0        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-sbrkr.o)
+ .data          0x000042a0        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-sysconf.o)
+ .data          0x000042a0        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-errno.o)
+ .data          0x000042a0        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-m/nofp/crtend.o
+ .data          0x000042a0        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-m/nofp/crtn.o
+ .data          0x000042a0        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-w_log.o)
+ .data          0x000042a0        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-w_log10.o)
+ .data          0x000042a0        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-w_pow.o)
+ .data          0x000042a0        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-w_sqrt.o)
+ .data          0x000042a0        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-s_finite.o)
+ .data          0x000042a0        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-s_nan.o)
+ .data          0x000042a0        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-e_sqrt.o)
+ .data          0x000042a0        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-e_log.o)
+ .data          0x000042a0        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-e_log10.o)
+ .data          0x000042a0        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-e_pow.o)
+ .data          0x000042a0        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-s_fabs.o)
+ .data          0x000042a0        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-s_scalbn.o)
+ .data          0x000042a0        0x0 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a(libm_a-math_err.o)
  *(.data.*)
  .data.rel.ro.local.TIERS
-                0x00004580       0xd8 src/game_state.c.49.o
-                0x00004580                TIERS
+                0x000042a0       0xd8 src/game_state.c.49.o
+                0x000042a0                TIERS
  .data.s_app_has_focus
-                0x00004658        0x1 src/main.c.49.o
- *fill*         0x00004659        0x3 
+                0x00004378        0x1 src/main.c.49.o
+ *fill*         0x00004379        0x3 
  .data._impure_ptr
-                0x0000465c        0x4 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-impure.o)
-                0x0000465c                _impure_ptr
+                0x0000437c        0x4 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-impure.o)
+                0x0000437c                _impure_ptr
  .data._impure_data
-                0x00004660      0x140 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-impure.o)
-                0x00004660                _impure_data
+                0x00004380      0x140 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-impure.o)
+                0x00004380                _impure_data
 
-.igot.plt       0x000047a0        0x0
- .igot.plt      0x000047a0        0x0 src/game_state.c.49.o
+.igot.plt       0x000044c0        0x0
+ .igot.plt      0x000044c0        0x0 src/game_state.c.49.o
 
-.got            0x000047a0        0x4
- .got           0x000047a0        0x4 src/game_state.c.49.o
+.got            0x000044c0        0x4
+ .got           0x000044c0        0x4 src/game_state.c.49.o
 
-.got.plt        0x000047a4        0xc
- .got.plt       0x000047a4        0xc src/game_state.c.49.o
-                0x000047a4                _GLOBAL_OFFSET_TABLE_
+.got.plt        0x000044c4        0xc
+ .got.plt       0x000044c4        0xc src/game_state.c.49.o
+                0x000044c4                _GLOBAL_OFFSET_TABLE_
 
-.bss            0x000047b0      0x2e0
+.bss            0x000044d0      0x2e0
  *(.bss)
  *(.bss.*)
  .bss.s_gravity_buffer.0
-                0x000047b0       0x40 src/main.c.49.o
+                0x000044d0       0x40 src/main.c.49.o
  .bss.s_mass_buffer.1
-                0x000047f0       0x40 src/main.c.49.o
+                0x00004510       0x40 src/main.c.49.o
  .bss.s_collapse_frame
-                0x00004830        0x4 src/main.c.49.o
+                0x00004550        0x4 src/main.c.49.o
  .bss.s_is_flashing
-                0x00004834        0x1 src/main.c.49.o
+                0x00004554        0x1 src/main.c.49.o
  .bss.s_is_collapsing
-                0x00004835        0x1 src/main.c.49.o
- *fill*         0x00004836        0x2 
+                0x00004555        0x1 src/main.c.49.o
+ *fill*         0x00004556        0x2 
  .bss.s_taps_since_last_tick
-                0x00004838        0x4 src/main.c.49.o
+                0x00004558        0x4 src/main.c.49.o
  .bss.s_is_app_exiting
-                0x0000483c        0x1 src/main.c.49.o
- *fill*         0x0000483d        0x3 
+                0x0000455c        0x1 src/main.c.49.o
+ *fill*         0x0000455d        0x3 
  .bss.s_hold_time_ms
-                0x00004840        0x4 src/main.c.49.o
+                0x00004560        0x4 src/main.c.49.o
  .bss.s_tap_timer
-                0x00004844        0x4 src/main.c.49.o
- .bss.s_state   0x00004848       0x50 src/main.c.49.o
+                0x00004564        0x4 src/main.c.49.o
+ .bss.s_state   0x00004568       0x50 src/main.c.49.o
  .bss.s_canvas_layer
-                0x00004898        0x4 src/main.c.49.o
+                0x000045b8        0x4 src/main.c.49.o
  .bss.s_gravity_layer
-                0x0000489c        0x4 src/main.c.49.o
+                0x000045bc        0x4 src/main.c.49.o
  .bss.s_mass_layer
-                0x000048a0        0x4 src/main.c.49.o
+                0x000045c0        0x4 src/main.c.49.o
  .bss.s_main_window
-                0x000048a4        0x4 src/main.c.49.o
+                0x000045c4        0x4 src/main.c.49.o
  .bss.s_cost_buf.0
-                0x000048a8       0x40 src/shop_menu.c.49.o
+                0x000045c8       0x40 src/shop_menu.c.49.o
  .bss.s_val_buf.1
-                0x000048e8       0x20 src/shop_menu.c.49.o
+                0x00004608       0x20 src/shop_menu.c.49.o
  .bss.s_name_buf.2
-                0x00004908       0x40 src/shop_menu.c.49.o
+                0x00004628       0x40 src/shop_menu.c.49.o
  .bss.s_callback
-                0x00004948        0x4 src/shop_menu.c.49.o
+                0x00004668        0x4 src/shop_menu.c.49.o
  .bss.s_game_state
-                0x0000494c        0x4 src/shop_menu.c.49.o
+                0x0000466c        0x4 src/shop_menu.c.49.o
  .bss.s_menu_layer
-                0x00004950        0x4 src/shop_menu.c.49.o
+                0x00004670        0x4 src/shop_menu.c.49.o
  .bss.s_shop_window
-                0x00004954        0x4 src/shop_menu.c.49.o
- .bss.__sf      0x00004958      0x138 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-findfp.o)
-                0x00004958                __sf
+                0x00004674        0x4 src/shop_menu.c.49.o
+ .bss.__sf      0x00004678      0x138 /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-findfp.o)
+                0x00004678                __sf
 
 DISCARD         0x00000000      0x283
  libc.a(*)
@@ -2195,33 +2181,29 @@ LOAD /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gc
  .ARM.attributes
                 0x000004ff       0x2d /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-lock.o)
  .ARM.attributes
-                0x0000052c       0x2d /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libm_a-s_modf.o)
+                0x0000052c       0x2d /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-__atexit.o)
  .ARM.attributes
-                0x00000559       0x2d /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-__atexit.o)
+                0x00000559       0x2d /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-__call_atexit.o)
  .ARM.attributes
-                0x00000586       0x2d /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-__call_atexit.o)
+                0x00000586       0x2d /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-freer.o)
  .ARM.attributes
-                0x000005b3       0x2d /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-freer.o)
+                0x000005b3       0x2d /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-mallocr.o)
  .ARM.attributes
-                0x000005e0       0x2d /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-mallocr.o)
+                0x000005e0       0x2d /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-mlock.o)
  .ARM.attributes
-                0x0000060d       0x2d /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-mlock.o)
+                0x0000060d       0x2d /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-fclose.o)
  .ARM.attributes
-                0x0000063a       0x2d /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-fclose.o)
+                0x0000063a       0x2d /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-fflush.o)
  .ARM.attributes
-                0x00000667       0x2d /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-fflush.o)
+                0x00000667       0x2d /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-sbrkr.o)
  .ARM.attributes
-                0x00000694       0x2d /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-sbrkr.o)
+                0x00000694       0x2d /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-sysconf.o)
  .ARM.attributes
-                0x000006c1       0x2d /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-sysconf.o)
+                0x000006c1       0x2d /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-errno.o)
  .ARM.attributes
-                0x000006ee       0x2d /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libm_a-s_fpclassify.o)
+                0x000006ee       0x2d /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-m/nofp/crtend.o
  .ARM.attributes
-                0x0000071b       0x2d /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-errno.o)
- .ARM.attributes
-                0x00000748       0x2d /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-m/nofp/crtend.o
- .ARM.attributes
-                0x00000775       0x1d /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-m/nofp/crtn.o
+                0x0000071b       0x1d /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-m/nofp/crtn.o
 
 .comment        0x00000000       0x3a
  .comment       0x00000000       0x3a /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-m/nofp/crtbegin.o
@@ -2246,7 +2228,6 @@ LOAD /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gc
  .comment       0x0000003a       0x3b /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-init.o)
  .comment       0x0000003a       0x3b /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-fini.o)
  .comment       0x0000003a       0x3b /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-lock.o)
- .comment       0x0000003a       0x3b /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libm_a-s_modf.o)
  .comment       0x0000003a       0x3b /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-__atexit.o)
  .comment       0x0000003a       0x3b /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-__call_atexit.o)
  .comment       0x0000003a       0x3b /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-freer.o)
@@ -2256,36 +2237,35 @@ LOAD /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gc
  .comment       0x0000003a       0x3b /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-fflush.o)
  .comment       0x0000003a       0x3b /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-sbrkr.o)
  .comment       0x0000003a       0x3b /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-sysconf.o)
- .comment       0x0000003a       0x3b /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libm_a-s_fpclassify.o)
  .comment       0x0000003a       0x3b /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-errno.o)
  .comment       0x0000003a       0x3b /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-m/nofp/crtend.o
 
-.debug_info     0x00000000     0x45da
+.debug_info     0x00000000     0x4389
  .debug_info    0x00000000      0xbee src/game_state.c.49.o
  .debug_info    0x00000bee     0x1ba2 src/main.c.49.o
- .debug_info    0x00002790      0x69f src/math_utils.c.49.o
- .debug_info    0x00002e2f     0x1408 src/shop_menu.c.49.o
- .debug_info    0x00004237      0x33e aplite/appinfo.auto.c.49.o
- .debug_info    0x00004575       0x65 aplite/src/resource_ids.auto.c.49.o
+ .debug_info    0x00002790      0x5ce src/math_utils.c.49.o
+ .debug_info    0x00002d5e     0x1288 src/shop_menu.c.49.o
+ .debug_info    0x00003fe6      0x33e aplite/appinfo.auto.c.49.o
+ .debug_info    0x00004324       0x65 aplite/src/resource_ids.auto.c.49.o
 
-.debug_abbrev   0x00000000      0xe9e
+.debug_abbrev   0x00000000      0xe4f
  .debug_abbrev  0x00000000      0x2d3 src/game_state.c.49.o
  .debug_abbrev  0x000002d3      0x4c9 src/main.c.49.o
- .debug_abbrev  0x0000079c      0x1b8 src/math_utils.c.49.o
- .debug_abbrev  0x00000954      0x46b src/shop_menu.c.49.o
- .debug_abbrev  0x00000dbf       0xb9 aplite/appinfo.auto.c.49.o
- .debug_abbrev  0x00000e78       0x26 aplite/src/resource_ids.auto.c.49.o
+ .debug_abbrev  0x0000079c      0x178 src/math_utils.c.49.o
+ .debug_abbrev  0x00000914      0x45c src/shop_menu.c.49.o
+ .debug_abbrev  0x00000d70       0xb9 aplite/appinfo.auto.c.49.o
+ .debug_abbrev  0x00000e29       0x26 aplite/src/resource_ids.auto.c.49.o
 
 .debug_loclists
-                0x00000000     0x13c9
+                0x00000000     0x14fb
  .debug_loclists
                 0x00000000      0x448 src/game_state.c.49.o
  .debug_loclists
                 0x00000448      0x8e3 src/main.c.49.o
  .debug_loclists
-                0x00000d2b      0x1c4 src/math_utils.c.49.o
+                0x00000d2b      0x340 src/math_utils.c.49.o
  .debug_loclists
-                0x00000eef      0x4da src/shop_menu.c.49.o
+                0x0000106b      0x490 src/shop_menu.c.49.o
 
 .debug_aranges  0x00000000      0x1e0
  .debug_aranges
@@ -2302,35 +2282,35 @@ LOAD /home/brittp/.pebble-sdk/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gc
                 0x000001c8       0x18 aplite/src/resource_ids.auto.c.49.o
 
 .debug_rnglists
-                0x00000000      0x225
+                0x00000000      0x232
  .debug_rnglists
                 0x00000000       0x7b src/game_state.c.49.o
  .debug_rnglists
                 0x0000007b       0xf7 src/main.c.49.o
  .debug_rnglists
-                0x00000172       0x34 src/math_utils.c.49.o
+                0x00000172       0x41 src/math_utils.c.49.o
  .debug_rnglists
-                0x000001a6       0x7f src/shop_menu.c.49.o
+                0x000001b3       0x7f src/shop_menu.c.49.o
 
-.debug_line     0x00000000     0x1f00
+.debug_line     0x00000000     0x1dce
  .debug_line    0x00000000      0x73b src/game_state.c.49.o
  .debug_line    0x0000073b      0xb8f src/main.c.49.o
- .debug_line    0x000012ca      0x3da src/math_utils.c.49.o
- .debug_line    0x000016a4      0x6bb src/shop_menu.c.49.o
- .debug_line    0x00001d5f      0x162 aplite/appinfo.auto.c.49.o
- .debug_line    0x00001ec1       0x3f aplite/src/resource_ids.auto.c.49.o
+ .debug_line    0x000012ca      0x2e5 src/math_utils.c.49.o
+ .debug_line    0x000015af      0x67e src/shop_menu.c.49.o
+ .debug_line    0x00001c2d      0x162 aplite/appinfo.auto.c.49.o
+ .debug_line    0x00001d8f       0x3f aplite/src/resource_ids.auto.c.49.o
 
-.debug_str      0x00000000     0x17e0
- .debug_str     0x00000000     0x17e0 src/game_state.c.49.o
+.debug_str      0x00000000     0x17e1
+ .debug_str     0x00000000     0x17e1 src/game_state.c.49.o
                                 0x513 (size before relaxing)
- .debug_str     0x000017e0      0xde5 src/main.c.49.o
- .debug_str     0x000017e0      0x34c src/math_utils.c.49.o
- .debug_str     0x000017e0      0xb93 src/shop_menu.c.49.o
- .debug_str     0x000017e0      0x4c1 aplite/appinfo.auto.c.49.o
- .debug_str     0x000017e0      0x155 aplite/src/resource_ids.auto.c.49.o
+ .debug_str     0x000017e1      0xde5 src/main.c.49.o
+ .debug_str     0x000017e1      0x2cb src/math_utils.c.49.o
+ .debug_str     0x000017e1      0xaff src/shop_menu.c.49.o
+ .debug_str     0x000017e1      0x4c1 aplite/appinfo.auto.c.49.o
+ .debug_str     0x000017e1      0x155 aplite/src/resource_ids.auto.c.49.o
 
-.debug_frame    0x00000000      0x5c4
+.debug_frame    0x00000000      0x5c8
  .debug_frame   0x00000000      0x170 src/game_state.c.49.o
  .debug_frame   0x00000170      0x21c src/main.c.49.o
- .debug_frame   0x0000038c       0xb8 src/math_utils.c.49.o
- .debug_frame   0x00000444      0x180 src/shop_menu.c.49.o
+ .debug_frame   0x0000038c       0xbc src/math_utils.c.49.o
+ .debug_frame   0x00000448      0x180 src/shop_menu.c.49.o

@@ -31,24 +31,14 @@ static void menu_draw_row_callback(GContext *ctx, const Layer *cell_layer, MenuI
     format_mass(cost, s_val_buf);
     snprintf(s_cost_buf, sizeof(s_cost_buf), "Cost: %s", s_val_buf);
   } else {
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "Shop: Big Bang Drawing...");
     affordable = s_game_state->mass >= PRESTIGE_THRESHOLD;
     snprintf(s_name_buf, sizeof(s_name_buf), "%s", affordable ? "THE BIG BANG" : "SINGULARITY");
     
     if (affordable) {
-      APP_LOG(APP_LOG_LEVEL_DEBUG, "Shop: Threshold met, calculating dust");
-      double mass = s_game_state->mass;
-      double dust = calculate_prestige_dust(mass, PRESTIGE_THRESHOLD);
-      
-      double w;
-      double f = modf(dust, &w);
-      int dw = (int)w;
-      int df = (int)(f * 100.0);
-      
-      APP_LOG(APP_LOG_LEVEL_DEBUG, "Reward Whole: %d", dw);
-      APP_LOG(APP_LOG_LEVEL_DEBUG, "Reward Frac: %d", df);
-      
-      snprintf(s_cost_buf, sizeof(s_cost_buf), "Reward: %d.%02d Dust", dw, df);
+      double dust = calculate_prestige_dust(s_game_state->mass, PRESTIGE_THRESHOLD);
+      // Use format_mass to log dust safely (it handles doubles without int casts)
+      format_mass(dust, s_val_buf);
+      snprintf(s_cost_buf, sizeof(s_cost_buf), "Reward: %s Dust", s_val_buf);
     } else {
       format_mass(PRESTIGE_THRESHOLD, s_val_buf);
       snprintf(s_cost_buf, sizeof(s_cost_buf), "Goal: %s", s_val_buf);
