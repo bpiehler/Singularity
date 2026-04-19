@@ -186,6 +186,11 @@ static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
   }
   s_state.mass += game_state_calculate_gravity(&s_state);
   update_display();
+
+  // Save progress every minute
+  if (tick_time->tm_sec == 0) {
+    game_state_save(&s_state);
+  }
 }
 
 static void open_shop_handler(ClickRecognizerRef recognizer, void *context) {
@@ -235,6 +240,9 @@ static void init() {
   s_is_app_exiting = false;
   if (!game_state_load(&s_state)) {
     game_state_init(&s_state);
+  } else {
+    // Force check for gains immediately after load
+    game_state_apply_offline_gains(&s_state);
   }
 
   s_main_window = window_create();
