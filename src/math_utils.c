@@ -21,13 +21,22 @@ void format_mass(double mass, char *buffer) {
     snprintf(buffer, 16, "%d mg", (int)mass);
   } else if (mass < 1000000.0) {
     // Grams: 1.0 g - 999.9 g
-    snprintf(buffer, 16, "%.1f g", mass / 1000.0);
+    double g = mass / 1000.0;
+    int whole = (int)g;
+    int frac = (int)((g - whole) * 10.0);
+    snprintf(buffer, 16, "%d.%d g", whole, frac);
   } else if (mass < 1000000000.0) {
     // Kilograms: 1.0 kg - 999.9 kg
-    snprintf(buffer, 16, "%.1f kg", mass / 1000000.0);
+    double kg = mass / 1000000.0;
+    int whole = (int)kg;
+    int frac = (int)((kg - whole) * 10.0);
+    snprintf(buffer, 16, "%d.%d kg", whole, frac);
   } else if (mass < 1000000000000.0) {
     // Tonnes: 1.0 t - 999.9 t
-    snprintf(buffer, 16, "%.1f t", mass / 1000000000.0);
+    double t = mass / 1000000000.0;
+    int whole = (int)t;
+    int frac = (int)((t - whole) * 10.0);
+    snprintf(buffer, 16, "%d.%d t", whole, frac);
   } else {
     // Scientific notation for larger numbers: >= 1.000e12 mg
     int exponent = 0;
