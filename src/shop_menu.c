@@ -1,5 +1,6 @@
 #include "shop_menu.h"
 #include "math_utils.h"
+#include <math.h>
 
 static Window *s_shop_window;
 static MenuLayer *s_menu_layer;
@@ -18,8 +19,8 @@ static void menu_draw_row_callback(GContext *ctx, const Layer *cell_layer, MenuI
   int i = cell_index->row;
   if (!s_game_state || i > NUM_TIERS) return;
 
-  char name_buf[32];
-  char cost_buf[32];
+  char name_buf[64];
+  char cost_buf[64];
   char val_buf[32];
   bool affordable = false;
 
@@ -33,13 +34,14 @@ static void menu_draw_row_callback(GContext *ctx, const Layer *cell_layer, MenuI
   } else {
     // The Big Bang (10th Row)
     affordable = s_game_state->mass >= PRESTIGE_THRESHOLD;
-    snprintf(name_buf, sizeof(name_buf), affordable ? "THE BIG BANG" : "SINGULARITY");
+    snprintf(name_buf, sizeof(name_buf), "%s", affordable ? "THE BIG BANG" : "SINGULARITY");
     
     if (affordable) {
       double dust = calculate_prestige_dust(s_game_state->mass, PRESTIGE_THRESHOLD);
-      int d_whole = (int)dust;
-      int d_frac = (int)((dust - d_whole) * 100.0 + 0.5) % 100;
-      snprintf(cost_buf, sizeof(cost_buf), "Reward: %d.%02d Dust", d_whole, d_frac);
+      // Safe whole/frac extraction for large doubles
+      double whole_part;
+      double frac_part = modf(dust, &whole_part);
+      snprintf(cost_buf, sizeof(cost_buf), "Reward: %d.%02d Dust", (int)whole_part, (int)(frac_part * 100.0));
     } else {
       format_mass(PRESTIGE_THRESHOLD, val_buf);
       snprintf(cost_buf, sizeof(cost_buf), "Goal: %s", val_buf);
@@ -77,14 +79,12 @@ static void menu_draw_row_callback(GContext *ctx, const Layer *cell_layer, MenuI
                      GTextOverflowModeTrailingEllipsis, GTextAlignmentLeft, NULL);
 }
 
-static void safe_hide_timer_callback(void *data) {
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "Shop: Delayed hide executing");
-  shop_menu_hide();
+static void big_bang_timer_callback(void *data) {
+  main_trigger_big_bang();
 }
 
 static void menu_select_callback(MenuLayer *menu_layer, MenuIndex *cell_index, void *data) {
   int i = cell_index->row;
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "Shop: Select Row %d", i);
   
   if (i < NUM_TIERS) {
     // Normal Tier Purchase
@@ -101,17 +101,12 @@ static void menu_select_callback(MenuLayer *menu_layer, MenuIndex *cell_index, v
     }
   } else {
     // The Big Bang (Prestige)
-    APP_LOG(APP_LOG_LEVEL_INFO, "Shop: Big Bang requested!");
     if (s_game_state->mass >= PRESTIGE_THRESHOLD) {
-      APP_LOG(APP_LOG_LEVEL_INFO, "Shop: Starting Big Bang FX...");
       vibes_long_pulse();
-      
-      // We do NOT call prestige here. 
-      // We pop the window and tell main.c to start the collapse FX.
-      shop_menu_hide(); 
-      main_trigger_big_bang(); 
+      shop_menu_hide(); // Pop window immediately
+      // Trigger FX after window transition starts
+      app_timer_register(100, big_bang_timer_callback, NULL);
     } else {
-      APP_LOG(APP_LOG_LEVEL_WARNING, "Shop: Big Bang denied (insufficient mass)");
       vibes_short_pulse();
     }
   }
@@ -119,7 +114,7 @@ static void menu_select_callback(MenuLayer *menu_layer, MenuIndex *cell_index, v
 
 static void menu_select_long_callback(MenuLayer *menu_layer, MenuIndex *cell_index, void *data) {
   int i = cell_index->row;
-  if (i >= NUM_TIERS) return; // No Buy Max for Big Bang
+  if (i >= NUM_TIERS) return;
 
   double start_mass = s_game_state->mass;
   game_state_buy_max(s_game_state, i);
@@ -155,17 +150,15 @@ static void shop_window_load(Window *window) {
 
   menu_layer_set_click_config_onto_window(s_menu_layer, window);
   
-  // Smart Selection: Find highest affordable tier
+  // Smart Selection
   int initial_row = 0;
   for (int i = NUM_TIERS - 1; i >= 0; i--) {
-    double cost = calculate_cost(TIERS[i].base_cost, s_game_state->counts[i]);
-    if (s_game_state->mass >= cost) {
+    if (s_game_state->mass >= calculate_cost(TIERS[i].base_cost, s_game_state->counts[i])) {
       initial_row = i;
       break;
     }
   }
   menu_layer_set_selected_index(s_menu_layer, MenuIndex(0, initial_row), MenuRowAlignCenter, false);
-
   layer_add_child(window_layer, menu_layer_get_layer(s_menu_layer));
 }
 
@@ -191,7 +184,6 @@ void shop_menu_show(GameState *state, ShopPurchaseCallback callback) {
     .load = shop_window_load,
     .unload = shop_window_unload,
   });
-  
   window_stack_push(s_shop_window, true);
 }
 
