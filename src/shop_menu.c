@@ -32,10 +32,8 @@ static void menu_draw_row_callback(GContext *ctx, const Layer *cell_layer, MenuI
     format_mass(cost, s_val_buf);
     snprintf(s_cost_buf, sizeof(s_cost_buf), "Cost: %s", s_val_buf);
   } else {
-    // Big Bang Row (Uses pre-formatted buffer for absolute stability)
     affordable = s_game_state->mass >= PRESTIGE_THRESHOLD;
     snprintf(s_name_buf, sizeof(s_name_buf), "%s", affordable ? "THE BIG BANG" : "SINGULARITY");
-    
     if (affordable) {
       snprintf(s_cost_buf, sizeof(s_cost_buf), "%s", s_prestige_reward_buf);
     } else {
@@ -48,14 +46,11 @@ static void menu_draw_row_callback(GContext *ctx, const Layer *cell_layer, MenuI
   bool is_highlighted = menu_cell_layer_is_highlighted(cell_layer);
   GColor text_color = affordable ? GColorCeleste : GColorDarkGray;
   if (is_highlighted) text_color = GColorWhite;
-  
   graphics_context_set_text_color(ctx, text_color);
   int lp = PBL_IF_ROUND_ELSE(20, 5);
-  
   graphics_draw_text(ctx, s_name_buf, fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD), 
                      GRect(lp, 3, bounds.size.w - (lp + 5), 26), 
                      GTextOverflowModeTrailingEllipsis, GTextAlignmentLeft, NULL);
-
   graphics_draw_text(ctx, s_cost_buf, fonts_get_system_font(FONT_KEY_GOTHIC_18), 
                      GRect(lp, 27, bounds.size.w - (lp + 5), 20), 
                      GTextOverflowModeTrailingEllipsis, GTextAlignmentLeft, NULL);
@@ -97,6 +92,7 @@ static void menu_select_long_callback(MenuLayer *menu_layer, MenuIndex *cell_ind
 }
 
 static void shop_window_load(Window *window) {
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "Loc: Shop Load Start");
   Layer *window_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(window_layer);
   window_set_background_color(window, GColorBlack);
@@ -118,6 +114,7 @@ static void shop_window_load(Window *window) {
   }
   menu_layer_set_selected_index(s_menu_layer, MenuIndex(0, r), MenuRowAlignCenter, false);
   layer_add_child(window_layer, menu_layer_get_layer(s_menu_layer));
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "Loc: Shop Load End");
 }
 
 static void shop_window_unload(Window *window) {
@@ -126,23 +123,33 @@ static void shop_window_unload(Window *window) {
 }
 
 void shop_menu_show(GameState *state, ShopPurchaseCallback callback) {
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "Loc: Shop Show Start");
   s_game_state = state;
   s_callback = callback;
   
-  // Pre-calculate and format the reward once to keep the UI thread fast
   if (s_game_state->mass >= PRESTIGE_THRESHOLD) {
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "Loc: BB Reward Prep");
     double dust = calculate_prestige_dust(s_game_state->mass, PRESTIGE_THRESHOLD);
-    static char val_buf[32];
-    format_mass(dust, val_buf);
-    snprintf(s_prestige_reward_buf, sizeof(s_prestige_reward_buf), "Reward: %s Dust", val_buf);
+    static char vbuf[32];
+    format_mass(dust, vbuf);
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "Val: Dust String");
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "%s", vbuf);
+    snprintf(s_prestige_reward_buf, 64, "Reward: %s Dust", vbuf);
   } else {
     s_prestige_reward_buf[0] = '\0';
   }
   
-  if (s_shop_window) { window_stack_push(s_shop_window, true); return; }
+  if (s_shop_window) {
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "Loc: Shop Window Re-push");
+    window_stack_push(s_shop_window, true);
+    return;
+  }
+  
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "Loc: Shop Creating Window");
   s_shop_window = window_create();
   window_set_window_handlers(s_shop_window, (WindowHandlers) { .load = shop_window_load, .unload = shop_window_unload });
   window_stack_push(s_shop_window, true);
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "Loc: Shop Show End");
 }
 
 void shop_menu_hide() { if (s_shop_window) window_stack_pop(true); }

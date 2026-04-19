@@ -60,8 +60,25 @@ double calculate_milestone_multiplier(int count) {
 }
 
 double calculate_prestige_dust(double total_mass, double threshold) {
-  if (total_mass < threshold || threshold <= 0) return 0;
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "Loc: Calc Dust Start");
+  if (total_mass < threshold || threshold <= 0) {
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "Loc: Threshold not met");
+    return 0;
+  }
+  
+  static char lbuf[32];
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "Val: Raw Mass");
+  format_mass(total_mass, lbuf);
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "%s", lbuf);
+
   double ratio = total_mass / threshold;
-  if (isnan(ratio) || isinf(ratio)) return 1.0;
-  return sqrt(ratio);
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "Val: Ratio");
+  format_mass(ratio, lbuf);
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "%s", lbuf);
+
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "Loc: Sqrt Trigger");
+  double res = sqrt(ratio);
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "Loc: Sqrt Done");
+  
+  return res;
 }
