@@ -11,36 +11,39 @@
 #include "../src/game_state.c"
 
 void test_formatting() {
-  printf("Testing Expanded Formatting thresholds...\n");
+  printf("Testing Tonnes-Anchored Formatting...\n");
   char buf[32];
   
   // mg
   format_mass(500, buf);
   assert(strcmp(buf, "500 mg") == 0);
   
-  // kt (kilotonnes)
-  format_mass(1.5e12, buf);
-  assert(strcmp(buf, "1.5 kt") == 0);
+  // g
+  format_mass(1500, buf);
+  assert(strcmp(buf, "1.5 g") == 0);
   
-  // Gt (gigatonnes)
-  format_mass(2.5e18, buf);
-  assert(strcmp(buf, "2.5 Gt") == 0);
+  // kg
+  format_mass(2500000, buf);
+  assert(strcmp(buf, "2.5 kg") == 0);
   
-  // Tt (teratonnes)
-  format_mass(8.2e21, buf);
-  assert(strcmp(buf, "8.2 Tt") == 0);
+  // t (below 1000)
+  format_mass(5.2e9, buf);
+  assert(strcmp(buf, "5.2 t") == 0);
   
-  // scientific threshold (now 1e24)
-  format_mass(1e24, buf);
-  assert(strcmp(buf, "1.000e24 mg") == 0);
+  // t (scientific)
+  // 1e12 mg = 1000 t = 1.000e3 t
+  format_mass(1e12, buf);
+  assert(strcmp(buf, "1.000e3 t") == 0);
+  
+  // 1e30 mg = 1e21 t = 1.000e21 t
   format_mass(1e30, buf);
-  assert(strcmp(buf, "1.000e30 mg") == 0);
+  assert(strcmp(buf, "1.000e21 t") == 0);
 
   printf("✓ Formatting tests passed\n");
 }
 
 int main() {
-  printf("=== STARTING REALISM LOGIC TESTS ===\n");
+  printf("=== STARTING TONNES-ANCHOR TESTS ===\n");
   test_formatting();
   printf("=== ALL TESTS PASSED ===\n");
   return 0;

@@ -16,53 +16,37 @@ void format_mass(double mass, char *buffer) {
     return;
   }
 
-  // Thresholds for units
-  const char* units[] = {"mg", "g", "kg", "t", "kt", "Mt", "Gt", "Tt"};
-  double current_threshold = 1000.0;
-  
-  // mg is handled as pure integer
   if (mass < 1000.0) {
     snprintf(buffer, 32, "%d mg", (int)mass);
-    return;
-  }
-
-  // Find the appropriate metric unit
-  int unit_idx = 0;
-  double val = mass;
-  while (val >= 1000.0 && unit_idx < 7) {
-    val /= 1000.0;
-    unit_idx++;
-  }
-
-  if (unit_idx < 8 && val < 1000.0) {
-    // Add 0.05 for rounding to 1 decimal place before casting to int
-    int whole = (int)val;
-    int frac = (int)((val - whole) * 10.0 + 0.5);
-    if (frac >= 10) {
-      whole++;
-      frac = 0;
-    }
-    snprintf(buffer, 32, "%d.%d %s", whole, frac, units[unit_idx]);
+  } else if (mass < 1e6) {
+    double val = mass / 1e3;
+    snprintf(buffer, 32, "%d.%d g", (int)val, (int)((val - (int)val) * 10.0 + 0.5) % 10);
+  } else if (mass < 1e9) {
+    double val = mass / 1e6;
+    snprintf(buffer, 32, "%d.%d kg", (int)val, (int)((val - (int)val) * 10.0 + 0.5) % 10);
   } else {
-    // Scientific notation for larger numbers: >= 1.0e24 mg
-    int exponent = 0;
-    double mantissa = mass;
-    while (mantissa >= 10.0 && exponent < 308) {
-      mantissa /= 10.0;
-      exponent++;
-    }
-    while (mantissa < 1.0 && mantissa > 0.0 && exponent > -308) {
-      mantissa *= 10.0;
-      exponent--;
-    }
+    // Tonnes anchor for anything 1e9 mg and above
+    double tonnes = mass / 1e9;
     
-    int mantissa_int = (int)mantissa;
-    int mantissa_frac = (int)((mantissa - mantissa_int) * 1000.0 + 0.5);
-    if (mantissa_frac >= 1000) {
-      mantissa_int++;
-      mantissa_frac = 0;
+    if (tonnes < 1000.0) {
+      snprintf(buffer, 32, "%d.%d t", (int)tonnes, (int)((tonnes - (int)tonnes) * 10.0 + 0.5) % 10);
+    } else {
+      // Scientific notation on tonnes
+      int exponent = 0;
+      double mantissa = tonnes;
+      while (mantissa >= 10.0 && exponent < 308) {
+        mantissa /= 10.0;
+        exponent++;
+      }
+      
+      int m_int = (int)mantissa;
+      int m_frac = (int)((mantissa - m_int) * 1000.0 + 0.5);
+      if (m_frac >= 1000) {
+        m_int++;
+        m_frac = 0;
+      }
+      snprintf(buffer, 32, "%d.%03de%d t", m_int, m_frac, exponent);
     }
-    snprintf(buffer, 32, "%d.%03de%d mg", mantissa_int, mantissa_frac, exponent);
   }
 }
 
