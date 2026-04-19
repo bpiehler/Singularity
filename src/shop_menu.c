@@ -174,8 +174,7 @@ static void shop_window_unload(Window *window) {
     menu_layer_destroy(s_menu_layer);
     s_menu_layer = NULL;
   }
-  // Important: The window destroys itself when popped if we manage it correctly,
-  // or we can destroy it here if we ensure s_shop_window is NULLed.
+  s_shop_window = NULL;
 }
 
 void shop_menu_show(GameState *state, ShopPurchaseCallback callback) {
@@ -183,8 +182,8 @@ void shop_menu_show(GameState *state, ShopPurchaseCallback callback) {
   s_callback = callback;
   
   if (s_shop_window) {
-    window_stack_remove(s_shop_window, false);
-    window_destroy(s_shop_window);
+    window_stack_push(s_shop_window, true);
+    return;
   }
   
   s_shop_window = window_create();
@@ -198,7 +197,13 @@ void shop_menu_show(GameState *state, ShopPurchaseCallback callback) {
 
 void shop_menu_hide() {
   if (s_shop_window) {
-    window_stack_pop(true); // Safe transition back to main screen
-    s_shop_window = NULL; // The OS will trigger unload
+    window_stack_pop(true);
+  }
+}
+
+void shop_menu_deinit() {
+  if (s_shop_window) {
+    window_destroy(s_shop_window);
+    s_shop_window = NULL;
   }
 }

@@ -377,6 +377,7 @@ static void deinit() {
   #endif
   
   game_state_save(&s_state);
+  shop_menu_deinit();
   window_destroy(s_main_window);
 }
 
