@@ -90,7 +90,12 @@ static void select_up_handler(ClickRecognizerRef recognizer, void *context) {
 static void canvas_update_proc(Layer *layer, GContext *ctx) {
   GRect bounds = layer_get_bounds(layer);
   
-  // The "Well" where the circle lives: 35 to 143
+  // 1. Draw solid bars first (This ensures text layers on top can be clear)
+  graphics_context_set_fill_color(ctx, GColorBlack);
+  graphics_fill_rect(ctx, GRect(0, 0, bounds.size.w, 35), 0, GCornerNone); // Header
+  graphics_fill_rect(ctx, GRect(0, bounds.size.h - 25, bounds.size.w, 25), 0, GCornerNone); // Footer
+
+  // 2. The "Well" where the circle lives: 35 to 143
   int well_y_center = 35 + ((bounds.size.h - 35 - 25) / 2);
   GPoint center = GPoint(bounds.size.w / 2, well_y_center);
 
@@ -143,18 +148,23 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   graphics_context_set_stroke_color(ctx, is_unstable ? GColorWhite : era_color);
   graphics_draw_circle(ctx, center, radius + 2);
 
-  // Purchase Ready Indicator (>)
-  // Logic: Can we afford another unit of our highest owned tier?
-  int highest_owned = -1;
-  for (int i = NUM_TIERS - 1; i >= 0; i--) {
-    if (s_state.counts[i] > 0) {
-      highest_owned = i;
-      break;
+  // 3. Status Indicators
+  if (s_state.mass >= PRESTIGE_THRESHOLD) {
+    // BIG BANG READY (!)
+    graphics_context_set_text_color(ctx, GColorRed);
+    graphics_draw_text(ctx, "!", fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD), 
+                       GRect(bounds.size.w - 18, 5, 12, 25), 
+                       GTextOverflowModeTrailingEllipsis, GTextAlignmentCenter, NULL);
+  } else {
+    // Upgrade Ready (>)
+    bool any_affordable = false;
+    for (int i = 0; i < NUM_TIERS; i++) {
+      if (s_state.mass >= calculate_cost(TIERS[i].base_cost, s_state.counts[i])) {
+        any_affordable = true;
+        break;
+      }
     }
-  }
-  if (highest_owned >= 0) {
-    double cost = calculate_cost(TIERS[highest_owned].base_cost, s_state.counts[highest_owned]);
-    if (s_state.mass >= cost) {
+    if (any_affordable) {
       graphics_context_set_text_color(ctx, era_color);
       graphics_draw_text(ctx, ">", fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD), 
                          GRect(bounds.size.w - 15, 12, 10, 20), 
@@ -248,7 +258,7 @@ static void main_window_load(Window *window) {
 
   // Header Bar (Mass)
   s_mass_layer = text_layer_create(GRect(0, 0, bounds.size.w, 35));
-  text_layer_set_background_color(s_mass_layer, GColorBlack);
+  text_layer_set_background_color(s_mass_layer, GColorClear);
   text_layer_set_text_color(s_mass_layer, GColorWhite);
   text_layer_set_text_alignment(s_mass_layer, GTextAlignmentCenter);
   text_layer_set_font(s_mass_layer, fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD));
@@ -256,7 +266,7 @@ static void main_window_load(Window *window) {
 
   // Footer Bar (Gravity)
   s_gravity_layer = text_layer_create(GRect(0, bounds.size.h - 25, bounds.size.w, 25));
-  text_layer_set_background_color(s_gravity_layer, GColorBlack);
+  text_layer_set_background_color(s_gravity_layer, GColorClear);
   text_layer_set_text_color(s_gravity_layer, GColorCeleste);
   text_layer_set_text_alignment(s_gravity_layer, GTextAlignmentCenter);
   text_layer_set_font(s_gravity_layer, fonts_get_system_font(FONT_KEY_GOTHIC_18));

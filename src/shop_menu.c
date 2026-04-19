@@ -91,7 +91,7 @@ static void menu_select_callback(MenuLayer *menu_layer, MenuIndex *cell_index, v
       game_state_prestige(s_game_state);
       vibes_long_pulse();
       if (s_callback) s_callback();
-      shop_menu_hide(); // Return to main screen
+      shop_menu_hide(); // Return to main screen (Safe Pop)
     } else {
       vibes_short_pulse();
     }
@@ -100,6 +100,8 @@ static void menu_select_callback(MenuLayer *menu_layer, MenuIndex *cell_index, v
 
 static void menu_select_long_callback(MenuLayer *menu_layer, MenuIndex *cell_index, void *data) {
   int i = cell_index->row;
+  if (i >= NUM_TIERS) return; // No Buy Max for Big Bang
+
   double start_mass = s_game_state->mass;
   game_state_buy_max(s_game_state, i);
   
@@ -111,17 +113,13 @@ static void menu_select_long_callback(MenuLayer *menu_layer, MenuIndex *cell_ind
 }
 
 static void shop_window_load(Window *window) {
-  APP_LOG(APP_LOG_LEVEL_INFO, "Shop: window_load start");
   Layer *window_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(window_layer);
 
   window_set_background_color(window, GColorBlack);
 
   s_menu_layer = menu_layer_create(bounds);
-  if (!s_menu_layer) {
-    APP_LOG(APP_LOG_LEVEL_ERROR, "Shop: MenuLayer NULL");
-    return;
-  }
+  if (!s_menu_layer) return;
 
   #if defined(PBL_COLOR)
   menu_layer_set_normal_colors(s_menu_layer, GColorBlack, GColorCeleste);
@@ -150,20 +148,18 @@ static void shop_window_load(Window *window) {
   menu_layer_set_selected_index(s_menu_layer, MenuIndex(0, initial_row), MenuRowAlignCenter, false);
 
   layer_add_child(window_layer, menu_layer_get_layer(s_menu_layer));
-  APP_LOG(APP_LOG_LEVEL_INFO, "Shop: window_load end");
 }
 
 static void shop_window_unload(Window *window) {
-  APP_LOG(APP_LOG_LEVEL_INFO, "Shop: window_unload start");
   if (s_menu_layer) {
     menu_layer_destroy(s_menu_layer);
     s_menu_layer = NULL;
   }
-  APP_LOG(APP_LOG_LEVEL_INFO, "Shop: window_unload end");
+  // Important: The window destroys itself when popped if we manage it correctly,
+  // or we can destroy it here if we ensure s_shop_window is NULLed.
 }
 
 void shop_menu_show(GameState *state, ShopPurchaseCallback callback) {
-  APP_LOG(APP_LOG_LEVEL_INFO, "Shop: show() called");
   s_game_state = state;
   s_callback = callback;
   
@@ -183,8 +179,7 @@ void shop_menu_show(GameState *state, ShopPurchaseCallback callback) {
 
 void shop_menu_hide() {
   if (s_shop_window) {
-    window_stack_remove(s_shop_window, true);
-    window_destroy(s_shop_window);
-    s_shop_window = NULL;
+    window_stack_pop(true); // Safe transition back to main screen
+    s_shop_window = NULL; // The OS will trigger unload
   }
 }
