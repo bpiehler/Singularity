@@ -230,11 +230,12 @@ static void open_shop_handler(ClickRecognizerRef recognizer, void *context) {
 static void up_long_click_handler(ClickRecognizerRef recognizer, void *context) {
   if (s_is_collapsing) return;
   double gravity = game_state_calculate_gravity(&s_state);
-  double gain = gravity * 3600.0;
+  double gain = gravity * 21600.0; // 6 Hours
   if (gain < 1000000.0) gain = 1000000.0; 
   s_state.mass += gain;
   update_display();
   vibes_short_pulse();
+  APP_LOG(APP_LOG_LEVEL_INFO, "Debug: Warped 6 hours forward (+1e6 floor)");
 }
 
 static void click_config_provider(void *context) {
