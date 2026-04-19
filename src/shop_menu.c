@@ -34,8 +34,16 @@ static void menu_draw_row_callback(GContext *ctx, const Layer *cell_layer, MenuI
     // The Big Bang (10th Row)
     affordable = s_game_state->mass >= PRESTIGE_THRESHOLD;
     snprintf(name_buf, sizeof(name_buf), affordable ? "THE BIG BANG" : "SINGULARITY");
-    format_mass(PRESTIGE_THRESHOLD, val_buf);
-    snprintf(cost_buf, sizeof(cost_buf), "Target: %s", val_buf);
+    
+    if (affordable) {
+      double dust = calculate_prestige_dust(s_game_state->mass, PRESTIGE_THRESHOLD);
+      int d_whole = (int)dust;
+      int d_frac = (int)((dust - d_whole) * 100.0 + 0.5) % 100;
+      snprintf(cost_buf, sizeof(cost_buf), "Reward: %d.%02d Dust", d_whole, d_frac);
+    } else {
+      format_mass(PRESTIGE_THRESHOLD, val_buf);
+      snprintf(cost_buf, sizeof(cost_buf), "Goal: %s", val_buf);
+    }
   }
 
   GRect bounds = layer_get_bounds(cell_layer);
@@ -95,13 +103,13 @@ static void menu_select_callback(MenuLayer *menu_layer, MenuIndex *cell_index, v
     // The Big Bang (Prestige)
     APP_LOG(APP_LOG_LEVEL_INFO, "Shop: Big Bang requested!");
     if (s_game_state->mass >= PRESTIGE_THRESHOLD) {
-      APP_LOG(APP_LOG_LEVEL_INFO, "Shop: Threshold met, executing prestige...");
-      game_state_prestige(s_game_state);
+      APP_LOG(APP_LOG_LEVEL_INFO, "Shop: Starting Big Bang FX...");
       vibes_long_pulse();
-      if (s_callback) s_callback();
       
-      // Delay the window close to ensure OS is ready
-      app_timer_register(100, safe_hide_timer_callback, NULL);
+      // We do NOT call prestige here. 
+      // We pop the window and tell main.c to start the collapse FX.
+      shop_menu_hide(); 
+      main_trigger_big_bang(); 
     } else {
       APP_LOG(APP_LOG_LEVEL_WARNING, "Shop: Big Bang denied (insufficient mass)");
       vibes_short_pulse();

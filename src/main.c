@@ -42,10 +42,45 @@ static int s_hold_time_ms = 0;
 static bool s_is_app_exiting = false;
 static int s_taps_since_last_tick = 0;
 static bool s_app_has_focus = true;
+static bool s_is_collapsing = false;
+static bool s_is_flashing = false;
+static int s_collapse_frame = 0;
+
+static void collapse_timer_callback(void *data) {
+  if (s_is_app_exiting) return;
+  s_collapse_frame++;
+  
+  if (s_collapse_frame < 40) {
+    // 1. Shrink phase (~1.2 seconds at 30ms)
+    layer_mark_dirty(s_canvas_layer);
+    app_timer_register(30, collapse_timer_callback, NULL);
+  } else if (s_collapse_frame == 40) {
+    // 2. Flash phase (150ms)
+    s_is_flashing = true;
+    layer_mark_dirty(s_canvas_layer);
+    app_timer_register(150, collapse_timer_callback, NULL);
+  } else {
+    // 3. Final Reset
+    game_state_prestige(&s_state);
+    s_is_collapsing = false;
+    s_is_flashing = false;
+    s_collapse_frame = 0;
+    update_display();
+    APP_LOG(APP_LOG_LEVEL_INFO, "Big Bang: Sequence Complete");
+  }
+}
+
+void main_trigger_big_bang() {
+  APP_LOG(APP_LOG_LEVEL_INFO, "Big Bang: Starting Collapse FX...");
+  s_is_collapsing = true;
+  s_is_flashing = false;
+  s_collapse_frame = 0;
+  app_timer_register(30, collapse_timer_callback, NULL);
+}
 
 static void focus_handler(bool in_focus) {
   s_app_has_focus = in_focus;
-  if (s_app_has_focus) {
+  if (s_app_has_focus && !s_is_collapsing) {
     // Catch-up for time spent in background (notifications, etc)
     game_state_apply_offline_gains(&s_state);
     update_display();
@@ -53,12 +88,11 @@ static void focus_handler(bool in_focus) {
 }
 
 static void tap_timer_callback(void *data) {
-  if (s_is_app_exiting || !s_tap_timer || !s_app_has_focus) return;
+  if (s_is_app_exiting || !s_tap_timer || !s_app_has_focus || s_is_collapsing) return;
 
   s_hold_time_ms += 100;
   
   // Repeating taps (fires every 200ms AFTER the initial 500ms delay)
-  // We check % 200 to achieve 5 taps per second
   if (s_hold_time_ms >= 500 && (s_hold_time_ms % 200 == 0)) {
     s_state.mass += game_state_calculate_tap_strength(&s_state);
     s_taps_since_last_tick++;
@@ -68,7 +102,7 @@ static void tap_timer_callback(void *data) {
 }
 
 static void select_down_handler(ClickRecognizerRef recognizer, void *context) {
-  if (s_is_app_exiting) return;
+  if (s_is_app_exiting || s_is_collapsing) return;
   s_hold_time_ms = 0;
   if (s_tap_timer) app_timer_cancel(s_tap_timer);
   
@@ -76,7 +110,7 @@ static void select_down_handler(ClickRecognizerRef recognizer, void *context) {
   s_state.mass += game_state_calculate_tap_strength(&s_state);
   s_taps_since_last_tick++;
 
-  // Start timer for repeats and prestige hold
+  // Start timer for repeats
   s_tap_timer = app_timer_register(100, tap_timer_callback, NULL);
 }
 
@@ -90,22 +124,38 @@ static void select_up_handler(ClickRecognizerRef recognizer, void *context) {
 static void canvas_update_proc(Layer *layer, GContext *ctx) {
   GRect bounds = layer_get_bounds(layer);
   
-  // 1. Draw solid bars first (This ensures text layers on top can be clear)
+  if (s_is_flashing) {
+    graphics_context_set_fill_color(ctx, GColorWhite);
+    graphics_fill_rect(ctx, bounds, 0, GCornerNone);
+    return;
+  }
+
+  // 1. Draw solid bars first
   graphics_context_set_fill_color(ctx, GColorBlack);
   graphics_fill_rect(ctx, GRect(0, 0, bounds.size.w, 35), 0, GCornerNone); // Header
   graphics_fill_rect(ctx, GRect(0, bounds.size.h - 25, bounds.size.w, 25), 0, GCornerNone); // Footer
 
-  // 2. The "Well" where the circle lives: 35 to 143
+  // 2. The "Well" where the circle lives
   int well_y_center = 35 + ((bounds.size.h - 35 - 25) / 2);
   GPoint center = GPoint(bounds.size.w / 2, well_y_center);
 
-  // radius mapped to 10-45px to fit perfectly within the 100px well
-  double log_mass = log10(s_state.mass > 1.0 ? s_state.mass : 1.0);
-  if (log_mass > 36.0) log_mass = 36.0;
-  int radius = 10 + (int)((log_mass / 36.0) * 35.0);
+  int radius = 10;
+  if (s_is_collapsing) {
+    // Animation radius: from current scale down to 0
+    double start_log = log10(s_state.mass > 1.0 ? s_state.mass : 1.0);
+    if (start_log > 36.0) start_log = 36.0;
+    int start_radius = 10 + (int)((start_log / 36.0) * 35.0);
+    radius = start_radius - (int)((float)s_collapse_frame / 40.0f * (float)start_radius);
+    if (radius < 0) radius = 0;
+  } else {
+    // Normal radius
+    double log_mass = log10(s_state.mass > 1.0 ? s_state.mass : 1.0);
+    if (log_mass > 36.0) log_mass = 36.0;
+    radius = 10 + (int)((log_mass / 36.0) * 35.0);
+  }
 
   // Singularity Instability
-  bool is_unstable = (s_state.mass >= PRESTIGE_THRESHOLD * 0.9);
+  bool is_unstable = (s_state.mass >= PRESTIGE_THRESHOLD * 0.9 && !s_is_collapsing);
   if (is_unstable) {
     center.x += (rand() % 3) - 1;
     center.y += (rand() % 3) - 1;
@@ -114,7 +164,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   int era = game_state_get_era(&s_state);
   GColor era_color;
   
-  if (is_unstable) {
+  if (is_unstable || s_is_collapsing) {
     era_color = GColorRed;
   } else {
     switch (era) {
@@ -131,11 +181,16 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   }
 
   graphics_context_set_fill_color(ctx, era_color);
-  graphics_fill_circle(ctx, center, radius);
+  if (radius > 0) {
+    graphics_fill_circle(ctx, center, radius);
+    graphics_context_set_stroke_width(ctx, 2);
+    graphics_context_set_stroke_color(ctx, (is_unstable || s_is_collapsing) ? GColorWhite : era_color);
+    graphics_draw_circle(ctx, center, radius + 2);
+  }
 
-  // Era-specific B&W patterns
+  // Era-specific B&W patterns (only if not collapsing)
   #if defined(PBL_BW)
-  if (!is_unstable) {
+  if (!is_unstable && !s_is_collapsing && radius > 4) {
     if (era == 1) { // Stripes
       for (int i = -radius; i < radius; i += 4) {
         graphics_context_set_stroke_color(ctx, GColorBlack);
@@ -151,54 +206,35 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   }
   #endif
 
-  graphics_context_set_stroke_width(ctx, 2);
-  graphics_context_set_stroke_color(ctx, is_unstable ? GColorWhite : era_color);
-  graphics_draw_circle(ctx, center, radius + 2);
-
-  // 3. Status Indicators
-  if (s_state.mass >= PRESTIGE_THRESHOLD) {
-    // BIG BANG READY (!)
-    graphics_context_set_text_color(ctx, GColorRed);
-    graphics_draw_text(ctx, "!", fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD), 
-                       GRect(bounds.size.w - 18, 5, 12, 25), 
-                       GTextOverflowModeTrailingEllipsis, GTextAlignmentCenter, NULL);
-  } else {
-    // Upgrade Ready (>)
-    // Logic: Only show for the highest tier already owned.
-    int highest_owned = -1;
-    for (int i = NUM_TIERS - 1; i >= 0; i--) {
-      if (s_state.counts[i] > 0) {
-        highest_owned = i;
-        break;
-      }
-    }
-    
-    // Check if we can afford the NEXT one of that highest tier 
-    // OR the FIRST one of the next tier
-    bool upgrade_ready = false;
-    if (highest_owned >= 0) {
-      // 1. Can afford current highest?
-      if (s_state.mass >= calculate_cost(TIERS[highest_owned].base_cost, s_state.counts[highest_owned])) {
-        upgrade_ready = true;
-      }
-      // 2. Can afford next tier unlock?
-      if (highest_owned + 1 < NUM_TIERS) {
-        if (s_state.mass >= TIERS[highest_owned + 1].base_cost) {
-          upgrade_ready = true;
+  // 3. Status Indicators (hide during collapse)
+  if (!s_is_collapsing) {
+    if (s_state.mass >= PRESTIGE_THRESHOLD) {
+      graphics_context_set_text_color(ctx, GColorRed);
+      graphics_draw_text(ctx, "!", fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD), 
+                         GRect(bounds.size.w - 18, 5, 12, 25), 
+                         GTextOverflowModeTrailingEllipsis, GTextAlignmentCenter, NULL);
+    } else {
+      int highest_owned = -1;
+      for (int i = NUM_TIERS - 1; i >= 0; i--) {
+        if (s_state.counts[i] > 0) {
+          highest_owned = i;
+          break;
         }
       }
-    } else {
-      // Fresh start: show if we can afford the very first Pebble
-      if (s_state.mass >= TIERS[0].base_cost) {
+      bool upgrade_ready = false;
+      if (highest_owned >= 0) {
+        if (s_state.mass >= calculate_cost(TIERS[highest_owned].base_cost, s_state.counts[highest_owned])) upgrade_ready = true;
+        if (highest_owned + 1 < NUM_TIERS && s_state.mass >= TIERS[highest_owned + 1].base_cost) upgrade_ready = true;
+      } else if (s_state.mass >= TIERS[0].base_cost) {
         upgrade_ready = true;
       }
-    }
 
-    if (upgrade_ready) {
-      graphics_context_set_text_color(ctx, era_color);
-      graphics_draw_text(ctx, ">", fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD), 
-                         GRect(bounds.size.w - 15, 12, 10, 20), 
-                         GTextOverflowModeTrailingEllipsis, GTextAlignmentCenter, NULL);
+      if (upgrade_ready) {
+        graphics_context_set_text_color(ctx, era_color);
+        graphics_draw_text(ctx, ">", fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD), 
+                           GRect(bounds.size.w - 15, 12, 10, 20), 
+                           GTextOverflowModeTrailingEllipsis, GTextAlignmentCenter, NULL);
+      }
     }
   }
 }
@@ -229,6 +265,7 @@ static void save_timer_handler(void *data) {
 }
 
 static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
+  if (s_is_collapsing) return;
   if (s_taps_since_last_tick > 0) {
     APP_LOG(APP_LOG_LEVEL_DEBUG, "Taps this second: %d", s_taps_since_last_tick);
     s_taps_since_last_tick = 0;
@@ -243,17 +280,16 @@ static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
 }
 
 static void open_shop_handler(ClickRecognizerRef recognizer, void *context) {
+  if (s_is_collapsing) return;
   shop_menu_show(&s_state, update_display);
 }
 
 static void up_long_click_handler(ClickRecognizerRef recognizer, void *context) {
+  if (s_is_collapsing) return;
   // Debug: Warp forward 1 hour (3600 seconds)
   double gravity = game_state_calculate_gravity(&s_state);
   double gain = gravity * 3600.0;
-  
-  // Minimal floor for early warp testing
   if (gain < 1000000.0) gain = 1000000.0; 
-  
   s_state.mass += gain;
   update_display();
   vibes_short_pulse();
@@ -277,16 +313,10 @@ static void main_window_load(Window *window) {
   GRect bounds = layer_get_bounds(window_layer);
   window_set_background_color(window, GColorBlack);
 
-  // partitioning: 
-  // Header: 0-35 (Black)
-  // Well: 35-143 (Background for circle)
-  // Footer: 143-bottom (Black)
-
   s_canvas_layer = layer_create(bounds);
   layer_set_update_proc(s_canvas_layer, canvas_update_proc);
   layer_add_child(window_layer, s_canvas_layer);
 
-  // Header Bar (Mass)
   s_mass_layer = text_layer_create(GRect(0, 0, bounds.size.w, 35));
   text_layer_set_background_color(s_mass_layer, GColorClear);
   text_layer_set_text_color(s_mass_layer, GColorWhite);
@@ -294,7 +324,6 @@ static void main_window_load(Window *window) {
   text_layer_set_font(s_mass_layer, fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD));
   layer_add_child(window_layer, text_layer_get_layer(s_mass_layer));
 
-  // Footer Bar (Gravity)
   s_gravity_layer = text_layer_create(GRect(0, bounds.size.h - 25, bounds.size.w, 25));
   text_layer_set_background_color(s_gravity_layer, GColorClear);
   text_layer_set_text_color(s_gravity_layer, GColorCeleste);
