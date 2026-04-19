@@ -3,6 +3,7 @@
 #include <stdio.h>
 
 void format_mass(double mass, char *buffer) {
+  // 1. Extreme Safety Guards
   if (isnan(mass)) {
     snprintf(buffer, 32, "NaN");
     return;
@@ -11,40 +12,51 @@ void format_mass(double mass, char *buffer) {
     snprintf(buffer, 32, "Infinity");
     return;
   }
-  if (mass <= 0) {
+  if (mass <= 0.0) {
     snprintf(buffer, 32, "0 mg");
     return;
   }
+  if (mass > 1e300) {
+    snprintf(buffer, 32, "Infinite Mass");
+    return;
+  }
 
+  // 2. Unit Logic
   if (mass < 1000.0) {
-    // Milligrams: 0 - 999 mg
     snprintf(buffer, 32, "%d mg", (int)mass);
   } else if (mass < 1e6) {
-    // Grams: 1.0 g - 999.9 g
-    double val = mass / 1e3;
-    snprintf(buffer, 32, "%d.%d g", (int)val, (int)((val - (int)val) * 10.0 + 0.5) % 10);
+    double g = mass / 1000.0;
+    int whole = (int)g;
+    int frac = (int)((g - (double)whole) * 10.0 + 0.5) % 10;
+    snprintf(buffer, 32, "%d.%d g", whole, frac);
   } else if (mass < 1e9) {
-    // Kilograms: 1.0 kg - 999.9 kg
-    double val = mass / 1e6;
-    snprintf(buffer, 32, "%d.%d kg", (int)val, (int)((val - (int)val) * 10.0 + 0.5) % 10);
+    double kg = mass / 1e6;
+    int whole = (int)kg;
+    int frac = (int)((kg - (double)whole) * 10.0 + 0.5) % 10;
+    snprintf(buffer, 32, "%d.%d kg", whole, frac);
   } else {
-    // Tonnes anchor for everything 1e9 mg and above
+    // Tonnes Anchor
     double tonnes = mass / 1e9;
     
     if (tonnes < 1000.0) {
-      // Tonnes: 1.0 t - 999.9 t
-      snprintf(buffer, 32, "%d.%d t", (int)tonnes, (int)((tonnes - (int)tonnes) * 10.0 + 0.5) % 10);
+      int whole = (int)tonnes;
+      int frac = (int)((tonnes - (double)whole) * 10.0 + 0.5) % 10;
+      snprintf(buffer, 32, "%d.%d t", whole, frac);
     } else {
-      // Scientific notation on tonnes: >= 1000 t
+      // Scientific Notation on Tonnes
       int exponent = 0;
       double mantissa = tonnes;
-      while (mantissa >= 10.0 && exponent < 308) {
-        mantissa /= 10.0;
-        exponent++;
+      
+      // Safe normalization loop
+      if (mantissa > 0) {
+        while (mantissa >= 10.0 && exponent < 308) {
+          mantissa /= 10.0;
+          exponent++;
+        }
       }
       
       int m_int = (int)mantissa;
-      int m_frac = (int)((mantissa - m_int) * 1000.0 + 0.5);
+      int m_frac = (int)((mantissa - (double)m_int) * 1000.0 + 0.5);
       if (m_frac >= 1000) {
         m_int++;
         m_frac = 0;
@@ -55,15 +67,20 @@ void format_mass(double mass, char *buffer) {
 }
 
 double calculate_cost(double base_cost, int count) {
-  return base_cost * pow(1.15, count);
+  if (count < 0) count = 0;
+  if (count > 10000) return 1e300; // Cap cost
+  return base_cost * pow(1.15, (double)count);
 }
 
 double calculate_milestone_multiplier(int count) {
   int milestones = count / 25;
+  if (milestones > 100) milestones = 100; // Cap bonus
   return pow(2.0, (double)milestones);
 }
 
 double calculate_prestige_dust(double total_mass, double threshold) {
-  if (total_mass < threshold) return 0;
-  return sqrt(total_mass / threshold);
+  if (total_mass < threshold || threshold <= 0) return 0;
+  double ratio = total_mass / threshold;
+  if (isnan(ratio) || isinf(ratio)) return 1e6; // Cap dust
+  return sqrt(ratio);
 }
