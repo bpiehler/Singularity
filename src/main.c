@@ -227,19 +227,31 @@ static void open_shop_handler(ClickRecognizerRef recognizer, void *context) {
   shop_menu_show(&s_state, update_display);
 }
 
+static void down_long_click_handler(ClickRecognizerRef recognizer, void *context) {
+  if (s_is_collapsing) return;
+  // GOD MODE: Instant 1e36 mass
+  s_state.mass = 1.0e36;
+  game_state_update_cache(&s_state);
+  update_display();
+  vibes_double_pulse();
+  APP_LOG(APP_LOG_LEVEL_INFO, "God Mode: Mass set to 1e36!");
+}
+
 static void up_long_click_handler(ClickRecognizerRef recognizer, void *context) {
   if (s_is_collapsing) return;
   double gravity = game_state_calculate_gravity(&s_state);
   double gain = gravity * 21600.0; // 6 Hours
   if (gain < 1000000.0) gain = 1000000.0; 
   s_state.mass += gain;
+  game_state_update_cache(&s_state);
   update_display();
   vibes_short_pulse();
-  APP_LOG(APP_LOG_LEVEL_INFO, "Debug: Warped 6 hours forward (+1e6 floor)");
 }
 
 static void click_config_provider(void *context) {
   window_raw_click_subscribe(BUTTON_ID_DOWN, select_down_handler, select_up_handler, NULL);
+  window_long_click_subscribe(BUTTON_ID_DOWN, 500, down_long_click_handler, NULL);
+
   window_single_click_subscribe(BUTTON_ID_SELECT, open_shop_handler);
   window_single_click_subscribe(BUTTON_ID_UP, open_shop_handler);
   window_long_click_subscribe(BUTTON_ID_UP, 500, up_long_click_handler, NULL);
