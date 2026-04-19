@@ -31,16 +31,20 @@ static void menu_draw_row_callback(GContext *ctx, const Layer *cell_layer, MenuI
     format_mass(cost, s_val_buf);
     snprintf(s_cost_buf, sizeof(s_cost_buf), "Cost: %s", s_val_buf);
   } else {
-    // Big Bang Row (Just-In-Time calculation)
+    // Big Bang Row (10th Row)
     affordable = s_game_state->mass >= PRESTIGE_THRESHOLD;
     snprintf(s_name_buf, sizeof(s_name_buf), "%s", affordable ? "THE BIG BANG" : "SINGULARITY");
     
     if (affordable) {
-      APP_LOG(APP_LOG_LEVEL_DEBUG, "Loc: BB Draw Calc Start");
+      APP_LOG(APP_LOG_LEVEL_DEBUG, "Loc: BB Draw Start");
       double dust = calculate_prestige_dust(s_game_state->mass, PRESTIGE_THRESHOLD);
+      
+      APP_LOG(APP_LOG_LEVEL_DEBUG, "Loc: Format Reward");
       format_mass(dust, s_val_buf);
-      APP_LOG(APP_LOG_LEVEL_DEBUG, "Val: Dust String");
+      
+      APP_LOG(APP_LOG_LEVEL_DEBUG, "Val: Dust Result");
       APP_LOG(APP_LOG_LEVEL_DEBUG, "%s", s_val_buf);
+      
       snprintf(s_cost_buf, sizeof(s_cost_buf), "Reward: %s Dust", s_val_buf);
     } else {
       format_mass(PRESTIGE_THRESHOLD, s_val_buf);

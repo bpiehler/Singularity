@@ -61,7 +61,13 @@ double calculate_milestone_multiplier(int count) {
 
 double calculate_prestige_dust(double total_mass, double threshold) {
   if (total_mass < threshold || threshold <= 0) return 0;
+  
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "Math: Sqrt Input Check");
   double ratio = total_mass / threshold;
-  if (isnan(ratio) || isinf(ratio)) return 1.0;
-  return pow(ratio, 0.5);
+  
+  static char lbuf[32];
+  format_mass(ratio, lbuf);
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "Ratio: %s", lbuf);
+  
+  return sqrt(ratio);
 }
