@@ -15,6 +15,7 @@ const TierInfo TIERS[NUM_TIERS] = {
 };
 
 void game_state_update_cache(GameState *state) {
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "GS: Cache Update Start");
   double raw_g = 0;
   double highest_base_yield = 1.0;
   
@@ -30,11 +31,12 @@ void game_state_update_cache(GameState *state) {
   state->cached_tap_strength = (highest_base_yield * 10.0) + (state->cached_gravity * 0.25);
   if (state->cached_tap_strength < 1.0) state->cached_tap_strength = 1.0;
 
-  // Cache Prestige Reward (Moves heavy math out of UI Draw loop)
   state->cached_prestige_dust = calculate_prestige_dust(state->mass, PRESTIGE_THRESHOLD);
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "GS: Cache Update End");
 }
 
 void game_state_init(GameState *state) {
+  APP_LOG(APP_LOG_LEVEL_INFO, "GS: Fresh Init");
   state->version = STORAGE_VERSION;
   state->mass = 1.0;
   state->dust = 0.0;
@@ -53,11 +55,14 @@ void game_state_save(GameState *state) {
 }
 
 bool game_state_load(GameState *state) {
+  APP_LOG(APP_LOG_LEVEL_INFO, "GS: Load Start");
   if (persist_exists(STORAGE_KEY_GAME_STATE)) {
     persist_read_data(STORAGE_KEY_GAME_STATE, state, sizeof(GameState));
     if (state->version == STORAGE_VERSION) {
       game_state_update_cache(state);
       return true;
+    } else {
+      APP_LOG(APP_LOG_LEVEL_WARNING, "GS: Version Mismatch");
     }
   }
   return false;

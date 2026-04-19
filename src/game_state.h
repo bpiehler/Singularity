@@ -15,7 +15,7 @@ typedef struct {
 extern const TierInfo TIERS[NUM_TIERS];
 
 #define STORAGE_KEY_GAME_STATE 100
-#define STORAGE_VERSION 1
+#define STORAGE_VERSION 2
 
 // CRITICAL: Doubles must be at the top for 8-byte alignment on ARM hardware.
 typedef struct __attribute__((aligned(8))) {

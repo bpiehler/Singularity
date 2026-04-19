@@ -51,16 +51,13 @@ static void collapse_timer_callback(void *data) {
   s_collapse_frame++;
   
   if (s_collapse_frame < 40) {
-    // 1. Shrink phase
     layer_mark_dirty(s_canvas_layer);
     app_timer_register(30, collapse_timer_callback, NULL);
   } else if (s_collapse_frame == 40) {
-    // 2. Flash phase
     s_is_flashing = true;
     layer_mark_dirty(s_canvas_layer);
     app_timer_register(150, collapse_timer_callback, NULL);
   } else {
-    // 3. Final Reset
     game_state_prestige(&s_state);
     s_is_collapsing = false;
     s_is_flashing = false;
@@ -277,19 +274,28 @@ static void main_window_unload(Window *window) {
 }
 
 static void init() {
+  APP_LOG(APP_LOG_LEVEL_INFO, "Main: Init Start");
   s_is_app_exiting = false;
-  if (!game_state_load(&s_state)) game_state_init(&s_state);
-  else game_state_apply_offline_gains(&s_state);
+  if (!game_state_load(&s_state)) {
+    APP_LOG(APP_LOG_LEVEL_INFO, "Main: Fresh Init triggered");
+    game_state_init(&s_state);
+  } else {
+    APP_LOG(APP_LOG_LEVEL_INFO, "Main: Load Success, Applying Offline");
+    game_state_apply_offline_gains(&s_state);
+  }
+  APP_LOG(APP_LOG_LEVEL_INFO, "Main: Creating Window");
   s_main_window = window_create();
   window_set_click_config_provider(s_main_window, click_config_provider);
   window_set_window_handlers(s_main_window, (WindowHandlers) { .load = main_window_load, .unload = main_window_unload });
   window_stack_push(s_main_window, true);
+  APP_LOG(APP_LOG_LEVEL_INFO, "Main: Subscribing services");
   tick_timer_service_subscribe(SECOND_UNIT, tick_handler);
   app_focus_service_subscribe(focus_handler);
   #if defined(PBL_HEALTH)
   health_service_events_subscribe(health_handler, NULL);
   #endif
   app_timer_register(300000, save_timer_handler, NULL);
+  APP_LOG(APP_LOG_LEVEL_INFO, "Main: Init Complete");
 }
 
 static void deinit() {
