@@ -23,6 +23,7 @@ typedef struct __attribute__((aligned(8))) {
   double dust;
   double cached_gravity;
   double cached_tap_strength;
+  double cached_prestige_dust;
   int counts[NUM_TIERS];
   uint32_t version;
   time_t last_update;
@@ -30,35 +31,15 @@ typedef struct __attribute__((aligned(8))) {
 
 typedef void (*ShopPurchaseCallback)(void);
 
-// Initialize a new game state
 void game_state_init(GameState *state);
-
-// Calculate and cache gravity/tap strength
 void game_state_update_cache(GameState *state);
-
-// Get current gravity (cached)
 double game_state_calculate_gravity(GameState *state);
-
-// Get current tap strength (cached)
 double game_state_calculate_tap_strength(GameState *state);
-
-// Save state to persistent storage
 void game_state_save(GameState *state);
-
-// Load state from persistent storage, returns true if successful
 bool game_state_load(GameState *state);
-
-// Calculate and apply offline gains, returns mass gained
 double game_state_apply_offline_gains(GameState *state);
-
-// Buy max possible units of a tier
 void game_state_buy_max(GameState *state, int tier_index);
-
-// Trigger a prestige reset, returns amount of dust earned
 double game_state_prestige(GameState *state);
-
-// Add mass based on steps taken
 void game_state_add_steps(GameState *state, int steps);
-
-// Get the current era (0-4) based on highest tier owned
 int game_state_get_era(GameState *state);
+void main_trigger_big_bang();
