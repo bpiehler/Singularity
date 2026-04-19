@@ -197,10 +197,25 @@ static void open_shop_handler(ClickRecognizerRef recognizer, void *context) {
   shop_menu_show(&s_state, update_display);
 }
 
+static void up_long_click_handler(ClickRecognizerRef recognizer, void *context) {
+  // Debug: Warp forward 1 hour (3600 seconds)
+  double gravity = game_state_calculate_gravity(&s_state);
+  double gain = gravity * 3600.0;
+  
+  // Minimal floor for early warp testing
+  if (gain < 1000000.0) gain = 1000000.0; 
+  
+  s_state.mass += gain;
+  update_display();
+  vibes_short_pulse();
+  APP_LOG(APP_LOG_LEVEL_INFO, "Debug: Warped 1 hour forward (+1e6 floor)");
+}
+
 static void click_config_provider(void *context) {
   window_raw_click_subscribe(BUTTON_ID_SELECT, select_down_handler, select_up_handler, NULL);
   window_single_click_subscribe(BUTTON_ID_UP, open_shop_handler);
   window_single_click_subscribe(BUTTON_ID_DOWN, open_shop_handler);
+  window_long_click_subscribe(BUTTON_ID_UP, 500, up_long_click_handler, NULL);
 }
 
 static void main_window_load(Window *window) {
