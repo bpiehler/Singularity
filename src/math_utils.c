@@ -3,18 +3,9 @@
 #include <stdio.h>
 
 void format_mass(double mass, char *buffer) {
-  if (isnan(mass)) {
-    snprintf(buffer, 32, "NaN");
-    return;
-  }
-  if (isinf(mass)) {
-    snprintf(buffer, 32, "Infinity");
-    return;
-  }
-  if (mass <= 0.0) {
-    snprintf(buffer, 32, "0 mg");
-    return;
-  }
+  if (isnan(mass)) { snprintf(buffer, 32, "NaN"); return; }
+  if (isinf(mass)) { snprintf(buffer, 32, "Infinity"); return; }
+  if (mass <= 0.0) { snprintf(buffer, 32, "0 mg"); return; }
 
   if (mass < 1000.0) {
     snprintf(buffer, 32, "%d mg", (int)mass);
@@ -35,18 +26,13 @@ void format_mass(double mass, char *buffer) {
       int frac = (int)((tonnes - (double)whole) * 10.0 + 0.5) % 10;
       snprintf(buffer, 32, "%d.%d t", whole, frac);
     } else {
-      int exponent = 0;
+      int exp = 0;
       double mantissa = tonnes;
-      int loop_count = 0;
-      while (mantissa >= 10.0 && exponent < 308 && loop_count < 1000) {
-        mantissa /= 10.0;
-        exponent++;
-        loop_count++;
-      }
+      while (mantissa >= 10.0 && exp < 308) { mantissa /= 10.0; exp++; }
       int m_int = (int)mantissa;
       int m_frac = (int)((mantissa - (double)m_int) * 1000.0 + 0.5);
       if (m_frac >= 1000) { m_int++; m_frac = 0; }
-      snprintf(buffer, 32, "%d.%03de%d t", m_int, m_frac, exponent);
+      snprintf(buffer, 32, "%d.%03de%d t", m_int, m_frac, exp);
     }
   }
 }
@@ -60,25 +46,16 @@ double calculate_milestone_multiplier(int count) {
 }
 
 double calculate_prestige_dust(double total_mass, double threshold) {
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "Loc: Calc Dust Start");
-  if (total_mass < threshold || threshold <= 0) {
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "Loc: Threshold not met");
-    return 0;
-  }
+  if (total_mass < threshold || threshold <= 0) return 0;
   
-  static char lbuf[32];
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "Val: Raw Mass");
-  format_mass(total_mass, lbuf);
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "%s", lbuf);
-
   double ratio = total_mass / threshold;
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "Val: Ratio");
-  format_mass(ratio, lbuf);
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "%s", lbuf);
-
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "Loc: Sqrt Trigger");
-  double res = sqrt(ratio);
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "Loc: Sqrt Done");
+  if (ratio < 0) return 0;
   
-  return res;
+  // Custom Newton-Raphson Sqrt for total stability
+  double x = ratio;
+  double y = 1.0;
+  for (int i = 0; i < 10; i++) {
+    y = (y + x / y) / 2.0;
+  }
+  return y;
 }

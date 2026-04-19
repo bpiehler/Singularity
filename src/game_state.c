@@ -17,18 +17,17 @@ const TierInfo TIERS[NUM_TIERS] = {
 void game_state_update_cache(GameState *state) {
   double raw_g = 0;
   double highest_base_yield = 1.0;
-  
   for (int i = 0; i < NUM_TIERS; i++) {
     double tier_yield = TIERS[i].yield * calculate_milestone_multiplier(state->counts[i]);
     raw_g += tier_yield * (double)state->counts[i];
-    if (state->counts[i] > 0) {
-      highest_base_yield = TIERS[i].yield;
-    }
+    if (state->counts[i] > 0) highest_base_yield = TIERS[i].yield;
   }
-  
   state->cached_gravity = raw_g * (1.0 + (state->dust * 0.1));
   state->cached_tap_strength = (highest_base_yield * 10.0) + (state->cached_gravity * 0.25);
   if (state->cached_tap_strength < 1.0) state->cached_tap_strength = 1.0;
+  
+  // Cache prestige reward using custom safe math
+  state->cached_prestige_dust = calculate_prestige_dust(state->mass, PRESTIGE_THRESHOLD);
 }
 
 void game_state_init(GameState *state) {
@@ -61,10 +60,7 @@ bool game_state_load(GameState *state) {
 }
 
 double game_state_apply_offline_gains(GameState *state) {
-  if (state->last_update == 0) {
-    state->last_update = time(NULL);
-    return 0;
-  }
+  if (state->last_update == 0) { state->last_update = time(NULL); return 0; }
   time_t now = time(NULL);
   double seconds_diff = (double)(now - state->last_update);
   double gained = 0;

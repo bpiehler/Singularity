@@ -92,7 +92,6 @@ static void menu_select_long_callback(MenuLayer *menu_layer, MenuIndex *cell_ind
 }
 
 static void shop_window_load(Window *window) {
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "Loc: Shop Load Start");
   Layer *window_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(window_layer);
   window_set_background_color(window, GColorBlack);
@@ -114,7 +113,6 @@ static void shop_window_load(Window *window) {
   }
   menu_layer_set_selected_index(s_menu_layer, MenuIndex(0, r), MenuRowAlignCenter, false);
   layer_add_child(window_layer, menu_layer_get_layer(s_menu_layer));
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "Loc: Shop Load End");
 }
 
 static void shop_window_unload(Window *window) {
@@ -128,24 +126,22 @@ void shop_menu_show(GameState *state, ShopPurchaseCallback callback) {
   s_callback = callback;
   
   if (s_game_state->mass >= PRESTIGE_THRESHOLD) {
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "Loc: BB Reward Prep");
-    double dust = calculate_prestige_dust(s_game_state->mass, PRESTIGE_THRESHOLD);
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "Loc: Reward Prep");
     static char vbuf[32];
-    format_mass(dust, vbuf);
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "Val: Dust String");
+    format_mass(s_game_state->cached_prestige_dust, vbuf);
+    
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "Val: Reward Dust");
     APP_LOG(APP_LOG_LEVEL_DEBUG, "%s", vbuf);
+    
     snprintf(s_prestige_reward_buf, 64, "Reward: %s Dust", vbuf);
   } else {
     s_prestige_reward_buf[0] = '\0';
   }
   
   if (s_shop_window) {
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "Loc: Shop Window Re-push");
     window_stack_push(s_shop_window, true);
     return;
   }
-  
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "Loc: Shop Creating Window");
   s_shop_window = window_create();
   window_set_window_handlers(s_shop_window, (WindowHandlers) { .load = shop_window_load, .unload = shop_window_unload });
   window_stack_push(s_shop_window, true);
