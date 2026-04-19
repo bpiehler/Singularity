@@ -12,45 +12,46 @@ typedef struct {
   double yield;
 } TierInfo;
 
-#define STORAGE_VERSION 1
-
-typedef struct {
-  double mass;       // 8-byte aligned
-  double dust;       // 8-byte aligned
-  double cached_gravity;
-  double cached_tap_strength;
-  uint32_t version;  // 4-byte aligned
-  int counts[NUM_TIERS];
-  time_t last_update;
-} GameState;
-
-// Tier static data
 extern const TierInfo TIERS[NUM_TIERS];
 
 #define STORAGE_KEY_GAME_STATE 100
+#define STORAGE_VERSION 1
 
-// Initialize state
+// CRITICAL: Doubles must be at the top for 8-byte alignment on ARM hardware.
+typedef struct __attribute__((aligned(8))) {
+  double mass;
+  double dust;
+  double cached_gravity;
+  double cached_tap_strength;
+  int counts[NUM_TIERS];
+  uint32_t version;
+  time_t last_update;
+} GameState;
+
+typedef void (*ShopPurchaseCallback)(void);
+
+// Initialize a new game state
 void game_state_init(GameState *state);
+
+// Calculate and cache gravity/tap strength
+void game_state_update_cache(GameState *state);
+
+// Get current gravity (cached)
+double game_state_calculate_gravity(GameState *state);
+
+// Get current tap strength (cached)
+double game_state_calculate_tap_strength(GameState *state);
 
 // Save state to persistent storage
 void game_state_save(GameState *state);
 
-// Load state from persistent storage, returns true if data was found
+// Load state from persistent storage, returns true if successful
 bool game_state_load(GameState *state);
 
-// Recalculate and cache values to save CPU
-void game_state_update_cache(GameState *state);
-
-// Calculate total gravity per second (uses cache)
-double game_state_calculate_gravity(GameState *state);
-
-// Calculate tap strength (uses cache)
-double game_state_calculate_tap_strength(GameState *state);
-
-// Apply offline gains, returns mass gained
+// Calculate and apply offline gains, returns mass gained
 double game_state_apply_offline_gains(GameState *state);
 
-// Buy as many units of a tier as possible
+// Buy max possible units of a tier
 void game_state_buy_max(GameState *state, int tier_index);
 
 // Trigger a prestige reset, returns amount of dust earned

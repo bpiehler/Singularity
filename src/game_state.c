@@ -129,7 +129,10 @@ void game_state_buy_max(GameState *state, int i) {
 double game_state_prestige(GameState *state) {
   APP_LOG(APP_LOG_LEVEL_INFO, "Math: Prestige Starting...");
   double earned_dust = calculate_prestige_dust(state->mass, PRESTIGE_THRESHOLD);
-  APP_LOG(APP_LOG_LEVEL_INFO, "Math: Dust Earned: %d", (int)earned_dust);
+  
+  char buf[32];
+  format_mass(earned_dust, buf);
+  APP_LOG(APP_LOG_LEVEL_INFO, "Math: Dust Earned: %s", buf);
 
   if (earned_dust < 1.0) {
     APP_LOG(APP_LOG_LEVEL_WARNING, "Math: Prestige Aborted (Earned < 1)");

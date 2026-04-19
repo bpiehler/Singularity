@@ -117,10 +117,17 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   if (is_unstable) {
     era_color = GColorRed;
   } else {
-    static const GColor colors[] = {
-      GColorWhite, GColorIslamicGreen, GColorCyan, GColorYellow, GColorVividViolet
-    };
-    era_color = PBL_IF_COLOR_ELSE(colors[era], GColorWhite);
+    switch (era) {
+      case 0: era_color = GColorWhite; break;
+      case 1: era_color = GColorIslamicGreen; break;
+      case 2: era_color = GColorCyan; break;
+      case 3: era_color = GColorYellow; break;
+      case 4: era_color = GColorVividViolet; break;
+      default: era_color = GColorWhite; break;
+    }
+    if (!PBL_IF_COLOR_ELSE(true, false)) {
+      era_color = GColorWhite;
+    }
   }
 
   graphics_context_set_fill_color(ctx, era_color);
