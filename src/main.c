@@ -53,19 +53,10 @@ static void focus_handler(bool in_focus) {
 }
 
 static void tap_timer_callback(void *data) {
-  if (s_is_app_exiting || !s_tap_timer) return;
+  if (s_is_app_exiting || !s_tap_timer || !s_app_has_focus) return;
 
   s_hold_time_ms += 100;
   
-  // Big Bang check
-  if (s_hold_time_ms >= 5000 && s_state.mass >= PRESTIGE_THRESHOLD) {
-    game_state_prestige(&s_state);
-    update_display();
-    vibes_double_pulse();
-    s_tap_timer = NULL;
-    return; 
-  }
-
   // Repeating taps (fires every 200ms AFTER the initial 500ms delay)
   // We check % 200 to achieve 5 taps per second
   if (s_hold_time_ms >= 500 && (s_hold_time_ms % 200 == 0)) {
@@ -98,14 +89,17 @@ static void select_up_handler(ClickRecognizerRef recognizer, void *context) {
 
 static void canvas_update_proc(Layer *layer, GContext *ctx) {
   GRect bounds = layer_get_bounds(layer);
-  GPoint center = grect_center_point(&bounds);
+  
+  // The "Well" where the circle lives: 35 to 143
+  int well_y_center = 35 + ((bounds.size.h - 35 - 25) / 2);
+  GPoint center = GPoint(bounds.size.w / 2, well_y_center);
 
-  // radius = 10 + (log10(mass) / 36.0) * 60
+  // radius mapped to 10-45px to fit perfectly within the 100px well
   double log_mass = log10(s_state.mass > 1.0 ? s_state.mass : 1.0);
   if (log_mass > 36.0) log_mass = 36.0;
-  int radius = 10 + (int)((log_mass / 36.0) * 60.0);
+  int radius = 10 + (int)((log_mass / 36.0) * 35.0);
 
-  // Singularity Instability (Jitter and Red Color)
+  // Singularity Instability
   bool is_unstable = (s_state.mass >= PRESTIGE_THRESHOLD * 0.9);
   if (is_unstable) {
     center.x += (rand() % 3) - 1;
@@ -119,11 +113,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     era_color = GColorRed;
   } else {
     static const GColor colors[] = {
-      GColorWhite,          // Era 0: Terrestrial
-      GColorIslamicGreen,   // Era 1: Monolithic
-      GColorCyan,           // Era 2: Planetary
-      GColorYellow,         // Era 3: Stellar
-      GColorVividViolet     // Era 4: Singularity
+      GColorWhite, GColorIslamicGreen, GColorCyan, GColorYellow, GColorVividViolet
     };
     era_color = PBL_IF_COLOR_ELSE(colors[era], GColorWhite);
   }
@@ -131,18 +121,18 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   graphics_context_set_fill_color(ctx, era_color);
   graphics_fill_circle(ctx, center, radius);
 
-  // Era-specific B&W patterns or extra details
+  // Era-specific B&W patterns
   #if defined(PBL_BW)
   if (!is_unstable) {
-    if (era == 1) { // Monolithic: Horizontal Stripes (simulated with lines)
+    if (era == 1) { // Stripes
       for (int i = -radius; i < radius; i += 4) {
         graphics_context_set_stroke_color(ctx, GColorBlack);
         graphics_draw_line(ctx, GPoint(center.x - radius, center.y + i), GPoint(center.x + radius, center.y + i));
       }
-    } else if (era == 2) { // Planetary: Crosshatch
+    } else if (era == 2) { // Ring
       graphics_context_set_stroke_color(ctx, GColorBlack);
       graphics_draw_circle(ctx, center, radius / 2);
-    } else if (era == 3) { // Stellar: Inverted core
+    } else if (era == 3) { // Core
       graphics_context_set_fill_color(ctx, GColorBlack);
       graphics_fill_circle(ctx, center, radius / 2);
     }
@@ -152,6 +142,25 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   graphics_context_set_stroke_width(ctx, 2);
   graphics_context_set_stroke_color(ctx, is_unstable ? GColorWhite : era_color);
   graphics_draw_circle(ctx, center, radius + 2);
+
+  // Purchase Ready Indicator (>)
+  // Logic: Can we afford another unit of our highest owned tier?
+  int highest_owned = -1;
+  for (int i = NUM_TIERS - 1; i >= 0; i--) {
+    if (s_state.counts[i] > 0) {
+      highest_owned = i;
+      break;
+    }
+  }
+  if (highest_owned >= 0) {
+    double cost = calculate_cost(TIERS[highest_owned].base_cost, s_state.counts[highest_owned]);
+    if (s_state.mass >= cost) {
+      graphics_context_set_text_color(ctx, era_color);
+      graphics_draw_text(ctx, ">", fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD), 
+                         GRect(bounds.size.w - 15, 12, 10, 20), 
+                         GTextOverflowModeTrailingEllipsis, GTextAlignmentCenter, NULL);
+    }
+  }
 }
 
 static void update_display() {
@@ -212,9 +221,14 @@ static void up_long_click_handler(ClickRecognizerRef recognizer, void *context) 
 }
 
 static void click_config_provider(void *context) {
-  window_raw_click_subscribe(BUTTON_ID_SELECT, select_down_handler, select_up_handler, NULL);
+  // DOWN (Bottom) handles all tapping
+  window_raw_click_subscribe(BUTTON_ID_DOWN, select_down_handler, select_up_handler, NULL);
+  
+  // SELECT (Center) and UP (Top) open the shop
+  window_single_click_subscribe(BUTTON_ID_SELECT, open_shop_handler);
   window_single_click_subscribe(BUTTON_ID_UP, open_shop_handler);
-  window_single_click_subscribe(BUTTON_ID_DOWN, open_shop_handler);
+  
+  // UP (Top) Long-press for Time Warp
   window_long_click_subscribe(BUTTON_ID_UP, 500, up_long_click_handler, NULL);
 }
 
@@ -223,20 +237,27 @@ static void main_window_load(Window *window) {
   GRect bounds = layer_get_bounds(window_layer);
   window_set_background_color(window, GColorBlack);
 
+  // partitioning: 
+  // Header: 0-35 (Black)
+  // Well: 35-143 (Background for circle)
+  // Footer: 143-bottom (Black)
+
   s_canvas_layer = layer_create(bounds);
   layer_set_update_proc(s_canvas_layer, canvas_update_proc);
   layer_add_child(window_layer, s_canvas_layer);
 
-  s_mass_layer = text_layer_create(GRect(0, PBL_IF_ROUND_ELSE(40, 30), bounds.size.w, 30));
-  text_layer_set_background_color(s_mass_layer, GColorClear);
-  text_layer_set_text_color(s_mass_layer, PBL_IF_COLOR_ELSE(GColorCeleste, GColorWhite));
+  // Header Bar (Mass)
+  s_mass_layer = text_layer_create(GRect(0, 0, bounds.size.w, 35));
+  text_layer_set_background_color(s_mass_layer, GColorBlack);
+  text_layer_set_text_color(s_mass_layer, GColorWhite);
   text_layer_set_text_alignment(s_mass_layer, GTextAlignmentCenter);
   text_layer_set_font(s_mass_layer, fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD));
   layer_add_child(window_layer, text_layer_get_layer(s_mass_layer));
 
-  s_gravity_layer = text_layer_create(GRect(0, bounds.size.h - PBL_IF_ROUND_ELSE(50, 40), bounds.size.w, 20));
-  text_layer_set_background_color(s_gravity_layer, GColorClear);
-  text_layer_set_text_color(s_gravity_layer, PBL_IF_COLOR_ELSE(GColorCeleste, GColorWhite));
+  // Footer Bar (Gravity)
+  s_gravity_layer = text_layer_create(GRect(0, bounds.size.h - 25, bounds.size.w, 25));
+  text_layer_set_background_color(s_gravity_layer, GColorBlack);
+  text_layer_set_text_color(s_gravity_layer, GColorCeleste);
   text_layer_set_text_alignment(s_gravity_layer, GTextAlignmentCenter);
   text_layer_set_font(s_gravity_layer, fonts_get_system_font(FONT_KEY_GOTHIC_18));
   layer_add_child(window_layer, text_layer_get_layer(s_gravity_layer));

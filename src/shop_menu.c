@@ -7,7 +7,7 @@ static GameState *s_game_state;
 static ShopPurchaseCallback s_callback;
 
 static uint16_t menu_get_num_rows_callback(MenuLayer *menu_layer, uint16_t section_index, void *data) {
-  return NUM_TIERS;
+  return NUM_TIERS + 1; // 9 Tiers + Big Bang
 }
 
 static int16_t menu_get_cell_height_callback(MenuLayer *menu_layer, MenuIndex *cell_index, void *data) {
@@ -16,41 +16,50 @@ static int16_t menu_get_cell_height_callback(MenuLayer *menu_layer, MenuIndex *c
 
 static void menu_draw_row_callback(GContext *ctx, const Layer *cell_layer, MenuIndex *cell_index, void *data) {
   int i = cell_index->row;
-  if (!s_game_state || i >= NUM_TIERS) return;
+  if (!s_game_state || i > NUM_TIERS) return;
 
-  double cost = calculate_cost(TIERS[i].base_cost, s_game_state->counts[i]);
-  bool affordable = s_game_state->mass >= cost;
-  GRect bounds = layer_get_bounds(cell_layer);
-  
   char name_buf[32];
-  snprintf(name_buf, sizeof(name_buf), "%s (x%d)", TIERS[i].name, s_game_state->counts[i]);
-  
   char cost_buf[32];
-  char val_buf[16];
-  format_mass(cost, val_buf);
-  snprintf(cost_buf, sizeof(cost_buf), "Cost: %s", val_buf);
+  char val_buf[32];
+  bool affordable = false;
 
+  if (i < NUM_TIERS) {
+    // Normal Tier
+    double cost = calculate_cost(TIERS[i].base_cost, s_game_state->counts[i]);
+    affordable = s_game_state->mass >= cost;
+    snprintf(name_buf, sizeof(name_buf), "%s (x%d)", TIERS[i].name, s_game_state->counts[i]);
+    format_mass(cost, val_buf);
+    snprintf(cost_buf, sizeof(cost_buf), "Cost: %s", val_buf);
+  } else {
+    // The Big Bang (10th Row)
+    affordable = s_game_state->mass >= PRESTIGE_THRESHOLD;
+    snprintf(name_buf, sizeof(name_buf), affordable ? "THE BIG BANG" : "SINGULARITY");
+    format_mass(PRESTIGE_THRESHOLD, val_buf);
+    snprintf(cost_buf, sizeof(cost_buf), "Target: %s", val_buf);
+  }
+
+  GRect bounds = layer_get_bounds(cell_layer);
   bool is_highlighted = menu_cell_layer_is_highlighted(cell_layer);
   
-  // Dark Nebula Colors
   GColor text_color;
   if (is_highlighted) {
     text_color = affordable ? GColorWhite : PBL_IF_COLOR_ELSE(GColorLightGray, GColorWhite);
   } else {
-    text_color = affordable ? GColorCeleste : GColorDarkGray;
+    if (i == NUM_TIERS) {
+      text_color = affordable ? GColorVividViolet : GColorDarkGray;
+    } else {
+      text_color = affordable ? GColorCeleste : GColorDarkGray;
+    }
   }
   graphics_context_set_text_color(ctx, text_color);
 
-  // On B&W, if it's selected but unaffordable, we apply a dither mask to the text
-  // to make it look "Light Gray" against the black selection bar.
   #if !defined(PBL_COLOR)
   if (is_highlighted && !affordable) {
-    graphics_context_set_compositing_mode(ctx, GCompOpClear); // Dither out every other pixel
+    graphics_context_set_compositing_mode(ctx, GCompOpClear);
   }
   #endif
 
   int left_padding = PBL_IF_ROUND_ELSE(20, 5);
-  // Vertically centered within 52px: (52 - (24 + 18)) / 2 = 5px approx
   graphics_draw_text(ctx, name_buf, fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD), 
                      GRect(left_padding, 3, bounds.size.w - (left_padding + 5), 26), 
                      GTextOverflowModeTrailingEllipsis, GTextAlignmentLeft, NULL);
@@ -62,17 +71,30 @@ static void menu_draw_row_callback(GContext *ctx, const Layer *cell_layer, MenuI
 
 static void menu_select_callback(MenuLayer *menu_layer, MenuIndex *cell_index, void *data) {
   int i = cell_index->row;
-  double cost = calculate_cost(TIERS[i].base_cost, s_game_state->counts[i]);
   
-  if (s_game_state->mass >= cost) {
-    s_game_state->mass -= cost;
-    s_game_state->counts[i]++;
-    game_state_update_cache(s_game_state);
-    vibes_double_pulse();
-    menu_layer_reload_data(s_menu_layer);
-    if (s_callback) s_callback();
+  if (i < NUM_TIERS) {
+    // Normal Tier Purchase
+    double cost = calculate_cost(TIERS[i].base_cost, s_game_state->counts[i]);
+    if (s_game_state->mass >= cost) {
+      s_game_state->mass -= cost;
+      s_game_state->counts[i]++;
+      game_state_update_cache(s_game_state);
+      vibes_double_pulse();
+      menu_layer_reload_data(s_menu_layer);
+      if (s_callback) s_callback();
+    } else {
+      vibes_short_pulse();
+    }
   } else {
-    vibes_short_pulse();
+    // The Big Bang (Prestige)
+    if (s_game_state->mass >= PRESTIGE_THRESHOLD) {
+      game_state_prestige(s_game_state);
+      vibes_long_pulse();
+      if (s_callback) s_callback();
+      shop_menu_hide(); // Return to main screen
+    } else {
+      vibes_short_pulse();
+    }
   }
 }
 
@@ -116,6 +138,17 @@ static void shop_window_load(Window *window) {
 
   menu_layer_set_click_config_onto_window(s_menu_layer, window);
   
+  // Smart Selection: Find highest affordable tier
+  int initial_row = 0;
+  for (int i = NUM_TIERS - 1; i >= 0; i--) {
+    double cost = calculate_cost(TIERS[i].base_cost, s_game_state->counts[i]);
+    if (s_game_state->mass >= cost) {
+      initial_row = i;
+      break;
+    }
+  }
+  menu_layer_set_selected_index(s_menu_layer, MenuIndex(0, initial_row), MenuRowAlignCenter, false);
+
   layer_add_child(window_layer, menu_layer_get_layer(s_menu_layer));
   APP_LOG(APP_LOG_LEVEL_INFO, "Shop: window_load end");
 }
