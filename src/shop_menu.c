@@ -19,6 +19,11 @@ static void menu_draw_row_callback(GContext *ctx, const Layer *cell_layer, MenuI
   int i = cell_index->row;
   if (!s_game_state || i > NUM_TIERS) return;
 
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "Shop: Drawing Row Index");
+  static char log_val[32];
+  snprintf(log_val, 32, "%d", i);
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "Row: %s", log_val);
+
   static char s_name_buf[64];
   static char s_cost_buf[64];
   static char s_val_buf[32];
@@ -31,13 +36,18 @@ static void menu_draw_row_callback(GContext *ctx, const Layer *cell_layer, MenuI
     format_mass(cost, s_val_buf);
     snprintf(s_cost_buf, sizeof(s_cost_buf), "Cost: %s", s_val_buf);
   } else {
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "Shop: Drawing Big Bang Cell");
     affordable = s_game_state->mass >= PRESTIGE_THRESHOLD;
     snprintf(s_name_buf, sizeof(s_name_buf), "%s", affordable ? "THE BIG BANG" : "SINGULARITY");
     
     if (affordable) {
+      APP_LOG(APP_LOG_LEVEL_DEBUG, "Shop: Calculating reward...");
       double dust = calculate_prestige_dust(s_game_state->mass, PRESTIGE_THRESHOLD);
-      // Use format_mass to log dust safely (it handles doubles without int casts)
+      
       format_mass(dust, s_val_buf);
+      APP_LOG(APP_LOG_LEVEL_DEBUG, "Shop: Reward String:");
+      APP_LOG(APP_LOG_LEVEL_DEBUG, "Value: %s", s_val_buf);
+      
       snprintf(s_cost_buf, sizeof(s_cost_buf), "Reward: %s Dust", s_val_buf);
     } else {
       format_mass(PRESTIGE_THRESHOLD, s_val_buf);
@@ -52,6 +62,8 @@ static void menu_draw_row_callback(GContext *ctx, const Layer *cell_layer, MenuI
   
   graphics_context_set_text_color(ctx, text_color);
   int lp = PBL_IF_ROUND_ELSE(20, 5);
+  
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "Shop: Rendering Text");
   graphics_draw_text(ctx, s_name_buf, fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD), 
                      GRect(lp, 3, bounds.size.w - (lp + 5), 26), 
                      GTextOverflowModeTrailingEllipsis, GTextAlignmentLeft, NULL);
@@ -59,6 +71,7 @@ static void menu_draw_row_callback(GContext *ctx, const Layer *cell_layer, MenuI
   graphics_draw_text(ctx, s_cost_buf, fonts_get_system_font(FONT_KEY_GOTHIC_18), 
                      GRect(lp, 27, bounds.size.w - (lp + 5), 20), 
                      GTextOverflowModeTrailingEllipsis, GTextAlignmentLeft, NULL);
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "Shop: Row Complete");
 }
 
 static void big_bang_timer_callback(void *data) {

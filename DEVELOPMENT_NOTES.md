@@ -11,6 +11,16 @@ This document captures critical technical lessons learned during the development
 *   **Lesson:** Always move `double` fields to the top of structs or use `__attribute__((aligned(8)))`.
 *   **Resolution:** Reordered `GameState` and applied explicit alignment to the static state variable.
 
+### **The Zero-Cast Rule (Large Double -> Int)**
+*   **Issue:** Casting a `double` value greater than $2.1 \times 10^9$ (INT_MAX) directly to an `int` or `long` triggers an immediate hardware exception on ARM.
+*   **Lesson:** **NEVER** cast mass-scale variables to integers.
+*   **Resolution:** Implement manual whole/fractional extraction using `modf()` or custom string formatting (e.g., scientific notation) to display large numbers safely.
+
+### **Stack Preservation (UI Thread)**
+*   **Issue:** The Pebble UI thread has a very small stack (< 4KB). Large local string buffers (e.g., `char buf[128]`) inside repetitive drawing callbacks can trigger a stack overflow.
+*   **Lesson:** Use `static` buffers for string formatting inside `MenuLayer` or `LayerUpdateProc` callbacks.
+*   **Resolution:** Moved all shop row buffers to `static char` to ensure they live in the data segment rather than the stack.
+
 ### **Watchdog Timer (The "Minutes Later" Crash)**
 *   **Issue:** If the main thread stays busy for too long (blocking the event loop), the OS assumes the app has hung and reboots the watch.
 *   **Lesson:** Avoid expensive math (`pow()`, `log()`) inside drawing routines or high-frequency timers.
