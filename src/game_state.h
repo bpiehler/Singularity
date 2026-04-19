@@ -23,10 +23,10 @@ typedef struct __attribute__((aligned(8))) {
   double dust;
   double cached_gravity;
   double cached_tap_strength;
-  double cached_prestige_dust;
   int counts[NUM_TIERS];
   uint32_t version;
   time_t last_update;
+  int padding; // Ensures struct size is a multiple of 8 (Total: 88 bytes)
 } GameState;
 
 typedef void (*ShopPurchaseCallback)(void);

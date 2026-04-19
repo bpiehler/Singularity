@@ -37,15 +37,12 @@ void format_mass(double mass, char *buffer) {
     } else {
       int exponent = 0;
       double mantissa = tonnes;
-      
-      // Safety guard against infinite normalization
       int loop_count = 0;
       while (mantissa >= 10.0 && exponent < 308 && loop_count < 1000) {
         mantissa /= 10.0;
         exponent++;
         loop_count++;
       }
-      
       int m_int = (int)mantissa;
       int m_frac = (int)((mantissa - (double)m_int) * 1000.0 + 0.5);
       if (m_frac >= 1000) { m_int++; m_frac = 0; }
@@ -63,14 +60,8 @@ double calculate_milestone_multiplier(int count) {
 }
 
 double calculate_prestige_dust(double total_mass, double threshold) {
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "Math: Prestige Calc Start");
   if (total_mass < threshold || threshold <= 0) return 0;
-  
   double ratio = total_mass / threshold;
-  
-  static char lbuf[32];
-  format_mass(ratio, lbuf);
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "Math: Ratio: %s", lbuf);
-  
+  if (isnan(ratio) || isinf(ratio)) return 1.0;
   return pow(ratio, 0.5);
 }
