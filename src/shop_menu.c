@@ -6,7 +6,7 @@ static Window *s_shop_window;
 static MenuLayer *s_menu_layer;
 static GameState *s_game_state;
 static ShopPurchaseCallback s_callback;
-static double s_cached_reward = 0;
+static char s_prestige_reward_buf[64];
 
 static uint16_t menu_get_num_rows_callback(MenuLayer *menu_layer, uint16_t section_index, void *data) {
   return NUM_TIERS + 1;
@@ -32,13 +32,16 @@ static void menu_draw_row_callback(GContext *ctx, const Layer *cell_layer, MenuI
     format_mass(cost, s_val_buf);
     snprintf(s_cost_buf, sizeof(s_cost_buf), "Cost: %s", s_val_buf);
   } else {
-    // TEMPORARY: Bare-bones Big Bang Row to test stability
+    // Big Bang Row (Uses pre-formatted buffer for absolute stability)
     affordable = s_game_state->mass >= PRESTIGE_THRESHOLD;
     snprintf(s_name_buf, sizeof(s_name_buf), "%s", affordable ? "THE BIG BANG" : "SINGULARITY");
     
-    // Static subtitle, NO reward calculation
-    format_mass(PRESTIGE_THRESHOLD, s_val_buf);
-    snprintf(s_cost_buf, sizeof(s_cost_buf), "Goal: %s", s_val_buf);
+    if (affordable) {
+      snprintf(s_cost_buf, sizeof(s_cost_buf), "%s", s_prestige_reward_buf);
+    } else {
+      format_mass(PRESTIGE_THRESHOLD, s_val_buf);
+      snprintf(s_cost_buf, sizeof(s_cost_buf), "Goal: %s", s_val_buf);
+    }
   }
 
   GRect bounds = layer_get_bounds(cell_layer);
@@ -126,8 +129,15 @@ void shop_menu_show(GameState *state, ShopPurchaseCallback callback) {
   s_game_state = state;
   s_callback = callback;
   
-  // TEMPORARY: Disable dynamic reward calculation to test stability
-  s_cached_reward = 0; // calculate_prestige_dust(s_game_state->mass, PRESTIGE_THRESHOLD);
+  // Pre-calculate and format the reward once to keep the UI thread fast
+  if (s_game_state->mass >= PRESTIGE_THRESHOLD) {
+    double dust = calculate_prestige_dust(s_game_state->mass, PRESTIGE_THRESHOLD);
+    static char val_buf[32];
+    format_mass(dust, val_buf);
+    snprintf(s_prestige_reward_buf, sizeof(s_prestige_reward_buf), "Reward: %s Dust", val_buf);
+  } else {
+    s_prestige_reward_buf[0] = '\0';
+  }
   
   if (s_shop_window) { window_stack_push(s_shop_window, true); return; }
   s_shop_window = window_create();
