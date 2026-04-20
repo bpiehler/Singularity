@@ -138,15 +138,17 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   int radius = 10;
   if (s_is_collapsing) {
     double start_log = log10(s_state.mass > 1.0 ? s_state.mass : 1.0);
-    if (start_log > 36.0) start_log = 36.0;
-    int start_radius = 10 + (int)((start_log / 36.0) * 35.0);
+    if (start_log > 100.0) start_log = 100.0;
+    int start_radius = 10 + (int)((start_log / 100.0) * 45.0);
     radius = start_radius - (int)((float)s_collapse_frame / 40.0f * (float)start_radius);
     if (radius < 0) radius = 0;
   } else {
     double log_mass = log10(s_state.mass > 1.0 ? s_state.mass : 1.0);
-    if (log_mass > 36.0) log_mass = 36.0;
-    radius = 10 + (int)((log_mass / 36.0) * 35.0);
+    if (log_mass > 100.0) log_mass = 100.0;
+    radius = 10 + (int)((log_mass / 100.0) * 45.0);
   }
+  
+  bool is_prestige_ready = (s_state.mass >= PRESTIGE_THRESHOLD);
   bool is_unstable = (s_state.mass >= PRESTIGE_THRESHOLD * 0.9 && !s_is_collapsing);
   if (is_unstable) {
     center.x += (rand() % 3) - 1;
@@ -190,7 +192,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   }
   #endif
   if (!s_is_collapsing) {
-    if (s_state.mass >= PRESTIGE_THRESHOLD) {
+    if (is_prestige_ready) {
       graphics_context_set_text_color(ctx, GColorRed);
       graphics_draw_text(ctx, "!", fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD), GRect(bounds.size.w - 18, 5, 12, 25), GTextOverflowModeTrailingEllipsis, GTextAlignmentCenter, NULL);
     } else {
