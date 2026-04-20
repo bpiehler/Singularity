@@ -28,9 +28,14 @@ static void menu_draw_row_callback(GContext *ctx, const Layer *cell_layer, MenuI
   if (i < NUM_TIERS) {
     double cost = calculate_cost(TIERS[i].base_cost, s_game_state->counts[i]);
     affordable = s_game_state->mass >= cost;
-    snprintf(s_name_buf, sizeof(s_name_buf), "%s (x%d)", TIERS[i].name, s_game_state->counts[i]);
+    snprintf(s_name_buf, sizeof(s_name_buf), "%s", TIERS[i].name);
     format_mass(cost, s_val_buf);
-    snprintf(s_cost_buf, sizeof(s_cost_buf), "Cost: %s", s_val_buf);
+    
+    if (s_game_state->counts[i] > 0) {
+      snprintf(s_cost_buf, sizeof(s_cost_buf), "Cost: %s (Coalesced: %d)", s_val_buf, s_game_state->counts[i]);
+    } else {
+      snprintf(s_cost_buf, sizeof(s_cost_buf), "Cost: %s", s_val_buf);
+    }
   } else {
     affordable = s_game_state->mass >= PRESTIGE_THRESHOLD;
     snprintf(s_name_buf, sizeof(s_name_buf), "%s", affordable ? "THE BIG BANG" : "SINGULARITY");

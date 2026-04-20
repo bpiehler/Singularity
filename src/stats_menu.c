@@ -1,12 +1,13 @@
 #include "stats_menu.h"
 #include "math_utils.h"
+#include "instructions_view.h"
 
 static Window *s_stats_window;
 static MenuLayer *s_menu_layer;
 static GameState *s_game_state;
 
 static uint16_t menu_get_num_rows_callback(MenuLayer *menu_layer, uint16_t section_index, void *data) {
-  return 4; // Dust, Big Bangs, Playtime, Peak Mass
+  return 5; // Dust, Big Bangs, Playtime, Peak Mass, Instructions
 }
 
 static int16_t menu_get_cell_height_callback(MenuLayer *menu_layer, MenuIndex *cell_index, void *data) {
@@ -54,6 +55,10 @@ static void menu_draw_row_callback(GContext *ctx, const Layer *cell_layer, MenuI
       snprintf(s_title_buf, sizeof(s_title_buf), "Peak Mass");
       snprintf(s_subtitle_buf, sizeof(s_subtitle_buf), "%s", s_val_buf);
       break;
+    case 4: // Instructions
+      snprintf(s_title_buf, sizeof(s_title_buf), "How to Play");
+      snprintf(s_subtitle_buf, sizeof(s_subtitle_buf), "Help & Instructions");
+      break;
   }
 
   GRect bounds = layer_get_bounds(cell_layer);
@@ -68,6 +73,12 @@ static void menu_draw_row_callback(GContext *ctx, const Layer *cell_layer, MenuI
   graphics_draw_text(ctx, s_subtitle_buf, fonts_get_system_font(FONT_KEY_GOTHIC_18), 
                      GRect(lp, 27, bounds.size.w - (lp + 5), 20), 
                      GTextOverflowModeTrailingEllipsis, GTextAlignmentLeft, NULL);
+}
+
+static void menu_select_callback(MenuLayer *menu_layer, MenuIndex *cell_index, void *data) {
+  if (cell_index->row == 4) {
+    instructions_view_show();
+  }
 }
 
 static void stats_window_load(Window *window) {
@@ -87,6 +98,7 @@ static void stats_window_load(Window *window) {
     .get_num_rows = menu_get_num_rows_callback,
     .get_cell_height = menu_get_cell_height_callback,
     .draw_row = menu_draw_row_callback,
+    .select_click = menu_select_callback,
   });
 
   menu_layer_set_click_config_onto_window(s_menu_layer, window);
@@ -119,6 +131,7 @@ void stats_menu_hide() {
 }
 
 void stats_menu_deinit() {
+  instructions_view_deinit();
   if (s_stats_window) {
     window_stack_remove(s_stats_window, false);
     window_destroy(s_stats_window);
