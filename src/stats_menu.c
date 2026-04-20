@@ -98,20 +98,17 @@ static void stats_window_unload(Window *window) {
     menu_layer_destroy(s_menu_layer);
     s_menu_layer = NULL;
   }
-  s_stats_window = NULL;
 }
 
 void stats_menu_show(GameState *state) {
   s_game_state = state;
-  if (s_stats_window) {
-    window_stack_push(s_stats_window, true);
-    return;
+  if (!s_stats_window) {
+    s_stats_window = window_create();
+    window_set_window_handlers(s_stats_window, (WindowHandlers) {
+      .load = stats_window_load,
+      .unload = stats_window_unload,
+    });
   }
-  s_stats_window = window_create();
-  window_set_window_handlers(s_stats_window, (WindowHandlers) {
-    .load = stats_window_load,
-    .unload = stats_window_unload,
-  });
   window_stack_push(s_stats_window, true);
 }
 
@@ -123,6 +120,7 @@ void stats_menu_hide() {
 
 void stats_menu_deinit() {
   if (s_stats_window) {
+    window_stack_remove(s_stats_window, false);
     window_destroy(s_stats_window);
     s_stats_window = NULL;
   }

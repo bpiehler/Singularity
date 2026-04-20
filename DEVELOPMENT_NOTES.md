@@ -35,15 +35,31 @@ This document captures critical technical lessons learned during the development
 
 ## 2. UI & Interaction Polish
 
+### **Input Conflict (Raw vs Long-Click)**
+*   **Issue:** The Pebble SDK `window_single_repeating_click_subscribe` (or `window_raw_click_subscribe`) and `window_long_click_subscribe` conflict if registered on the same button. The behavior is undefined and often leads to the long-click failing or the button "locking up."
+*   **Lesson:** Use `window_raw_click_subscribe` and a manual `AppTimer` to handle both taps and holds on a single button.
+*   **Resolution:** Unified the DOWN button handler into a single raw interface that tracks `s_hold_time_ms` to support both Tapping and "God Mode" (later Auto-tap).
+
+### **Window Lifecycle & Memory Leaks**
+*   **Issue:** Setting a window pointer to `NULL` in a `.unload` handler does not actually destroy the window or free its memory.
+*   **Lesson:** Use `window_destroy()` for cleanup. However, never call `window_destroy()` on a window that might still be on the window stack.
+*   **Resolution:** Implemented a safe `deinit()` pattern for sub-menus (Shop/Stats) that calls `window_stack_remove()` before `window_destroy()`.
+
+---
+
+## 2. UI & Interaction Polish
+
+### **System-Consistent Mapping**
+*   **Design Choice:** Moved "Open Shop" to the **SELECT** button. This aligns with standard Pebble apps where the middle button acts as the primary "Action/Menu" button.
+*   **Prestige Location:** Moved "Big Bang" initiation to a dedicated row in the Shop menu to prevent accidental resets and provide a clear reward preview.
+
+### **Testing: God Mode**
+*   **Utility:** To facilitate rapid balance testing, long-pressing **DOWN** (500ms) instantly triggers the prestige threshold, while long-pressing **UP** grants a large mass boost.
+
 ### **Decoupling Engine from UI**
 *   **Issue:** Calling `update_display()` (which triggers a screen redraw) inside a 100ms or 200ms timer causes input lag and reboots.
 *   **Lesson:** Redraw the screen no more than once per second.
 *   **Resolution:** High-frequency clicks update the `mass` in memory instantly, but the visual "UI Catch-up" is deferred to the 1-second `tick_handler`.
-
-### **Input Conflict (Repeating vs Long-Click)**
-*   **Issue:** The SDK `single_repeating_click` and `long_click` conflict if registered on the same button.
-*   **Lesson:** For complex overlapping inputs (Auto-Tap + Prestige), use `window_raw_click_subscribe` and a manual timer to track hold duration.
-*   **Resolution:** Implemented a manual `s_hold_time_ms` tracker to separate single taps from the 5-second Big Bang hold.
 
 ### **The "Double-Tap" Bug**
 *   **Issue:** Firing a repeat timer immediately on down-press causes many human clicks to register twice.

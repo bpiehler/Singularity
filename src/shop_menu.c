@@ -97,6 +97,16 @@ static void shop_window_load(Window *window) {
   window_set_background_color(window, GColorBlack);
   s_menu_layer = menu_layer_create(bounds);
   if (!s_menu_layer) return;
+
+  // Set colors to match app theme (Black background, readable text)
+  #if defined(PBL_COLOR)
+  menu_layer_set_normal_colors(s_menu_layer, GColorBlack, GColorCeleste);
+  menu_layer_set_highlight_colors(s_menu_layer, GColorDarkGray, GColorWhite);
+  #else
+  menu_layer_set_normal_colors(s_menu_layer, GColorBlack, GColorWhite);
+  menu_layer_set_highlight_colors(s_menu_layer, GColorWhite, GColorBlack);
+  #endif
+
   menu_layer_set_callbacks(s_menu_layer, NULL, (MenuLayerCallbacks) {
     .get_num_rows = menu_get_num_rows_callback,
     .get_cell_height = menu_get_cell_height_callback,
@@ -117,39 +127,33 @@ static void shop_window_load(Window *window) {
 
 static void shop_window_unload(Window *window) {
   if (s_menu_layer) { menu_layer_destroy(s_menu_layer); s_menu_layer = NULL; }
-  s_shop_window = NULL;
 }
 
 void shop_menu_show(GameState *state, ShopPurchaseCallback callback) {
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "Loc: Shop Show Start");
   s_game_state = state;
   s_callback = callback;
   
   if (s_game_state->mass >= PRESTIGE_THRESHOLD) {
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "Loc: Reward Prep");
     static char vbuf[32];
     format_mass(s_game_state->cached_prestige_dust, vbuf);
-    
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "Val: Reward Dust");
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "%s", vbuf);
-    
     snprintf(s_prestige_reward_buf, 64, "Reward: %s Dust", vbuf);
   } else {
     s_prestige_reward_buf[0] = '\0';
   }
   
-  if (s_shop_window) {
-    window_stack_push(s_shop_window, true);
-    return;
+  if (!s_shop_window) {
+    s_shop_window = window_create();
+    window_set_window_handlers(s_shop_window, (WindowHandlers) { .load = shop_window_load, .unload = shop_window_unload });
   }
-  s_shop_window = window_create();
-  window_set_window_handlers(s_shop_window, (WindowHandlers) { .load = shop_window_load, .unload = shop_window_unload });
   window_stack_push(s_shop_window, true);
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "Loc: Shop Show End");
 }
 
 void shop_menu_hide() { if (s_shop_window) window_stack_pop(true); }
 
 void shop_menu_deinit() {
-  if (s_shop_window) { window_destroy(s_shop_window); s_shop_window = NULL; }
+  if (s_shop_window) {
+    window_stack_remove(s_shop_window, false);
+    window_destroy(s_shop_window);
+    s_shop_window = NULL;
+  }
 }

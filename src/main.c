@@ -82,13 +82,27 @@ static void focus_handler(bool in_focus) {
 }
 
 static void tap_timer_callback(void *data) {
-  if (s_is_app_exiting || !s_tap_timer || !s_app_has_focus || s_is_collapsing) return;
-  s_hold_time_ms += 100;
-  if (s_hold_time_ms >= 500 && (s_hold_time_ms % 200 == 0)) {
-    s_state.mass += game_state_calculate_tap_strength(&s_state);
-    s_taps_since_last_tick++;
-    game_state_update_cache(&s_state); // Updates Peak Mass
+  if (s_is_app_exiting || !s_tap_timer || !s_app_has_focus || s_is_collapsing) {
+    s_tap_timer = NULL;
+    return;
   }
+  
+  s_hold_time_ms += 100;
+
+  // Tapping Logic (current long-press behavior on DOWN)
+  // User wants God Mode on DOWN hold for now, but eventually auto-clicks.
+  // Current God Mode is 500ms.
+  if (s_hold_time_ms == 500) {
+    // Trigger God Mode (instantly to prestige)
+    s_state.mass = PRESTIGE_THRESHOLD;
+    game_state_update_cache(&s_state);
+    update_display();
+    vibes_double_pulse();
+  } else if (s_hold_time_ms > 500 && (s_hold_time_ms % 200 == 0)) {
+    // This is where auto-clicks will eventually go.
+    // For now, let's just keep the timer running to maintain the hold.
+  }
+  
   s_tap_timer = app_timer_register(100, tap_timer_callback, NULL);
 }
 
@@ -96,9 +110,12 @@ static void select_down_handler(ClickRecognizerRef recognizer, void *context) {
   if (s_is_app_exiting || s_is_collapsing) return;
   s_hold_time_ms = 0;
   if (s_tap_timer) app_timer_cancel(s_tap_timer);
+  
+  // Single Tap on DOWN
   s_state.mass += game_state_calculate_tap_strength(&s_state);
   s_taps_since_last_tick++;
-  game_state_update_cache(&s_state); // Updates Peak Mass
+  game_state_update_cache(&s_state);
+  
   s_tap_timer = app_timer_register(100, tap_timer_callback, NULL);
 }
 
@@ -232,16 +249,10 @@ static void open_stats_handler(ClickRecognizerRef recognizer, void *context) {
   stats_menu_show(&s_state);
 }
 
-static void down_long_click_handler(ClickRecognizerRef recognizer, void *context) {
-  if (s_is_collapsing) return;
-  s_state.mass = 1.0e36;
-  game_state_update_cache(&s_state);
-  update_display();
-  vibes_double_pulse();
-}
-
 static void up_long_click_handler(ClickRecognizerRef recognizer, void *context) {
   if (s_is_collapsing) return;
+  // God Mode (instantly to prestige) on UP too? 
+  // User said "god mode is needed for now". Let's keep a variant on UP.
   double gravity = game_state_calculate_gravity(&s_state);
   double gain = gravity * 21600.0;
   if (gain < 1000000.0) gain = 1000000.0; 
@@ -252,9 +263,13 @@ static void up_long_click_handler(ClickRecognizerRef recognizer, void *context) 
 }
 
 static void click_config_provider(void *context) {
+  // DOWN for Tapping and God Mode (Unified to resolve conflict)
   window_raw_click_subscribe(BUTTON_ID_DOWN, select_down_handler, select_up_handler, NULL);
-  window_long_click_subscribe(BUTTON_ID_DOWN, 500, down_long_click_handler, NULL);
+  
+  // SELECT for Shop
   window_single_click_subscribe(BUTTON_ID_SELECT, open_shop_handler);
+  
+  // UP for Stats and variant God Mode
   window_single_click_subscribe(BUTTON_ID_UP, open_stats_handler);
   window_long_click_subscribe(BUTTON_ID_UP, 500, up_long_click_handler, NULL);
 }
@@ -298,9 +313,13 @@ static void init() {
   window_stack_push(s_main_window, true);
   tick_timer_service_subscribe(SECOND_UNIT, tick_handler);
   app_focus_service_subscribe(focus_handler);
+  
   #if defined(PBL_HEALTH)
-  health_service_events_subscribe(health_handler, NULL);
+  if (!health_service_events_subscribe(health_handler, NULL)) {
+    APP_LOG(APP_LOG_LEVEL_WARNING, "Health subscription failed!");
+  }
   #endif
+  
   app_timer_register(300000, save_timer_handler, NULL);
 }
 
