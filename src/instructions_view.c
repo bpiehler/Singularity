@@ -2,19 +2,64 @@
 
 static Window *s_window;
 static ScrollLayer *s_scroll_layer;
-static TextLayer *s_text_layer;
+static Layer *s_content_layer;
 
-static const char *s_instructions_text = 
-  "THE MISSION\n"
-  "From a lone milligram, coalesce the scattered dust of the void. Amass enough matter to reach a point of infinite density. Once the Singularity is achieved, you may trigger the Big Bang to seed the next universe with permanent Cosmic Dust.\n\n"
-  "PROGRESSION\n"
-  "• PASSIVE: Gravity draws in matter while you wait.\n"
-  "• ACTIVE: Tap DOWN or walk in the physical world to accelerate accumulation. Kinetic energy and movement are far more potent than passive attraction.\n\n"
-  "COMMANDS\n"
-  "• SELECT: Visit the Cosmic Forge (Shop).\n"
-  "• UP: View the Cosmic Ledger (Stats & Help).\n"
-  "• DOWN: Tap to add mass; Hold for continuous rapid accumulation.\n"
-  "• LONG-SELECT: In the Forge, hold to manifest the maximum number of bodies you can afford.";
+typedef struct {
+  char *title;
+  char *body;
+  GColor color;
+} InstructionSection;
+
+static InstructionSection s_sections[] = {
+  {
+    "THE MISSION", 
+    "From a lone milligram, coalesce the scattered dust of the void. Amass enough matter to reach a point of infinite density. Once the Singularity is achieved, you may trigger the Big Bang to seed the next universe with permanent Cosmic Dust.",
+    GColorIslamicGreen
+  },
+  {
+    "PROGRESSION",
+    "• PASSIVE: Gravity draws in matter while you wait.\n• ACTIVE: Tap DOWN or walk in the physical world to accelerate accumulation. Kinetic energy and movement are far more potent than passive attraction.",
+    GColorCyan
+  },
+  {
+    "COMMANDS",
+    "• SELECT: Visit the Cosmic Forge (Shop).\n• UP: View the Cosmic Ledger (Stats & Help).\n• DOWN: Tap to add mass; Hold for continuous rapid accumulation.\n• LONG-SELECT: In the Forge, hold to manifest the maximum number of bodies you can afford.",
+    GColorYellow
+  }
+};
+
+#define NUM_SECTIONS 3
+
+static void content_update_proc(Layer *layer, GContext *ctx) {
+  GRect bounds = layer_get_bounds(layer);
+  GFont font_title = fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD);
+  GFont font_body = fonts_get_system_font(FONT_KEY_GOTHIC_24);
+  
+  int padding = PBL_IF_ROUND_ELSE(20, 5);
+  int cur_y = 10;
+  int width = bounds.size.w - (padding * 2);
+
+  for (int i = 0; i < NUM_SECTIONS; i++) {
+    // Draw Title
+    graphics_context_set_text_color(ctx, PBL_IF_COLOR_ELSE(s_sections[i].color, GColorWhite));
+    GRect title_rect = GRect(padding, cur_y, width, 30);
+    graphics_draw_text(ctx, s_sections[i].title, font_title, title_rect, 
+                       GTextOverflowModeWordWrap, GTextAlignmentCenter, NULL);
+    cur_y += 28;
+
+    // Draw Body
+    graphics_context_set_text_color(ctx, GColorWhite);
+    GSize body_size = graphics_text_layout_get_content_size(
+      s_sections[i].body, font_body, GRect(padding, 0, width, 1000),
+      GTextOverflowModeWordWrap, GTextAlignmentLeft
+    );
+    GRect body_rect = GRect(padding, cur_y, width, body_size.h);
+    graphics_draw_text(ctx, s_sections[i].body, font_body, body_rect,
+                       GTextOverflowModeWordWrap, GTextAlignmentLeft, NULL);
+    
+    cur_y += body_size.h + 15;
+  }
+}
 
 static void window_load(Window *window) {
   Layer *window_layer = window_get_root_layer(window);
@@ -23,28 +68,33 @@ static void window_load(Window *window) {
   s_scroll_layer = scroll_layer_create(bounds);
   scroll_layer_set_click_config_onto_window(s_scroll_layer, window);
 
-  // Calculate maximum height needed for text
-  GFont font = fonts_get_system_font(FONT_KEY_GOTHIC_18);
-  int padding = 5;
-  GSize max_size = graphics_text_layout_get_content_size(
-    s_instructions_text, font, GRect(padding, 0, bounds.size.w - (padding * 2), 2000),
-    GTextOverflowModeWordWrap, GTextAlignmentLeft
-  );
+  // Calculate total height
+  GFont font_title = fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD);
+  GFont font_body = fonts_get_system_font(FONT_KEY_GOTHIC_24);
+  int padding = PBL_IF_ROUND_ELSE(20, 5);
+  int total_h = 20;
+  int width = bounds.size.w - (padding * 2);
 
-  s_text_layer = text_layer_create(GRect(padding, 0, bounds.size.w - (padding * 2), max_size.h + 20));
-  text_layer_set_text(s_text_layer, s_instructions_text);
-  text_layer_set_font(s_text_layer, font);
-  text_layer_set_background_color(s_text_layer, GColorClear);
-  text_layer_set_text_color(s_text_layer, GColorWhite);
+  for (int i = 0; i < NUM_SECTIONS; i++) {
+    total_h += 28; // Title
+    GSize body_size = graphics_text_layout_get_content_size(
+      s_sections[i].body, font_body, GRect(padding, 0, width, 1000),
+      GTextOverflowModeWordWrap, GTextAlignmentLeft
+    );
+    total_h += body_size.h + 15;
+  }
 
-  scroll_layer_add_child(s_scroll_layer, text_layer_get_layer(s_text_layer));
-  scroll_layer_set_content_size(s_scroll_layer, GSize(bounds.size.w, max_size.h + 20));
+  s_content_layer = layer_create(GRect(0, 0, bounds.size.w, total_h));
+  layer_set_update_proc(s_content_layer, content_update_proc);
+
+  scroll_layer_add_child(s_scroll_layer, s_content_layer);
+  scroll_layer_set_content_size(s_scroll_layer, GSize(bounds.size.w, total_h));
 
   layer_add_child(window_layer, scroll_layer_get_layer(s_scroll_layer));
 }
 
 static void window_unload(Window *window) {
-  text_layer_destroy(s_text_layer);
+  layer_destroy(s_content_layer);
   scroll_layer_destroy(s_scroll_layer);
 }
 
