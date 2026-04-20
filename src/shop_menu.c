@@ -32,7 +32,11 @@ static void menu_draw_row_callback(GContext *ctx, const Layer *cell_layer, MenuI
     format_mass(cost, s_val_buf);
     
     if (s_game_state->counts[i] > 0) {
-      snprintf(s_cost_buf, sizeof(s_cost_buf), "Cost: %s (Coalesced: %d)", s_val_buf, s_game_state->counts[i]);
+      if (PBL_IF_ROUND_ELSE(true, false)) {
+        snprintf(s_cost_buf, sizeof(s_cost_buf), "Cost: %s (%d)", s_val_buf, s_game_state->counts[i]);
+      } else {
+        snprintf(s_cost_buf, sizeof(s_cost_buf), "Cost: %s (Coalesced: %d)", s_val_buf, s_game_state->counts[i]);
+      }
     } else {
       snprintf(s_cost_buf, sizeof(s_cost_buf), "Cost: %s", s_val_buf);
     }

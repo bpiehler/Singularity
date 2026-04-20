@@ -30,9 +30,9 @@ void format_mass(double mass, char *buffer) {
       double mantissa = tonnes;
       while (mantissa >= 10.0 && exp < 308) { mantissa /= 10.0; exp++; }
       int m_int = (int)mantissa;
-      int m_frac = (int)((mantissa - (double)m_int) * 1000.0 + 0.5);
-      if (m_frac >= 1000) { m_int++; m_frac = 0; }
-      snprintf(buffer, 32, "%d.%03de%d t", m_int, m_frac, exp);
+      int m_frac = (int)((mantissa - (double)m_int) * 100.0 + 0.5);
+      if (m_frac >= 100) { m_int++; m_frac = 0; }
+      snprintf(buffer, 32, "%d.%02de%d t", m_int, m_frac, exp);
     }
   }
 }

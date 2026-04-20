@@ -192,9 +192,12 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   }
   #endif
   if (!s_is_collapsing) {
+    int indicator_x = bounds.size.w - PBL_IF_ROUND_ELSE(18, 12);
     if (is_prestige_ready) {
       graphics_context_set_text_color(ctx, GColorRed);
-      graphics_draw_text(ctx, "!", fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD), GRect(bounds.size.w - 18, 5, 12, 25), GTextOverflowModeTrailingEllipsis, GTextAlignmentCenter, NULL);
+      graphics_draw_text(ctx, "!", fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD), 
+                         GRect(indicator_x, center.y - 12, 12, 25), 
+                         GTextOverflowModeTrailingEllipsis, GTextAlignmentCenter, NULL);
     } else {
       int highest_owned = -1;
       for (int i = NUM_TIERS - 1; i >= 0; i--) if (s_state.counts[i] > 0) { highest_owned = i; break; }
@@ -205,7 +208,9 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
       } else if (s_state.mass >= TIERS[0].base_cost) upgrade_ready = true;
       if (upgrade_ready) {
         graphics_context_set_text_color(ctx, era_color);
-        graphics_draw_text(ctx, ">", fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD), GRect(bounds.size.w - 15, 12, 10, 20), GTextOverflowModeTrailingEllipsis, GTextAlignmentCenter, NULL);
+        graphics_draw_text(ctx, ">", fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD), 
+                           GRect(indicator_x - 3, center.y - 10, 10, 20), 
+                           GTextOverflowModeTrailingEllipsis, GTextAlignmentCenter, NULL);
       }
     }
   }
@@ -283,13 +288,18 @@ static void main_window_load(Window *window) {
   s_canvas_layer = layer_create(bounds);
   layer_set_update_proc(s_canvas_layer, canvas_update_proc);
   layer_add_child(window_layer, s_canvas_layer);
-  s_mass_layer = text_layer_create(GRect(0, 0, bounds.size.w, 35));
+  
+  // Add vertical margins for round screens to prevent horizontal cutoff
+  int margin_v = PBL_IF_ROUND_ELSE(10, 0);
+  
+  s_mass_layer = text_layer_create(GRect(0, margin_v, bounds.size.w, 35));
   text_layer_set_background_color(s_mass_layer, GColorClear);
   text_layer_set_text_color(s_mass_layer, GColorWhite);
   text_layer_set_text_alignment(s_mass_layer, GTextAlignmentCenter);
   text_layer_set_font(s_mass_layer, fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD));
   layer_add_child(window_layer, text_layer_get_layer(s_mass_layer));
-  s_gravity_layer = text_layer_create(GRect(0, bounds.size.h - 25, bounds.size.w, 25));
+  
+  s_gravity_layer = text_layer_create(GRect(0, bounds.size.h - 25 - margin_v, bounds.size.w, 25));
   text_layer_set_background_color(s_gravity_layer, GColorClear);
   text_layer_set_text_color(s_gravity_layer, GColorCeleste);
   text_layer_set_text_alignment(s_gravity_layer, GTextAlignmentCenter);
