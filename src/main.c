@@ -112,7 +112,7 @@ static void select_down_handler(ClickRecognizerRef recognizer, void *context) {
   if (s_tap_timer) app_timer_cancel(s_tap_timer);
   
   // Single Tap on DOWN
-  s_state.mass += game_state_calculate_tap_strength(&s_state);
+  game_state_add_mass(&s_state, game_state_calculate_tap_strength(&s_state));
   s_taps_since_last_tick++;
   game_state_update_cache(&s_state);
   
@@ -234,7 +234,7 @@ static void save_timer_handler(void *data) {
 static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
   if (s_is_collapsing) return;
   s_taps_since_last_tick = 0;
-  s_state.mass += game_state_calculate_gravity(&s_state);
+  game_state_add_mass(&s_state, game_state_calculate_gravity(&s_state));
   s_state.total_playtime_seconds++;
   game_state_update_cache(&s_state); // Updates Peak Mass
   update_display();
@@ -258,7 +258,7 @@ static void up_long_click_handler(ClickRecognizerRef recognizer, void *context) 
   double gravity = game_state_calculate_gravity(&s_state);
   double gain = gravity * 21600.0;
   if (gain < 1000000.0) gain = 1000000.0; 
-  s_state.mass += gain;
+  game_state_add_mass(&s_state, gain);
   game_state_update_cache(&s_state);
   update_display();
   vibes_short_pulse();

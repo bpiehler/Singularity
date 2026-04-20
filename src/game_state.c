@@ -37,12 +37,32 @@ void game_state_init(GameState *state) {
   state->version = STORAGE_VERSION;
   state->mass = 1.0;
   state->dust = 0.0;
+  state->mass_remainder = 0.0;
   state->highest_mass_ever = 1.0;
   state->total_singularities = 0;
   state->total_playtime_seconds = 0;
   for (int i = 0; i < NUM_TIERS; i++) state->counts[i] = 0;
   state->last_update = time(NULL);
   game_state_update_cache(state);
+}
+
+void game_state_add_mass(GameState *state, double amount) {
+  if (amount <= 0) return;
+  
+  // Precision management:
+  // If we are at 1e36, double precision has ~16 digits.
+  // This means gains < 1e20 (1e36 * 1e-16) are lost.
+  // We store these in mass_remainder until they are big enough to be added.
+  
+  state->mass_remainder += amount;
+  
+  // Rule of thumb: if remainder is at least 1/1,000,000th of the current mass,
+  // it's safe to try adding it.
+  if (state->mass_remainder > (state->mass * 1e-12)) {
+    double old_mass = state->mass;
+    state->mass += state->mass_remainder;
+    state->mass_remainder -= (state->mass - old_mass);
+  }
 }
 
 double game_state_calculate_gravity(GameState *state) { return state->cached_gravity; }
@@ -73,7 +93,7 @@ double game_state_apply_offline_gains(GameState *state) {
   if (seconds_diff > 10.0) {
     if (seconds_diff > OFFLINE_CAP_SECONDS) seconds_diff = OFFLINE_CAP_SECONDS;
     gained = state->cached_gravity * seconds_diff;
-    state->mass += gained;
+    game_state_add_mass(state, gained);
     
     // Add offline time to total playtime
     state->total_playtime_seconds += (uint32_t)seconds_diff;
@@ -119,7 +139,7 @@ double game_state_prestige(GameState *state) {
 void game_state_add_steps(GameState *state, int steps) {
   if (steps <= 0) return;
   double gain = (state->cached_gravity > 0) ? (state->cached_gravity * (double)steps) : (100.0 * (double)steps);
-  state->mass += gain;
+  game_state_add_mass(state, gain);
   game_state_update_cache(state);
 }
 
