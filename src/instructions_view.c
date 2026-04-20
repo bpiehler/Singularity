@@ -35,14 +35,15 @@ static void content_update_proc(Layer *layer, GContext *ctx) {
   GFont font_title = fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD);
   GFont font_body = fonts_get_system_font(FONT_KEY_GOTHIC_24);
   
-  int padding = PBL_IF_ROUND_ELSE(20, 5);
-  int cur_y = 10;
-  int width = bounds.size.w - (padding * 2);
+  int padding_h = PBL_IF_ROUND_ELSE(28, 5);
+  int padding_v = PBL_IF_ROUND_ELSE(40, 10);
+  int cur_y = padding_v;
+  int width = bounds.size.w - (padding_h * 2);
 
   for (int i = 0; i < NUM_SECTIONS; i++) {
     // Draw Title
     graphics_context_set_text_color(ctx, PBL_IF_COLOR_ELSE(s_sections[i].color, GColorWhite));
-    GRect title_rect = GRect(padding, cur_y, width, 30);
+    GRect title_rect = GRect(padding_h, cur_y, width, 30);
     graphics_draw_text(ctx, s_sections[i].title, font_title, title_rect, 
                        GTextOverflowModeWordWrap, GTextAlignmentCenter, NULL);
     cur_y += 28;
@@ -50,10 +51,10 @@ static void content_update_proc(Layer *layer, GContext *ctx) {
     // Draw Body
     graphics_context_set_text_color(ctx, GColorWhite);
     GSize body_size = graphics_text_layout_get_content_size(
-      s_sections[i].body, font_body, GRect(padding, 0, width, 1000),
+      s_sections[i].body, font_body, GRect(padding_h, 0, width, 1000),
       GTextOverflowModeWordWrap, GTextAlignmentLeft
     );
-    GRect body_rect = GRect(padding, cur_y, width, body_size.h);
+    GRect body_rect = GRect(padding_h, cur_y, width, body_size.h);
     graphics_draw_text(ctx, s_sections[i].body, font_body, body_rect,
                        GTextOverflowModeWordWrap, GTextAlignmentLeft, NULL);
     
@@ -69,20 +70,21 @@ static void window_load(Window *window) {
   scroll_layer_set_click_config_onto_window(s_scroll_layer, window);
 
   // Calculate total height
-  GFont font_title = fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD);
   GFont font_body = fonts_get_system_font(FONT_KEY_GOTHIC_24);
-  int padding = PBL_IF_ROUND_ELSE(20, 5);
-  int total_h = 20;
-  int width = bounds.size.w - (padding * 2);
+  int padding_h = PBL_IF_ROUND_ELSE(28, 5);
+  int padding_v = PBL_IF_ROUND_ELSE(40, 10);
+  int total_h = padding_v;
+  int width = bounds.size.w - (padding_h * 2);
 
   for (int i = 0; i < NUM_SECTIONS; i++) {
     total_h += 28; // Title
     GSize body_size = graphics_text_layout_get_content_size(
-      s_sections[i].body, font_body, GRect(padding, 0, width, 1000),
+      s_sections[i].body, font_body, GRect(padding_h, 0, width, 1000),
       GTextOverflowModeWordWrap, GTextAlignmentLeft
     );
     total_h += body_size.h + 15;
   }
+  total_h += padding_v; // Bottom padding
 
   s_content_layer = layer_create(GRect(0, 0, bounds.size.w, total_h));
   layer_set_update_proc(s_content_layer, content_update_proc);
