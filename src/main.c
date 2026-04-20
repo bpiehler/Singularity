@@ -138,14 +138,14 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   int radius = 10;
   if (s_is_collapsing) {
     double start_log = log10(s_state.mass > 1.0 ? s_state.mass : 1.0);
-    if (start_log > 100.0) start_log = 100.0;
-    int start_radius = 10 + (int)((start_log / 100.0) * 45.0);
+    if (start_log > 36.0) start_log = 36.0;
+    int start_radius = 10 + (int)((start_log / 36.0) * 50.0);
     radius = start_radius - (int)((float)s_collapse_frame / 40.0f * (float)start_radius);
     if (radius < 0) radius = 0;
   } else {
     double log_mass = log10(s_state.mass > 1.0 ? s_state.mass : 1.0);
-    if (log_mass > 100.0) log_mass = 100.0;
-    radius = 10 + (int)((log_mass / 100.0) * 45.0);
+    if (log_mass > 36.0) log_mass = 36.0;
+    radius = 10 + (int)((log_mass / 36.0) * 50.0);
   }
   
   bool is_prestige_ready = (s_state.mass >= PRESTIGE_THRESHOLD);
