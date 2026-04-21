@@ -89,18 +89,11 @@ static void tap_timer_callback(void *data) {
   
   s_hold_time_ms += 100;
 
-  // Tapping Logic (current long-press behavior on DOWN)
-  // User wants God Mode on DOWN hold for now, but eventually auto-clicks.
-  // Current God Mode is 500ms.
-  if (s_hold_time_ms == 500) {
-    // Trigger God Mode (instantly to prestige)
-    s_state.mass = PRESTIGE_THRESHOLD;
+  // Auto-tap logic (starts after 500ms)
+  if (s_hold_time_ms >= 500 && (s_hold_time_ms % 200 == 0)) {
+    game_state_add_mass(&s_state, game_state_calculate_tap_strength(&s_state));
+    s_taps_since_last_tick++;
     game_state_update_cache(&s_state);
-    update_display();
-    vibes_double_pulse();
-  } else if (s_hold_time_ms > 500 && (s_hold_time_ms % 200 == 0)) {
-    // This is where auto-clicks will eventually go.
-    // For now, let's just keep the timer running to maintain the hold.
   }
   
   s_tap_timer = app_timer_register(100, tap_timer_callback, NULL);
@@ -256,29 +249,15 @@ static void open_stats_handler(ClickRecognizerRef recognizer, void *context) {
   stats_menu_show(&s_state);
 }
 
-static void up_long_click_handler(ClickRecognizerRef recognizer, void *context) {
-  if (s_is_collapsing) return;
-  // God Mode (instantly to prestige) on UP too? 
-  // User said "god mode is needed for now". Let's keep a variant on UP.
-  double gravity = game_state_calculate_gravity(&s_state);
-  double gain = gravity * 21600.0;
-  if (gain < 1000000.0) gain = 1000000.0; 
-  game_state_add_mass(&s_state, gain);
-  game_state_update_cache(&s_state);
-  update_display();
-  vibes_short_pulse();
-}
-
 static void click_config_provider(void *context) {
-  // DOWN for Tapping and God Mode (Unified to resolve conflict)
+  // DOWN for Tapping and Auto-tap (Unified to resolve conflict)
   window_raw_click_subscribe(BUTTON_ID_DOWN, select_down_handler, select_up_handler, NULL);
   
   // SELECT for Shop
   window_single_click_subscribe(BUTTON_ID_SELECT, open_shop_handler);
   
-  // UP for Stats and variant God Mode
+  // UP for Stats
   window_single_click_subscribe(BUTTON_ID_UP, open_stats_handler);
-  window_long_click_subscribe(BUTTON_ID_UP, 500, up_long_click_handler, NULL);
 }
 
 static void main_window_load(Window *window) {
