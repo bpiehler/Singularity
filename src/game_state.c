@@ -95,8 +95,10 @@ bool game_state_load(GameState *state) {
 double game_state_apply_offline_gains(GameState *state) {
   if (state->last_update == 0) { state->last_update = time(NULL); return 0; }
   time_t now = time(NULL);
-  double seconds_diff = (double)(now - state->last_update);
+  time_t start = state->last_update;
+  double seconds_diff = (double)(now - start);
   double gained = 0;
+  
   if (seconds_diff > 10.0) {
     if (seconds_diff > OFFLINE_CAP_SECONDS) seconds_diff = OFFLINE_CAP_SECONDS;
     gained = state->cached_gravity * seconds_diff;
@@ -104,6 +106,21 @@ double game_state_apply_offline_gains(GameState *state) {
     
     // Add offline time to total playtime
     state->total_playtime_seconds += (uint32_t)seconds_diff;
+
+    // Offline Steps
+    #if defined(PBL_HEALTH)
+    // Capped at 7 days due to Pebble hardware history limits
+    time_t seven_days_ago = now - (7 * 24 * 60 * 60);
+    if (start < seven_days_ago) start = seven_days_ago;
+
+    HealthServiceAccessibilityMask mask = health_service_metric_accessible(HealthMetricStepCount, start, now);
+    if (mask & HealthServiceAccessibilityMaskAvailable) {
+      int offline_steps = (int)health_service_sum(HealthMetricStepCount, start, now);
+      if (offline_steps > 0) {
+        game_state_add_steps(state, offline_steps);
+      }
+    }
+    #endif
     
     game_state_update_cache(state);
   }

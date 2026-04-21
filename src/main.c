@@ -26,6 +26,9 @@ static void health_handler(HealthEventType event, void *context) {
   if (mask & HealthServiceAccessibilityMaskAvailable) {
     int total_steps = (int)health_service_sum_today(HealthMetricStepCount);
     if (s_last_step_count == 0) {
+      // Baseline initialization:
+      // We already credited all historical steps up to 'now' in game_state_apply_offline_gains().
+      // This baseline prevents double-counting the current day's steps.
       s_last_step_count = total_steps;
     } else {
       int delta = total_steps - s_last_step_count;
