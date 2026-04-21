@@ -28,16 +28,24 @@ static void menu_draw_row_callback(GContext *ctx, const Layer *cell_layer, MenuI
   if (i < NUM_TIERS) {
     double cost = calculate_cost(TIERS[i].base_cost, s_game_state->counts[i]);
     affordable = s_game_state->mass >= cost;
-    snprintf(s_name_buf, sizeof(s_name_buf), "%s", TIERS[i].name);
     format_mass(cost, s_val_buf);
     
-    if (s_game_state->counts[i] > 0) {
-      if (PBL_IF_ROUND_ELSE(true, false)) {
-        snprintf(s_cost_buf, sizeof(s_cost_buf), "Cost: %s (%d)", s_val_buf, s_game_state->counts[i]);
-      } else {
+    // Dynamic layout based on screen width
+    if (PBL_DISPLAY_WIDTH > 180) {
+      // Large screens (Emery/Gabbro): Plenty of room
+      snprintf(s_name_buf, sizeof(s_name_buf), "%s", TIERS[i].name);
+      if (s_game_state->counts[i] > 0) {
         snprintf(s_cost_buf, sizeof(s_cost_buf), "Cost: %s (Coalesced: %d)", s_val_buf, s_game_state->counts[i]);
+      } else {
+        snprintf(s_cost_buf, sizeof(s_cost_buf), "Cost: %s", s_val_buf);
       }
     } else {
+      // Standard (144px) and Round (180px) screens: Use Name (xCount) to save space
+      if (s_game_state->counts[i] > 0) {
+        snprintf(s_name_buf, sizeof(s_name_buf), "%s (x%d)", TIERS[i].name, s_game_state->counts[i]);
+      } else {
+        snprintf(s_name_buf, sizeof(s_name_buf), "%s", TIERS[i].name);
+      }
       snprintf(s_cost_buf, sizeof(s_cost_buf), "Cost: %s", s_val_buf);
     }
   } else {
