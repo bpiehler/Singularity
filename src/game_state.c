@@ -22,8 +22,15 @@ void game_state_update_cache(GameState *state) {
     raw_g += tier_yield * (double)state->counts[i];
     if (state->counts[i] > 0) highest_base_yield = TIERS[i].yield;
   }
-  state->cached_gravity = raw_g * (1.0 + (state->dust * 0.1));
-  state->cached_tap_strength = (highest_base_yield * 10.0) + (state->cached_gravity * 0.25);
+
+  double dust_multiplier = 1.0 + (state->dust * 0.1);
+
+  // Dust provides 'background radiation' gravity + multiplies body yield
+  state->cached_gravity = (raw_g + (state->dust * 1.0)) * dust_multiplier;
+
+  // Tap strength also benefits from Dust multiplier on its base
+  state->cached_tap_strength = (highest_base_yield * 10.0 * dust_multiplier) + (state->cached_gravity * 0.25);
+
   if (state->cached_tap_strength < 1.0) state->cached_tap_strength = 1.0;
   
   // Track Peak Mass
