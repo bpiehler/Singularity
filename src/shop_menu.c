@@ -131,7 +131,13 @@ static void shop_window_load(Window *window) {
     .select_click = menu_select_callback,
     .select_long_click = menu_select_long_callback,
   });
+
+  #if defined(PBL_ROUND)
+  menu_layer_set_center_focused(s_menu_layer, true);
+  #endif
+
   menu_layer_set_click_config_onto_window(s_menu_layer, window);
+
   int r = 0;
   for (int i = NUM_TIERS - 1; i >= 0; i--) {
     if (s_game_state->mass >= calculate_cost(TIERS[i].base_cost, s_game_state->counts[i])) {

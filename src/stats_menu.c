@@ -101,6 +101,10 @@ static void stats_window_load(Window *window) {
     .select_click = menu_select_callback,
   });
 
+  #if defined(PBL_ROUND)
+  menu_layer_set_center_focused(s_menu_layer, true);
+  #endif
+
   menu_layer_set_click_config_onto_window(s_menu_layer, window);
   layer_add_child(window_layer, menu_layer_get_layer(s_menu_layer));
 }
