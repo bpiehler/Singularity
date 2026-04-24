@@ -189,7 +189,8 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   #endif
   if (!s_is_collapsing) {
     // --- Navigation & Status Indicators ---
-    int margin_h = PBL_IF_ROUND_ELSE(32, 10);
+    // Use relative padding for round screens (approx 15% of width)
+    int margin_h = PBL_IF_ROUND_ELSE(bounds.size.w * 15 / 100, 10);
     int indicator_x = bounds.size.w - margin_h;
     GFont font_icons = fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD);
     
