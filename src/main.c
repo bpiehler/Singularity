@@ -188,11 +188,22 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   }
   #endif
   if (!s_is_collapsing) {
-    int indicator_x = bounds.size.w - PBL_IF_ROUND_ELSE(18, 12);
+    // --- Navigation & Status Indicators ---
+    int margin_h = PBL_IF_ROUND_ELSE(28, 10);
+    int indicator_x = bounds.size.w - margin_h;
+    GFont font_icons = fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD);
+    
+    // 1. UP: Cosmic Ledger (Hint)
+    int up_y = PBL_IF_ROUND_ELSE(42, 38);
+    graphics_context_set_text_color(ctx, GColorLightGray);
+    graphics_draw_text(ctx, "i", font_icons, GRect(indicator_x, up_y, 10, 20),
+                       GTextOverflowModeTrailingEllipsis, GTextAlignmentCenter, NULL);
+
+    // 2. SELECT: Cosmic Forge / Status
     if (is_prestige_ready) {
       graphics_context_set_text_color(ctx, GColorRed);
       graphics_draw_text(ctx, "!", fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD), 
-                         GRect(indicator_x, center.y - 12, 12, 25), 
+                         GRect(indicator_x - 2, center.y - 12, 12, 25), 
                          GTextOverflowModeTrailingEllipsis, GTextAlignmentCenter, NULL);
     } else {
       int highest_owned = -1;
@@ -202,13 +213,25 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
         if (s_state.mass >= calculate_cost(TIERS[highest_owned].base_cost, s_state.counts[highest_owned])) upgrade_ready = true;
         if (highest_owned + 1 < NUM_TIERS && s_state.mass >= TIERS[highest_owned + 1].base_cost) upgrade_ready = true;
       } else if (s_state.mass >= TIERS[0].base_cost) upgrade_ready = true;
+      
       if (upgrade_ready) {
         graphics_context_set_text_color(ctx, era_color);
-        graphics_draw_text(ctx, ">", fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD), 
+        graphics_draw_text(ctx, ">", font_icons, 
+                           GRect(indicator_x - 3, center.y - 10, 10, 20), 
+                           GTextOverflowModeTrailingEllipsis, GTextAlignmentCenter, NULL);
+      } else {
+        graphics_context_set_text_color(ctx, GColorDarkGray);
+        graphics_draw_text(ctx, "o", font_icons, 
                            GRect(indicator_x - 3, center.y - 10, 10, 20), 
                            GTextOverflowModeTrailingEllipsis, GTextAlignmentCenter, NULL);
       }
     }
+
+    // 3. DOWN: Amass / Tap (Hint)
+    int down_y = PBL_IF_ROUND_ELSE(bounds.size.h - 58, bounds.size.h - 45);
+    graphics_context_set_text_color(ctx, GColorLightGray);
+    graphics_draw_text(ctx, "+", font_icons, GRect(indicator_x - 3, down_y, 10, 20),
+                       GTextOverflowModeTrailingEllipsis, GTextAlignmentCenter, NULL);
   }
 }
 
