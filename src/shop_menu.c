@@ -144,6 +144,10 @@ static void shop_window_load(Window *window) {
 
 static void shop_window_unload(Window *window) {
   if (s_menu_layer) { menu_layer_destroy(s_menu_layer); s_menu_layer = NULL; }
+  
+  // High Priority Memory Refactor: Destroy window on unload to free heap
+  window_destroy(s_shop_window);
+  s_shop_window = NULL;
 }
 
 void shop_menu_show(GameState *state, ShopPurchaseCallback callback) {
@@ -160,6 +164,7 @@ void shop_menu_show(GameState *state, ShopPurchaseCallback callback) {
   
   if (!s_shop_window) {
     s_shop_window = window_create();
+    window_set_background_color(s_shop_window, GColorBlack);
     window_set_window_handlers(s_shop_window, (WindowHandlers) { .load = shop_window_load, .unload = shop_window_unload });
   }
   window_stack_push(s_shop_window, true);

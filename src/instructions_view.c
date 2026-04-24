@@ -98,6 +98,10 @@ static void window_load(Window *window) {
 static void window_unload(Window *window) {
   layer_destroy(s_content_layer);
   scroll_layer_destroy(s_scroll_layer);
+  
+  // High Priority Memory Refactor: Destroy window on unload to free heap
+  window_destroy(s_window);
+  s_window = NULL;
 }
 
 void instructions_view_show() {

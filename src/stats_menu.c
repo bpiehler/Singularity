@@ -110,6 +110,10 @@ static void stats_window_unload(Window *window) {
     menu_layer_destroy(s_menu_layer);
     s_menu_layer = NULL;
   }
+  
+  // High Priority Memory Refactor: Destroy window on unload to free heap
+  window_destroy(s_stats_window);
+  s_stats_window = NULL;
 }
 
 void stats_menu_show(GameState *state) {
