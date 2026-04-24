@@ -98,6 +98,7 @@ static void stats_window_load(Window *window) {
   menu_layer_set_highlight_colors(s_menu_layer, GColorWhite, GColorBlack);
   #endif
 
+
   menu_layer_set_callbacks(s_menu_layer, NULL, (MenuLayerCallbacks) {
     .get_num_rows = menu_get_num_rows_callback,
     .get_cell_height = menu_get_cell_height_callback,
