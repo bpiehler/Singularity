@@ -62,14 +62,14 @@ static void menu_draw_row_callback(GContext *ctx, const Layer *cell_layer, MenuI
   }
 
   GRect bounds = layer_get_bounds(cell_layer);
-  graphics_context_set_text_color(ctx, GColorCeleste);
+  graphics_context_set_text_color(ctx, PBL_IF_COLOR_ELSE(GColorCeleste, GColorWhite));
   
   int lp = PBL_IF_ROUND_ELSE(20, 5);
   graphics_draw_text(ctx, s_title_buf, fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD), 
                      GRect(lp, 3, bounds.size.w - (lp + 5), 26), 
                      GTextOverflowModeTrailingEllipsis, GTextAlignmentLeft, NULL);
 
-  graphics_context_set_text_color(ctx, GColorLightGray);
+  graphics_context_set_text_color(ctx, PBL_IF_COLOR_ELSE(GColorLightGray, GColorWhite));
   graphics_draw_text(ctx, s_subtitle_buf, fonts_get_system_font(FONT_KEY_GOTHIC_18), 
                      GRect(lp, 27, bounds.size.w - (lp + 5), 20), 
                      GTextOverflowModeTrailingEllipsis, GTextAlignmentLeft, NULL);

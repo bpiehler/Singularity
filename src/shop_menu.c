@@ -61,8 +61,11 @@ static void menu_draw_row_callback(GContext *ctx, const Layer *cell_layer, MenuI
 
   GRect bounds = layer_get_bounds(cell_layer);
   bool is_highlighted = menu_cell_layer_is_highlighted(cell_layer);
-  GColor text_color = affordable ? GColorCeleste : GColorDarkGray;
-  if (is_highlighted) text_color = GColorWhite;
+  
+  // High #11: Ensure B&W visibility. Celeste/DarkGray map to Black on B&W.
+  GColor text_color = PBL_IF_COLOR_ELSE(affordable ? GColorCeleste : GColorDarkGray, GColorWhite);
+  if (is_highlighted) text_color = PBL_IF_COLOR_ELSE(GColorWhite, GColorBlack);
+  
   graphics_context_set_text_color(ctx, text_color);
   int lp = PBL_IF_ROUND_ELSE(20, 5);
   graphics_draw_text(ctx, s_name_buf, fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD), 

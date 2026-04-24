@@ -235,7 +235,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     
     // 1. UP: Cosmic Ledger (Hint)
     int up_y = PBL_IF_ROUND_ELSE(42, 38);
-    graphics_context_set_text_color(ctx, GColorLightGray);
+    graphics_context_set_text_color(ctx, PBL_IF_COLOR_ELSE(GColorLightGray, GColorWhite));
     graphics_draw_text(ctx, "i", font_icons, GRect(indicator_x, up_y, 10, 20),
                        GTextOverflowModeTrailingEllipsis, GTextAlignmentCenter, NULL);
 
@@ -247,12 +247,12 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
                          GTextOverflowModeTrailingEllipsis, GTextAlignmentCenter, NULL);
     } else {
       if (s_state.upgrade_ready) {
-        graphics_context_set_text_color(ctx, colors.core);
+        graphics_context_set_text_color(ctx, PBL_IF_COLOR_ELSE(colors.core, GColorWhite));
         graphics_draw_text(ctx, ">", font_icons, 
                            GRect(indicator_x - 3, center.y - 10, 10, 20), 
                            GTextOverflowModeTrailingEllipsis, GTextAlignmentCenter, NULL);
       } else {
-        graphics_context_set_text_color(ctx, GColorDarkGray);
+        graphics_context_set_text_color(ctx, PBL_IF_COLOR_ELSE(GColorDarkGray, GColorWhite));
         graphics_draw_text(ctx, "o", font_icons, 
                            GRect(indicator_x - 3, center.y - 10, 10, 20), 
                            GTextOverflowModeTrailingEllipsis, GTextAlignmentCenter, NULL);
@@ -261,7 +261,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
 
     // 3. DOWN: Amass / Tap (Hint)
     int down_y = PBL_IF_ROUND_ELSE(bounds.size.h - 58, bounds.size.h - 45);
-    graphics_context_set_text_color(ctx, GColorLightGray);
+    graphics_context_set_text_color(ctx, PBL_IF_COLOR_ELSE(GColorLightGray, GColorWhite));
     graphics_draw_text(ctx, "+", font_icons, GRect(indicator_x - 3, down_y, 10, 20),
                        GTextOverflowModeTrailingEllipsis, GTextAlignmentCenter, NULL);
   }
