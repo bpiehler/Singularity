@@ -89,9 +89,13 @@ static void stats_window_load(Window *window) {
   s_menu_layer = menu_layer_create(bounds);
   if (!s_menu_layer) return;
 
+  // Set colors to match app theme (Black background, readable text)
   #if defined(PBL_COLOR)
   menu_layer_set_normal_colors(s_menu_layer, GColorBlack, GColorCeleste);
   menu_layer_set_highlight_colors(s_menu_layer, GColorDarkGray, GColorWhite);
+  #else
+  menu_layer_set_normal_colors(s_menu_layer, GColorBlack, GColorWhite);
+  menu_layer_set_highlight_colors(s_menu_layer, GColorWhite, GColorBlack);
   #endif
 
   menu_layer_set_callbacks(s_menu_layer, NULL, (MenuLayerCallbacks) {
