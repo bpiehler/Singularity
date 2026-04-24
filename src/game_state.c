@@ -36,6 +36,15 @@ void game_state_update_cache(GameState *state) {
   // Track Peak Mass
   if (state->mass > state->highest_mass_ever) state->highest_mass_ever = state->mass;
 
+  // Pre-calculate upgrade availability for UI efficiency
+  int highest_owned = -1;
+  for (int i = NUM_TIERS - 1; i >= 0; i--) if (state->counts[i] > 0) { highest_owned = i; break; }
+  state->upgrade_ready = false;
+  if (highest_owned >= 0) {
+    if (state->mass >= calculate_cost(TIERS[highest_owned].base_cost, state->counts[highest_owned])) state->upgrade_ready = true;
+    if (highest_owned + 1 < NUM_TIERS && state->mass >= TIERS[highest_owned + 1].base_cost) state->upgrade_ready = true;
+  } else if (state->mass >= TIERS[0].base_cost) state->upgrade_ready = true;
+
   // Cache prestige reward
   state->cached_prestige_dust = calculate_prestige_dust(state->mass, PRESTIGE_THRESHOLD);
 }

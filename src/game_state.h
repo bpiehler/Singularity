@@ -31,6 +31,7 @@ typedef struct __attribute__((aligned(8))) {
   time_t last_update;
   uint32_t total_playtime_seconds;
   int total_singularities;
+  bool upgrade_ready;
 } GameState;
 
 typedef void (*ShopPurchaseCallback)(void);

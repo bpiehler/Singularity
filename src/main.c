@@ -85,38 +85,37 @@ static void focus_handler(bool in_focus) {
 }
 
 static void tap_timer_callback(void *data) {
-  if (s_is_app_exiting || !s_tap_timer || !s_app_has_focus || s_is_collapsing) {
+  if (s_is_app_exiting || !s_app_has_focus || s_is_collapsing) {
     s_tap_timer = NULL;
     return;
   }
   
-  s_hold_time_ms += 100;
-
-  // Auto-tap logic (starts after 500ms)
-  if (s_hold_time_ms >= 500 && (s_hold_time_ms % 200 == 0)) {
-    game_state_add_mass(&s_state, game_state_calculate_tap_strength(&s_state));
-    s_taps_since_last_tick++;
-    game_state_update_cache(&s_state);
-  }
-  
-  s_tap_timer = app_timer_register(100, tap_timer_callback, NULL);
-}
-
-static void select_down_handler(ClickRecognizerRef recognizer, void *context) {
-  if (s_is_app_exiting || s_is_collapsing) return;
-  s_hold_time_ms = 0;
-  if (s_tap_timer) app_timer_cancel(s_tap_timer);
-  
-  // Single Tap on DOWN
+  // Auto-tap logic: Add mass and schedule next tap
   game_state_add_mass(&s_state, game_state_calculate_tap_strength(&s_state));
   s_taps_since_last_tick++;
   game_state_update_cache(&s_state);
   
-  s_tap_timer = app_timer_register(100, tap_timer_callback, NULL);
+  s_tap_timer = app_timer_register(200, tap_timer_callback, NULL);
+}
+
+static void select_down_handler(ClickRecognizerRef recognizer, void *context) {
+  if (s_is_app_exiting || s_is_collapsing) return;
+  if (s_tap_timer) app_timer_cancel(s_tap_timer);
+  
+  // 1. Immediate Single Tap
+  game_state_add_mass(&s_state, game_state_calculate_tap_strength(&s_state));
+  s_taps_since_last_tick++;
+  game_state_update_cache(&s_state);
+  
+  // 2. Schedule start of auto-tap after 500ms hold
+  s_tap_timer = app_timer_register(500, tap_timer_callback, NULL);
 }
 
 static void select_up_handler(ClickRecognizerRef recognizer, void *context) {
-  if (s_tap_timer) { app_timer_cancel(s_tap_timer); s_tap_timer = NULL; }
+  if (s_tap_timer) { 
+    app_timer_cancel(s_tap_timer); 
+    s_tap_timer = NULL; 
+  }
 }
 
 static void canvas_update_proc(Layer *layer, GContext *ctx) {
@@ -207,15 +206,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
                          GRect(indicator_x - 2, center.y - 12, 12, 25), 
                          GTextOverflowModeTrailingEllipsis, GTextAlignmentCenter, NULL);
     } else {
-      int highest_owned = -1;
-      for (int i = NUM_TIERS - 1; i >= 0; i--) if (s_state.counts[i] > 0) { highest_owned = i; break; }
-      bool upgrade_ready = false;
-      if (highest_owned >= 0) {
-        if (s_state.mass >= calculate_cost(TIERS[highest_owned].base_cost, s_state.counts[highest_owned])) upgrade_ready = true;
-        if (highest_owned + 1 < NUM_TIERS && s_state.mass >= TIERS[highest_owned + 1].base_cost) upgrade_ready = true;
-      } else if (s_state.mass >= TIERS[0].base_cost) upgrade_ready = true;
-      
-      if (upgrade_ready) {
+      if (s_state.upgrade_ready) {
         graphics_context_set_text_color(ctx, era_color);
         graphics_draw_text(ctx, ">", font_icons, 
                            GRect(indicator_x - 3, center.y - 10, 10, 20), 
@@ -252,10 +243,22 @@ static void update_display() {
 
 static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
   if (s_is_collapsing) return;
+
+  // Power Save Mode: Check battery
+  BatteryChargeState battery = battery_state_service_peek();
+  bool power_save = (battery.charge_percent <= 20 && !battery.is_charging);
+  
+  // In Power Save, only update full logic every 4 seconds to save CPU/Screen
+  if (power_save && (tick_time->tm_sec % 4 != 0)) return;
+
+  int seconds_elapsed = power_save ? 4 : 1;
   s_taps_since_last_tick = 0;
-  game_state_add_mass(&s_state, game_state_calculate_gravity(&s_state));
-  s_state.total_playtime_seconds++;
-  game_state_update_cache(&s_state); // Updates Peak Mass
+  
+  double gravity = game_state_calculate_gravity(&s_state);
+  game_state_add_mass(&s_state, gravity * (double)seconds_elapsed);
+  s_state.total_playtime_seconds += seconds_elapsed;
+  
+  game_state_update_cache(&s_state); // Updates Peak Mass and Upgrade Flags
   update_display();
   
   // Consolidate saving: Save every 5 minutes (at :00 seconds)
