@@ -226,12 +226,6 @@ static void update_display() {
   if (s_canvas_layer) layer_mark_dirty(s_canvas_layer);
 }
 
-static void save_timer_handler(void *data) {
-  if (s_is_app_exiting) return;
-  game_state_save(&s_state);
-  app_timer_register(300000, save_timer_handler, NULL);
-}
-
 static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
   if (s_is_collapsing) return;
   s_taps_since_last_tick = 0;
@@ -239,7 +233,11 @@ static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
   s_state.total_playtime_seconds++;
   game_state_update_cache(&s_state); // Updates Peak Mass
   update_display();
-  if (tick_time->tm_sec == 0) game_state_save(&s_state);
+  
+  // Consolidate saving: Save every 5 minutes (at :00 seconds)
+  if (tick_time->tm_sec == 0 && tick_time->tm_min % 5 == 0) {
+    game_state_save(&s_state);
+  }
 }
 
 static void open_shop_handler(ClickRecognizerRef recognizer, void *context) {
@@ -299,6 +297,8 @@ static void main_window_unload(Window *window) {
 
 static void init() {
   s_is_app_exiting = false;
+  srand(time(NULL)); // Seed RNG for visual effects
+  
   if (!game_state_load(&s_state)) game_state_init(&s_state);
   else game_state_apply_offline_gains(&s_state);
   s_main_window = window_create();
@@ -313,8 +313,6 @@ static void init() {
     APP_LOG(APP_LOG_LEVEL_WARNING, "Health subscription failed!");
   }
   #endif
-  
-  app_timer_register(300000, save_timer_handler, NULL);
 }
 
 static void deinit() {
