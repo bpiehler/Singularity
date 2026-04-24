@@ -118,6 +118,26 @@ static void select_up_handler(ClickRecognizerRef recognizer, void *context) {
   }
 }
 
+typedef struct {
+  GColor core;
+  GColor aura;
+} EraColors;
+
+static EraColors get_era_colors(int era) {
+  #if defined(PBL_BW)
+  return (EraColors){ .core = GColorWhite, .aura = GColorWhite };
+  #else
+  switch (era) {
+    case 0: return (EraColors){ .core = GColorWhite, .aura = GColorLightGray };
+    case 1: return (EraColors){ .core = GColorIslamicGreen, .aura = GColorMalachite };
+    case 2: return (EraColors){ .core = GColorCyan, .aura = GColorElectricBlue };
+    case 3: return (EraColors){ .core = GColorYellow, .aura = GColorOrange };
+    case 4: return (EraColors){ .core = GColorVividViolet, .aura = GColorShockingPink };
+    default: return (EraColors){ .core = GColorWhite, .aura = GColorWhite };
+  }
+  #endif
+}
+
 static void canvas_update_proc(Layer *layer, GContext *ctx) {
   GRect bounds = layer_get_bounds(layer);
   if (s_is_flashing) {
@@ -130,6 +150,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   graphics_fill_rect(ctx, GRect(0, bounds.size.h - 25, bounds.size.w, 25), 0, GCornerNone);
   int well_y_center = 35 + ((bounds.size.h - 35 - 25) / 2);
   GPoint center = GPoint(bounds.size.w / 2, well_y_center);
+
   int radius = 10;
   if (s_is_collapsing) {
     double start_log = log10(s_state.mass > 1.0 ? s_state.mass : 1.0);
@@ -142,34 +163,52 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     if (log_mass > 36.0) log_mass = 36.0;
     radius = 10 + (int)((log_mass / 36.0) * 50.0);
   }
-  
+
   bool is_prestige_ready = (s_state.mass >= PRESTIGE_THRESHOLD);
   bool is_unstable = (s_state.mass >= PRESTIGE_THRESHOLD * 0.9 && !s_is_collapsing);
   if (is_unstable) {
     center.x += (rand() % 3) - 1;
     center.y += (rand() % 3) - 1;
   }
+
   int era = game_state_get_era(&s_state);
-  GColor era_color;
-  if (is_unstable || s_is_collapsing) era_color = GColorRed;
-  else {
-    switch (era) {
-      case 0: era_color = GColorWhite; break;
-      case 1: era_color = GColorIslamicGreen; break;
-      case 2: era_color = GColorCyan; break;
-      case 3: era_color = GColorYellow; break;
-      case 4: era_color = GColorVividViolet; break;
-      default: era_color = GColorWhite; break;
+  EraColors colors = get_era_colors(era);
+
+  if (is_unstable || s_is_collapsing) {
+    #if defined(PBL_COLOR)
+    // Slow color cycle at 1Hz for prestige warning
+    time_t now = time(NULL);
+    switch (now % 4) {
+      case 0: colors.core = GColorRed; colors.aura = GColorDarkCandyAppleRed; break;
+      case 1: colors.core = GColorOrange; colors.aura = GColorRed; break;
+      case 2: colors.core = GColorYellow; colors.aura = GColorOrange; break;
+      case 3: colors.core = GColorWhite; colors.aura = GColorYellow; break;
     }
-    if (!PBL_IF_COLOR_ELSE(true, false)) era_color = GColorWhite;
+    #else
+    colors.core = GColorWhite; colors.aura = GColorWhite;
+    #endif
   }
-  graphics_context_set_fill_color(ctx, era_color);
+
   if (radius > 0) {
+    // Draw Aura (Accretion Disk)
+    graphics_context_set_fill_color(ctx, colors.aura);
     graphics_fill_circle(ctx, center, radius);
-    graphics_context_set_stroke_width(ctx, 2);
-    graphics_context_set_stroke_color(ctx, (is_unstable || s_is_collapsing) ? GColorWhite : era_color);
-    graphics_draw_circle(ctx, center, radius + 2);
+
+    // Draw Core (Matter)
+    // Core is 80% of aura size, but at least 2px smaller
+    int core_radius = (radius * 8) / 10;
+    if (core_radius > radius - 2) core_radius = radius - 2;
+    if (core_radius < 1) core_radius = 1;
+
+    graphics_context_set_fill_color(ctx, colors.core);
+    graphics_fill_circle(ctx, center, core_radius);
+
+    // Draw Contrasting Rim
+    graphics_context_set_stroke_width(ctx, 1);
+    graphics_context_set_stroke_color(ctx, (is_unstable || s_is_collapsing) ? GColorWhite : colors.aura);
+    graphics_draw_circle(ctx, center, radius + 1);
   }
+
   #if defined(PBL_BW)
   if (!is_unstable && !s_is_collapsing && radius > 4) {
     if (era == 1) {
@@ -186,6 +225,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     }
   }
   #endif
+
   if (!s_is_collapsing) {
     // --- Navigation & Status Indicators ---
     // Use relative padding for round screens (approx 15% of width)
@@ -207,7 +247,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
                          GTextOverflowModeTrailingEllipsis, GTextAlignmentCenter, NULL);
     } else {
       if (s_state.upgrade_ready) {
-        graphics_context_set_text_color(ctx, era_color);
+        graphics_context_set_text_color(ctx, colors.core);
         graphics_draw_text(ctx, ">", font_icons, 
                            GRect(indicator_x - 3, center.y - 10, 10, 20), 
                            GTextOverflowModeTrailingEllipsis, GTextAlignmentCenter, NULL);
